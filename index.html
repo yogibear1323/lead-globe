@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Robert Walker · Lead Globe (private research tool)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@500;600&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">RW</div>
+      <div class="titles">
+        <h1>Robert Walker · Lead Globe (private research tool)</h1>
+        <p>An independent partner’s internal research tool. Not an official DataEarners or Mode product.</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="iv-btn-ghost" id="export-btn">
+        <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+      <a class="iv-btn" href="https://robertwalker.dataearns.com/invite" target="_blank" rel="noopener">
+        <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Invite page
+      </a>
+    </div>
+  </header>
+
+  <div class="banner" role="note">
+    Personal, one-at-a-time outreach only, per DataEarners partner rules. Do not blast this list. Honor opt-outs the same day. This tool does not contact anyone.
+  </div>
+
+  <div class="app">
+    <section class="stage" aria-label="Globe of research leads">
+      <div id="globe"></div>
+      <aside class="legend">
+        <div class="kicker">Fit score</div>
+        <ul>
+          <li><span class="swatch" style="color:#08BEC8;background:#08BEC8"></span> 5 — strongest matches</li>
+          <li><span class="swatch" style="color:#0874C9;background:#0874C9"></span> 4 — still useful</li>
+          <li><span class="swatch" style="color:#f59e0b;background:#f59e0b"></span> 3 or lower — thinner fit</li>
+        </ul>
+        <ul class="legend-src">
+          <li><span class="swatch seed"></span> Seed research list</li>
+          <li><span class="swatch osm"></span> OpenStreetMap (heuristic fit)</li>
+        </ul>
+      </aside>
+      <p class="globe-hint" id="globe-hint">
+        <b>Click a state, province, or European country</b>
+        to zoom in, filter the list, and (where allowed) load matching OpenStreetMap businesses. Seed pins for Arizona are city-level, not rooftop-accurate.
+      </p>
+    </section>
+
+    <aside class="panel">
+      <div class="panel-head">
+        <div class="kicker">Research list</div>
+        <div class="filters">
+          <label class="field">Region
+            <select id="region">
+              <option value="">All seed leads</option>
+            </select>
+          </label>
+          <label class="field">Search
+            <input id="q" type="search" placeholder="Name, city, category, or system" autocomplete="off">
+          </label>
+          <label class="field">Category
+            <select id="cat">
+              <option value="All">All</option>
+            </select>
+          </label>
+          <div class="filter-row">
+            <label class="field">Min fit
+              <select id="min-fit">
+                <option value="1">1+</option>
+                <option value="2">2+</option>
+                <option value="3">3+</option>
+                <option value="4">4+</option>
+                <option value="5">5 only</option>
+              </select>
+            </label>
+            <label class="field">Sort
+              <select id="sort">
+                <option value="fit">Fit, high to low</option>
+                <option value="name">Company name</option>
+                <option value="city">City</option>
+                <option value="category">Category</option>
+                <option value="source">Source</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <p class="count" id="count"></p>
+        <p class="status" id="status"></p>
+        <p class="gdpr" id="gdpr" hidden>European region: emails from OpenStreetMap are hidden (GDPR). Use published business contacts only if you later reach out yourself, one at a time.</p>
+      </div>
+      <div class="list" id="list"></div>
+      <div class="detail" id="detail" hidden></div>
+      <p class="attrib" id="attrib"></p>
+    </aside>
+  </div>
+
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="leads.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

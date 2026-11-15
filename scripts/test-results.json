@@ -1,0 +1,10 @@
+{
+  "ok": [
+    "globe renders",
+    "Arizona shows 66 seed pins",
+    "Delaware Overpass returned 277 OSM pins (ok)",
+    "Outreach panel for Televerde (call-center, mailto, placeholders, invite URL, no dollar claims)",
+    "Open in email disabled for Earnhardt (no published email)"
+  ],
+  "fail": []
+}

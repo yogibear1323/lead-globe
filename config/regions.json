@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "comment": "Each set points at a bundled GeoJSON file of clickable polygons. Features use properties: id, name, set, privacy (us|ca|eu), overpassAreaTag, overpassAreaValue, allowOverpass, lat, lng, bbox. To add a region set, add an object here and drop a GeoJSON file in data/geo/ — no code changes needed. privacy=eu hides emails (GDPR).",
+  "attribution": "Region boundaries from Natural Earth (public domain). https://www.naturalearthdata.com/",
+  "sets": [
+    {
+      "id": "us-states",
+      "label": "US states",
+      "geojson": "data/geo/us-states.geojson",
+      "idProperty": "id",
+      "nameProperty": "name",
+      "privacy": "us",
+      "hideEmail": false,
+      "overpassAreaTag": "ISO3166-2"
+    },
+    {
+      "id": "ca-provinces",
+      "label": "Canadian provinces and territories",
+      "geojson": "data/geo/ca-provinces.geojson",
+      "idProperty": "id",
+      "nameProperty": "name",
+      "privacy": "ca",
+      "hideEmail": false,
+      "overpassAreaTag": "ISO3166-2"
+    },
+    {
+      "id": "european-countries",
+      "label": "European countries",
+      "geojson": "data/geo/european-countries.geojson",
+      "idProperty": "id",
+      "nameProperty": "name",
+      "privacy": "eu",
+      "hideEmail": true,
+      "overpassAreaTag": "ISO3166-1"
+    }
+  ]
+}

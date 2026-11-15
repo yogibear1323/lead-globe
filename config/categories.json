@@ -1,0 +1,268 @@
+{
+  "version": 1,
+  "comment": "Category labels should stay stable so the side-panel filter stays useful when seed and OSM rows are merged. Medical, dental, and insurance are present but disabled by default. To add a category, add an object here \u2014 no code changes needed. Each queries[] item is an OSM tag key/value used in a single Overpass union.",
+  "resultCap": 300,
+  "overpassTimeoutSec": 45,
+  "categories": [
+    {
+      "id": "home-services",
+      "label": "Home services",
+      "enabled": true,
+      "baseFit": 5,
+      "queries": [
+        {
+          "key": "craft",
+          "value": "plumber"
+        },
+        {
+          "key": "craft",
+          "value": "electrician"
+        },
+        {
+          "key": "craft",
+          "value": "hvac"
+        },
+        {
+          "key": "craft",
+          "value": "roofer"
+        },
+        {
+          "key": "trade",
+          "value": "plumber"
+        },
+        {
+          "key": "trade",
+          "value": "electrician"
+        },
+        {
+          "key": "shop",
+          "value": "hvac"
+        },
+        {
+          "key": "shop",
+          "value": "electrical"
+        }
+      ]
+    },
+    {
+      "id": "contractors",
+      "label": "Contractors",
+      "enabled": true,
+      "baseFit": 5,
+      "queries": [
+        {
+          "key": "office",
+          "value": "construction_company"
+        },
+        {
+          "key": "office",
+          "value": "builder"
+        },
+        {
+          "key": "craft",
+          "value": "builder"
+        },
+        {
+          "key": "company",
+          "value": "construction"
+        }
+      ]
+    },
+    {
+      "id": "auto",
+      "label": "Auto dealer / auto group",
+      "enabled": true,
+      "baseFit": 5,
+      "queries": [
+        {
+          "key": "shop",
+          "value": "car"
+        },
+        {
+          "key": "shop",
+          "value": "car_repair"
+        },
+        {
+          "key": "shop",
+          "value": "tyres"
+        }
+      ]
+    },
+    {
+      "id": "property",
+      "label": "Property management",
+      "enabled": true,
+      "baseFit": 5,
+      "queries": [
+        {
+          "key": "office",
+          "value": "property_management"
+        }
+      ]
+    },
+    {
+      "id": "logistics",
+      "label": "Logistics / fleet",
+      "enabled": true,
+      "baseFit": 5,
+      "queries": [
+        {
+          "key": "office",
+          "value": "logistics"
+        },
+        {
+          "key": "office",
+          "value": "transport"
+        },
+        {
+          "key": "company",
+          "value": "transport"
+        },
+        {
+          "key": "industrial",
+          "value": "warehouse"
+        },
+        {
+          "key": "industrial",
+          "value": "logistics"
+        }
+      ]
+    },
+    {
+      "id": "agencies",
+      "label": "Agencies",
+      "enabled": true,
+      "baseFit": 4,
+      "queries": [
+        {
+          "key": "office",
+          "value": "advertising_agency"
+        },
+        {
+          "key": "office",
+          "value": "graphic_design"
+        },
+        {
+          "key": "office",
+          "value": "marketing"
+        }
+      ]
+    },
+    {
+      "id": "retail",
+      "label": "Retail / e-commerce",
+      "enabled": true,
+      "baseFit": 4,
+      "queries": [
+        {
+          "key": "shop",
+          "value": "department_store"
+        },
+        {
+          "key": "shop",
+          "value": "supermarket"
+        }
+      ]
+    },
+    {
+      "id": "call-center",
+      "label": "Call center / BPO",
+      "enabled": true,
+      "baseFit": 4,
+      "queries": [
+        {
+          "key": "office",
+          "value": "telemarketing"
+        },
+        {
+          "key": "office",
+          "value": "call_centre"
+        },
+        {
+          "key": "office",
+          "value": "call_center"
+        }
+      ]
+    },
+    {
+      "id": "photo",
+      "label": "Photo / video studio",
+      "enabled": true,
+      "baseFit": 3,
+      "queries": [
+        {
+          "key": "shop",
+          "value": "photo"
+        },
+        {
+          "key": "craft",
+          "value": "photographer"
+        },
+        {
+          "key": "studio",
+          "value": "photography"
+        },
+        {
+          "key": "studio",
+          "value": "video"
+        }
+      ]
+    },
+    {
+      "id": "saas",
+      "label": "App / SaaS",
+      "enabled": true,
+      "baseFit": 4,
+      "queries": [
+        {
+          "key": "office",
+          "value": "it"
+        },
+        {
+          "key": "office",
+          "value": "software"
+        }
+      ]
+    },
+    {
+      "id": "medical",
+      "label": "Medical / dental",
+      "enabled": false,
+      "baseFit": 1,
+      "queries": [
+        {
+          "key": "amenity",
+          "value": "hospital"
+        },
+        {
+          "key": "amenity",
+          "value": "clinic"
+        },
+        {
+          "key": "amenity",
+          "value": "doctors"
+        },
+        {
+          "key": "amenity",
+          "value": "dentist"
+        },
+        {
+          "key": "office",
+          "value": "physician"
+        }
+      ]
+    },
+    {
+      "id": "insurance",
+      "label": "Insurance",
+      "enabled": false,
+      "baseFit": 1,
+      "queries": [
+        {
+          "key": "office",
+          "value": "insurance"
+        }
+      ]
+    }
+  ]
+}
