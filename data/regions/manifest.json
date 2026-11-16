@@ -34,6 +34,13 @@
     "name": "Newfoundland and Labrador",
     "totalMatched": 318
   },
+  "CA-NS": {
+    "capped": false,
+    "count": 490,
+    "extractedAt": "2026-11-16T06:07:37Z",
+    "name": "Nova Scotia",
+    "totalMatched": 490
+  },
   "CA-NT": {
     "capped": false,
     "count": 60,
