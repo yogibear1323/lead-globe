@@ -76,6 +76,13 @@
     "name": "Quebec",
     "totalMatched": 3790
   },
+  "CA-SK": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T06:26:30Z",
+    "name": "Saskatchewan",
+    "totalMatched": 624
+  },
   "CA-YT": {
     "capped": false,
     "count": 32,
