@@ -29,8 +29,17 @@
         <p>An independent partner research tool by Robert Walker.</p>
       </div>
     </div>
+    <nav class="top-nav" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#data">Data &amp; privacy</a>
+      <a href="#purpose">What it’s for</a>
+      <a href="#dataearners">For business owners</a>
+    </nav>
     <div class="top-actions">
-      <a class="iv-btn" href="globe.html">Launch App</a>
+      <a class="iv-btn top-launch" href="globe.html">
+        <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Launch App
+      </a>
     </div>
   </header>
 
@@ -54,11 +63,23 @@
         </ul>
       </div>
       <div class="hero-side">
+      <div class="focus-ring" aria-hidden="true"></div>
+      <div class="float-tag t1" aria-hidden="true"><span class="dot"></span>Click a region</div>
+      <div class="float-tag t2" aria-hidden="true"><span class="dot pink"></span>Phone · website · email</div>
+      <div class="float-tag t3" aria-hidden="true"><span class="dot violet"></span>Fit rating on every card</div>
       <figure class="preview">
         <img src="assets/preview-kansas-static.jpg" width="1200" height="678" alt="Lead Globe with Kansas selected and a list of businesses with contact details" loading="eager">
         <figcaption>Click a region · business list opens instantly</figcaption>
       </figure>
       </div>
+    </section>
+
+    <section class="stats reveal" aria-label="Coverage">
+      <div class="stat"><b data-count="51">51</b><span>US states + DC</span></div>
+      <div class="stat"><b data-count="13">13</b><span>Canadian provinces &amp; territories</span></div>
+      <div class="stat"><b data-count="45">45</b><span>European countries</span></div>
+      <div class="stat"><b>1&nbsp;click</b><span>from a region to its business list</span></div>
+      <div class="stat"><b>ODbL</b><span>open OpenStreetMap data</span></div>
     </section>
 
     <section id="how" class="reveal" aria-labelledby="how-title">
@@ -70,7 +91,7 @@
         <li><h3>Filter by category</h3><p>Narrow the list by business type, minimum fit, or a search term, and sort by fit or name.</p></li>
         <li><h3>Personal outreach panel</h3><p>Open a business to see editable email and call scripts for one-to-one outreach. Nothing is sent automatically; one recipient at a time.</p></li>
       </ol>
-      <div class="two reveal">
+      <div class="two reveal" id="data">
         <div class="panel-card">
           <h3>Where the listings come from</h3>
           <p>Business listings come from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> (© OpenStreetMap contributors, ODbL), a public, community-maintained map. No bought or scraped lists are used.</p>
@@ -86,21 +107,50 @@
       </div>
     </section>
 
+    <section id="purpose" class="reveal" aria-labelledby="purpose-title">
+      <div class="purpose">
+        <div class="purpose-intro">
+          <div class="kicker">What Lead Globe is for</div>
+          <h2 id="purpose-title">Finding businesses that may be a fit, one at a time</h2>
+          <p class="lead">Lead Globe helps an independent DataEarners partner find businesses that may be a fit for the program. It locates businesses across the US, Canada, and Europe with their public contact details (phone, website, and email where available; emails are hidden for Europe). From there, the partner reaches out personally, one business at a time, to introduce the free Data Asset Profile through the invite link.</p>
+          <p class="purpose-note">Lead Globe is an independent partner tool by Robert Walker, not an official DataEarners or Mode product.</p>
+        </div>
+        <ul class="purpose-points">
+          <li><span class="pi">
+            <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+            <h3>Find fit businesses</h3><p>Browse by region and category to surface businesses that may be a fit.</p></li>
+          <li><span class="pi">
+            <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="13" y2="13"/></svg></span>
+            <h3>Review contacts &amp; fit</h3><p>Check each card’s public phone, website, and email where available, plus its fit rating.</p></li>
+          <li><span class="pi">
+            <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+            <h3>Personal, one-to-one outreach</h3><p>Select a business and get a ready-to-send outreach email and call script tailored to its industry, which you personalize and send yourself, one business at a time.</p></li>
+          <li><span class="pi">
+            <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+            <h3>Respectful by default</h3><p>Opt-outs are honored. No bulk email, and no bought or scraped lists.</p></li>
+        </ul>
+      </div>
+    </section>
+
     <section id="dataearners" class="reveal" aria-labelledby="de-title">
       <div class="kicker">For business owners</div>
       <h2 id="de-title">Explore whether your company’s data could be licensed</h2>
       <div class="opportunity">
-        <p class="lead">Through the DataEarners program, a business can request a free <strong>Data Asset Profile</strong>: a look at the business systems your company already runs. That profile may lead to a written offer from a data licensing company (Mode) to license consented, de-identified company data that is used to build AI.</p>
-        <ul class="chips">
-          <li>Free Data Asset Profile</li>
-          <li>Consented &amp; de-identified</li>
-          <li>Written offer, if any, from the licensing company</li>
-        </ul>
-        <div class="cta-row">
-          <a class="iv-btn lg" href="https://robertwalker.dataearns.com/invite" target="_blank" rel="noopener">Request your Data Asset Profile</a>
-          <a class="iv-btn-ghost lg" href="globe.html">Launch App</a>
+        <div class="opp-main">
+          <p class="lead">Through the DataEarners program, a business can request a free <strong>Data Asset Profile</strong>: a look at the business systems your company already runs. That profile may lead to a written offer from a data licensing company (Mode) to license consented, de-identified company data that is used to build AI.</p>
+          <p class="fine">Using the globe or viewing listings does not involve any payment. Whether an offer is made, and its terms, is decided by the licensing company and is subject to its review.</p>
         </div>
-        <p class="fine">Using the globe or viewing listings does not involve any payment. Whether an offer is made, and its terms, is decided by the licensing company and is subject to its review.</p>
+        <div class="opp-side">
+          <ul class="chips">
+            <li>Free Data Asset Profile</li>
+            <li>Consented &amp; de-identified</li>
+            <li>Written offer, if any, from the licensing company</li>
+          </ul>
+          <div class="cta-row">
+            <a class="iv-btn lg" href="https://robertwalker.dataearns.com/invite" target="_blank" rel="noopener">Request your Data Asset Profile</a>
+            <a class="iv-btn-ghost lg" href="globe.html">Launch App</a>
+          </div>
+        </div>
       </div>
     </section>
 
