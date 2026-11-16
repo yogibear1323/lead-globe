@@ -188,6 +188,13 @@
     "name": "Montana",
     "totalMatched": 1165
   },
+  "US-NE": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:08:56Z",
+    "name": "Nebraska",
+    "totalMatched": 938
+  },
   "US-OH": {
     "capped": true,
     "count": 500,
