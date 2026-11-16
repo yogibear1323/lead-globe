@@ -1410,6 +1410,11 @@ out center tags ${cap};`;
       paintPolygons();
       sizeGlobe();
       window.addEventListener("resize", sizeGlobe);
+      // Keep the canvas matched to the stage when the side panel changes width.
+      if ("ResizeObserver" in window) {
+        let ro = 0;
+        new ResizeObserver(() => { cancelAnimationFrame(ro); ro = requestAnimationFrame(sizeGlobe); }).observe(els.globe);
+      }
     }
 
     renderList();
