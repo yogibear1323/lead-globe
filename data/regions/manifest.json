@@ -83,6 +83,13 @@
     "name": "Hawaii",
     "totalMatched": 409
   },
+  "US-ID": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T02:23:22Z",
+    "name": "Idaho",
+    "totalMatched": 1275
+  },
   "US-KS": {
     "capped": true,
     "count": 500,
