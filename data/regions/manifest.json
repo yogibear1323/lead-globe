@@ -97,6 +97,13 @@
     "name": "Illinois",
     "totalMatched": 5162
   },
+  "US-IN": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T02:35:16Z",
+    "name": "Indiana",
+    "totalMatched": 2670
+  },
   "US-KS": {
     "capped": true,
     "count": 500,
