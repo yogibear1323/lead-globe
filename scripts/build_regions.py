@@ -108,10 +108,15 @@ def download(url: str, dest: Path, retries: int = 4) -> None:
                 "3",
                 "--retry-delay",
                 "2",
+                "--retry-all-errors",
                 "--connect-timeout",
                 "30",
                 "--max-time",
                 "3600",
+                "--speed-limit",
+                "4096",
+                "--speed-time",
+                "45",
                 "-C",
                 "-",
                 "-A",
@@ -120,9 +125,9 @@ def download(url: str, dest: Path, retries: int = 4) -> None:
                 str(tmp),
                 url,
             ]
-            r = subprocess.run(cmd, capture_output=True, text=True)
+            r = subprocess.run(cmd)
             if r.returncode != 0:
-                raise RuntimeError((r.stderr or r.stdout or "curl failed").strip()[-400:])
+                raise RuntimeError(f"curl exited {r.returncode}")
             size = tmp.stat().st_size if tmp.exists() else 0
             if size < 1000:
                 raise RuntimeError(f"download too small ({size} bytes)")
