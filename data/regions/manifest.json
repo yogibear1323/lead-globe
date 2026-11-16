@@ -125,6 +125,13 @@
     "name": "Kentucky",
     "totalMatched": 1384
   },
+  "US-LA": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T02:46:54Z",
+    "name": "Louisiana",
+    "totalMatched": 1402
+  },
   "US-OH": {
     "capped": true,
     "count": 500,
