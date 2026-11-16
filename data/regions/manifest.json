@@ -118,6 +118,13 @@
     "name": "Germany",
     "totalMatched": 104633
   },
+  "EE": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T08:03:31Z",
+    "name": "Estonia",
+    "totalMatched": 1143
+  },
   "IE": {
     "capped": true,
     "count": 500,
