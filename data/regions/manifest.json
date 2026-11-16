@@ -258,6 +258,13 @@
     "name": "Slovenia",
     "totalMatched": 2010
   },
+  "SK": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T09:09:17Z",
+    "name": "Slovakia",
+    "totalMatched": 3895
+  },
   "US-AK": {
     "capped": false,
     "count": 303,
