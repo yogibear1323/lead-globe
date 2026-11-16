@@ -1,4 +1,32 @@
 {
+  "US-AK": {
+    "capped": false,
+    "count": 303,
+    "extractedAt": "2026-11-16T01:10:25Z",
+    "name": "Alaska",
+    "totalMatched": 303
+  },
+  "US-AL": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T01:08:55Z",
+    "name": "Alabama",
+    "totalMatched": 2058
+  },
+  "US-AR": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T01:17:33Z",
+    "name": "Arkansas",
+    "totalMatched": 1116
+  },
+  "US-AZ": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T01:16:22Z",
+    "name": "Arizona",
+    "totalMatched": 4920
+  },
   "US-CA": {
     "capped": true,
     "count": 500,
