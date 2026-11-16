@@ -118,6 +118,27 @@
     "name": "Ireland",
     "totalMatched": 3836
   },
+  "LI": {
+    "capped": false,
+    "count": 33,
+    "extractedAt": "2026-11-16T07:58:16Z",
+    "name": "Liechtenstein",
+    "totalMatched": 33
+  },
+  "MC": {
+    "capped": false,
+    "count": 1,
+    "extractedAt": "2026-11-16T07:58:13Z",
+    "name": "Monaco",
+    "totalMatched": 1
+  },
+  "MT": {
+    "capped": false,
+    "count": 284,
+    "extractedAt": "2026-11-16T07:58:22Z",
+    "name": "Malta",
+    "totalMatched": 284
+  },
   "US-AK": {
     "capped": false,
     "count": 303,
