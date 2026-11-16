@@ -125,6 +125,13 @@
     "name": "Ireland",
     "totalMatched": 3836
   },
+  "IS": {
+    "capped": false,
+    "count": 288,
+    "extractedAt": "2026-11-16T08:00:49Z",
+    "name": "Iceland",
+    "totalMatched": 288
+  },
   "LI": {
     "capped": false,
     "count": 33,
