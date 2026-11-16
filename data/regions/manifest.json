@@ -209,6 +209,13 @@
     "name": "New Jersey",
     "totalMatched": 3246
   },
+  "US-NM": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:17:15Z",
+    "name": "New Mexico",
+    "totalMatched": 1009
+  },
   "US-NV": {
     "capped": true,
     "count": 500,
