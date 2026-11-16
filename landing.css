@@ -288,3 +288,5 @@ body.globe-on .bg-fallback::after { opacity: 0; transition: opacity 1.6s ease; }
   .hero-copy { padding: clamp(2rem, 2.6vw, 3rem) clamp(2rem, 3vw, 3.4rem); }
   .landing .hero-copy p.lead { max-width: 60ch; }
 }
+/* Keep the fixed header (and its Launch App button) above the page content */
+.landing .top { z-index: 50; }
