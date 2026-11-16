@@ -20,6 +20,13 @@
     "name": "Bosnia and Herzegovina",
     "totalMatched": 1647
   },
+  "BE": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T10:13:49Z",
+    "name": "Belgium",
+    "totalMatched": 8902
+  },
   "BG": {
     "capped": true,
     "count": 500,
