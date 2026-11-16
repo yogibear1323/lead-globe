@@ -348,5 +348,12 @@
     "extractedAt": "2026-11-16T04:20:30Z",
     "name": "West Virginia",
     "totalMatched": 752
+  },
+  "US-WY": {
+    "capped": false,
+    "count": 336,
+    "extractedAt": "2026-11-16T04:31:47Z",
+    "name": "Wyoming",
+    "totalMatched": 336
   }
 }
