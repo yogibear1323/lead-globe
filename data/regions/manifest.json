@@ -195,6 +195,13 @@
     "name": "North Carolina",
     "totalMatched": 4975
   },
+  "US-ND": {
+    "capped": false,
+    "count": 296,
+    "extractedAt": "2026-11-16T03:34:24Z",
+    "name": "North Dakota",
+    "totalMatched": 296
+  },
   "US-NE": {
     "capped": true,
     "count": 500,
