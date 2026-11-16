@@ -1,0 +1,9 @@
+{
+  "US-KS": {
+    "name": "Kansas",
+    "count": 500,
+    "totalMatched": 1372,
+    "capped": true,
+    "extractedAt": "2026-11-16T00:42:26Z"
+  }
+}

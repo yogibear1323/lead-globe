@@ -438,4 +438,4 @@ select option { background: #0b2340; color: var(--iv-ink); }
 
 .osm-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .45rem; }
 .osm-actions .iv-btn-ghost { margin: 0; }
-.osm-more { padding: .35rem .85rem; font-size: .78rem; }
+.osm-more, .osm-live { padding: .35rem .85rem; font-size: .78rem; }

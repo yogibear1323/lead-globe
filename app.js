@@ -37,6 +37,7 @@
     exportBtn: document.getElementById("export-btn"),
     retry: document.getElementById("osm-retry"),
     more: document.getElementById("osm-more"),
+    live: document.getElementById("osm-live"),
   };
 
   let categoryConfig = { categories: [], resultCap: RESULT_CAP, overpassTimeoutSec: 25 };
@@ -257,9 +258,13 @@
         msg = "Loading OpenStreetMap businesses for this region…";
         kind = "loading";
       } else if (selectedRegion && osm === "error") {
-        msg = "The OpenStreetMap query failed or timed out. Use Retry, or try again in a moment.";
+        msg = "The list could not be loaded. Try Search live for more, or Retry.";
         kind = "error";
-      } else if (selectedRegion && (osm === "ok" || osm === "cached")) {
+      } else if (selectedRegion && osm === "missing") {
+        msg = "No prebuilt list for this region yet. Use Search live for more, or check back after the next extract.";
+      } else if (selectedRegion && osm === "skipped") {
+        msg = "This region is not included in the prebuilt OpenStreetMap extracts.";
+      } else if (selectedRegion && (osm === "ok" || osm === "cached" || osm === "static")) {
         msg = "No businesses matched in this region for the current filters.";
       }
       els.list.innerHTML = `<p class="empty${kind ? " is-" + kind : ""}">${msg}</p>`;
@@ -637,18 +642,20 @@
     if (r) {
       els.hint.innerHTML = `<b>${escapeHtml(r.properties.name)}.</b> The list is filtered to this region. Seed rows (if any) stay marked seed; OpenStreetMap rows are labelled heuristic.`;
       zoomToRegion(r);
-      if (r.properties.allowOverpass === false) {
-        setStatus("This region is too large for a useful live OpenStreetMap query. Seed rows still show if any are in this region.", "muted");
+      if (!opts.skipStatic) {
+        loadStaticRegion(r);
+      } else if (r.properties.allowOverpass === false) {
+        setStatus("This region is not included in the prebuilt OpenStreetMap extracts. Seed rows still show if any are in this region.", "muted");
         document.documentElement.dataset.osm = "skipped";
-      } else if (!opts.skipOsm) {
-        requestOsm(r);
+        showLiveSearch(false);
       }
     } else {
       els.hint.innerHTML =
-        "<b>Click a state, province, or European country</b> to zoom in, filter the list, and (where allowed) load matching OpenStreetMap businesses. Seed pins for Arizona are city-level, not rooftop-accurate.";
+        "<b>Click a state, province, or European country</b> to zoom in and open a prebuilt list of matching OpenStreetMap businesses. You can optionally search live OpenStreetMap for more. Seed pins for Arizona are city-level, not rooftop-accurate.";
       setStatus("");
       showRetry(false);
       showMore(false);
+      showLiveSearch(false);
       document.documentElement.dataset.osm = "idle";
       if (globe && !opts.silent) globe.pointOfView({ lat: 33.45, lng: -112.07, altitude: 0.95 }, 800);
     }
@@ -657,7 +664,75 @@
     return r;
   }
 
-  function cacheKey(regionId) {
+  function showLiveSearch(show) {
+    if (els.live) els.live.hidden = !show;
+  }
+
+  async function loadStaticRegion(region) {
+    const id = region.properties.id;
+    const gen = ++queryGen;
+    document.documentElement.dataset.osm = "loading";
+    showRetry(false);
+    showMore(false);
+    showLiveSearch(false);
+    setStatus("Loading prebuilt OpenStreetMap businesses for this region…", "loading");
+    openListPanel();
+    renderList();
+    try {
+      const res = await fetch("data/regions/" + encodeURIComponent(id) + ".json");
+      if (gen !== queryGen) return;
+      if (res.status === 404) {
+        if (!osmByRegion[id]) osmByRegion[id] = [];
+        if (region.properties.allowOverpass === false) {
+          setStatus(
+            "This region is not included in the prebuilt OpenStreetMap extracts. Seed rows still show if any are in this region.",
+            "muted"
+          );
+          document.documentElement.dataset.osm = "skipped";
+          showLiveSearch(false);
+        } else {
+          setStatus(
+            "No prebuilt list for this region yet. You can search live OpenStreetMap for businesses, or check back after the next extract.",
+            "muted"
+          );
+          document.documentElement.dataset.osm = "missing";
+          showLiveSearch(true);
+        }
+        renderList();
+        return;
+      }
+      if (!res.ok) throw new Error("Could not load prebuilt list (" + res.status + ")");
+      const data = await res.json();
+      if (gen !== queryGen) return;
+      const leads = ensureKeys(data.leads || []);
+      osmByRegion[id] = leads;
+      const total = data.totalMatched != null ? data.totalMatched : leads.length;
+      const capNote =
+        data.capped && total > leads.length ? " (top " + leads.length + " of " + total + " matches by fit)" : "";
+      setStatus(
+        leads.length
+          ? "Loaded " + leads.length + " OpenStreetMap businesses from a prebuilt extract" + capNote + "."
+          : "No OpenStreetMap businesses matched in this region for the enabled categories."
+      );
+      document.documentElement.dataset.osm = "ok";
+      document.documentElement.dataset.staticCount = String(leads.length);
+      showLiveSearch(region.properties.allowOverpass !== false);
+      showRetry(false);
+      showMore(false);
+      renderList();
+    } catch (err) {
+      if (gen !== queryGen) return;
+      if (!osmByRegion[id]) osmByRegion[id] = [];
+      const why = err && err.message ? " (" + err.message + ")" : "";
+      setStatus("Could not load the prebuilt list" + why + ". You can try searching live OpenStreetMap.", "error");
+      document.documentElement.dataset.osm = "error";
+      showLiveSearch(region.properties.allowOverpass !== false);
+      showRetry(false);
+      renderList();
+    }
+  }
+
+    function cacheKey(regionId) {
     return CACHE_PREFIX + regionId + ":" + categoryHash();
   }
 
@@ -917,8 +992,9 @@ out center tags ${cap};`;
       delete osmProgress[id];
       osmByRegion[id] = [];
     }
-    const cached = opts.force || opts.more ? null : readCache(id);
-    if (cached) {
+    // Live "search for more" always hits Overpass and appends onto the prebuilt list.
+    const cached = opts.force || opts.more || opts.live ? null : readCache(id);
+    if (cached && !osmByRegion[id]) {
       osmByRegion[id] = ensureKeys(cached.leads);
       const more = !!cached.moreAvailable;
       osmProgress[id] = {
@@ -955,7 +1031,7 @@ out center tags ${cap};`;
     const plan = firstWavePlan(region);
     const prog0 = osmProgress[id] || { nextCat: 0, moreAvailable: false, capped: false };
     const startCat = opts.more ? prog0.nextCat || 0 : 0;
-    const collected = opts.more && osmByRegion[id] ? osmByRegion[id].slice() : [];
+    const collected = (opts.more || opts.live) && osmByRegion[id] ? osmByRegion[id].slice() : [];
     const seen = new Set(collected.map((l) => l.osmId || l.key));
     const waveCap = opts.more ? cap : Math.min(cap, plan.waveCap);
     const catCap = plan.catCap;
@@ -971,7 +1047,9 @@ out center tags ${cap};`;
     setStatus(
       startCat
         ? "Loading more OpenStreetMap businesses…"
-        : "Querying OpenStreetMap (Overpass) for this region…",
+        : opts.live
+          ? "Searching live OpenStreetMap for more businesses…"
+          : "Querying OpenStreetMap (Overpass) for this region…",
       "loading"
     );
     renderList();
@@ -1049,6 +1127,7 @@ out center tags ${cap};`;
           document.documentElement.dataset.osmMore = prog.moreAvailable ? "yes" : "no";
           showRetry(!!failures);
           showMore(!!prog.moreAvailable);
+          showLiveSearch(region.properties.allowOverpass !== false && !prog.moreAvailable);
           renderList();
         }
       } else if (failures) {
@@ -1224,6 +1303,11 @@ out center tags ${cap};`;
   if (els.more) {
     els.more.addEventListener("click", () => {
       if (selectedRegion) requestOsm(selectedRegion, { more: true });
+    });
+  }
+  if (els.live) {
+    els.live.addEventListener("click", () => {
+      if (selectedRegion) requestOsm(selectedRegion, { live: true });
     });
   }
 

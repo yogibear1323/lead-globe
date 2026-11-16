@@ -20,18 +20,19 @@ Optional query flags for screenshots or testing:
 
 - `/?shot=overview` — default globe view
 - `/?region=US-AZ` — select Arizona (seed pins)
-- `/?region=US-DE` — select Delaware and query Overpass
+- `/?region=US-KS` — select Kansas and load the prebuilt OpenStreetMap list
+- `/?region=US-DE` — select Delaware and load its prebuilt list (Search live for more is optional)
 - `/?region=LU` — select Luxembourg (emails hidden; GDPR note)
 - `/?shot=outreach` or `/?lead=Televerde` — open the outreach panel for a selected business (Televerde by default)
 
 ## What it does
 
 - Clickable polygons for all US states (plus DC), Canadian provinces and territories, and European countries (plus Cyprus). Hover highlights a region; click zooms the globe and filters the side list.
-- Clicking any US state (plus DC), Canadian province or territory, or European country opens the list panel right away. OpenStreetMap businesses are loaded with area queries keyed to ISO 3166-2 (US/Canada) or ISO 3166-1 (Europe), one category chunk at a time. Large regions (for example Texas, California, Ontario, Germany, France) use a tighter first wave so results appear before timeout; use Load more for the rest, up to a cap of about 300. Failed responses are not cached. Russia is drawn but not auto-queried.
+- Clicking any US state (plus DC), Canadian province or territory, or European country opens the list panel right away and loads a prebuilt OpenStreetMap extract from `data/regions/<ISO>.json` (up to about 500 best-fit businesses, sorted by heuristic fit, preferring those with a phone or website). Contact details are visible on each card. Live Overpass is optional: use **Search live for more**. Russia is drawn but has no prebuilt extract and is not live-queried.
 - Seed leads (Phoenix-metro research list) are merged with OSM rows and marked `seed` or `OSM`.
 - OSM fit scores are **heuristic** (1–5), labelled as such, based on category base fit and whether a name, website, or phone is tagged. They are not a Mode or DataEarners decision.
 - Emails are included only when OSM tags them. For European regions, emails are hidden and a GDPR note is shown (also omitted from CSV export).
-- Min-fit filter and CSV export apply to the visible list. Selecting a state, province, or country opens the list panel right away, shows a loading state while OpenStreetMap results come in, and lists every visible business with name, category, address, phone, public email, website, and fit on the card itself.
+- Min-fit filter and CSV export apply to the visible list. Selecting a state, province, or country opens the list panel right away and lists every visible business with name, category, address, phone, public email, website, and fit on the card itself.
 - Medical, dental, and insurance categories exist in the config but are **disabled by default**.
 - Selecting a pin or card opens an **outreach panel** with category-specific email and call scripts from `config/scripts.json`. Placeholders are filled from the business (`{business_name}`, `{city}`, `{category}`); `{first_name}` is left for you to fill. Copy a script, or use **Open in email** to create a single-recipient `mailto:` draft in your own mail client — only when a published email is listed. The button is disabled, with a note and the phone number, if no email is published. There is no auto-send, no multi-select, and no BCC.
 - The CTA and every script use [https://robertwalker.dataearns.com/invite](https://robertwalker.dataearns.com/invite), the business-facing invite page (“You've been invited. This is about your company.”). The similarly named `robertwalker.dataearners.com/invite` is a different, team/partner recruitment page, so it is not used here.
@@ -49,16 +50,24 @@ No code changes are required for ordinary additions.
 
 - **Seed list:** compiled from public business pages for Phoenix-metro research (see the DataEarners funnel plan). Stored in `seed/dataearners-leads-phoenix.csv` and `leads.js`.
 - **Region boundaries:** [Natural Earth](https://www.naturalearthdata.com/) 50m admin-1 (US, Canada) and 50m admin-0 (Europe), public domain. Geometries were simplified for the globe. Source extracts were taken from the [nvkelso/natural-earth-vector](https://github.com/nvkelso/natural-earth-vector) GeoJSON files.
-- **OpenStreetMap:** live results via the Overpass API. Map data © OpenStreetMap contributors, licensed under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/). Each OSM row links back to its OSM object. Attribution is shown in the side panel when OSM data is present.
+- **OpenStreetMap:** prebuilt per-region extracts in `data/regions/<ISO>.json`, built from [Geofabrik](https://download.geofabrik.de) regional PBF files with `scripts/extract_region.py`. Optional live results via the Overpass API (**Search live for more**). Map data © OpenStreetMap contributors, licensed under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/). Each OSM row links back to its OSM object. Attribution is shown in the side panel when OSM data is present.
 
 ## Limitations
 
 - Seed pins are city-level approximations, not rooftop-accurate.
 - OSM coverage and tags vary widely. Many real businesses are missing; some tagged shops are small or a weak fit. Heuristic scores can be wrong.
-- Overpass may throttle, time out, or return a partial cap of 300. Queries run one category at a time (area filter by ISO 3166 code) against several public mirrors, and failed responses are not cached. If a region comes up empty, use Retry. Russia is drawn but not auto-queried (too large for a useful search).
+- Prebuilt lists are capped at about 500 businesses per region (best heuristic fit, preferring phone or website). OSM coverage and tags still vary; a cap is not a complete business census. **Search live for more** uses Overpass, which may throttle or time out; failed live responses are not cached. Russia is drawn but has no extract and is not live-queried. Rebuild extracts with `scripts/extract_region.py` (and `scripts/build_regions.py` for a batch) from Geofabrik PBFs; delete the large PBF files afterward.
 - European country polygons are 50m Natural Earth: a few microstates are included; some dependencies (Faroe Islands, Crown dependencies, Åland) are omitted on purpose.
 - Emails on OSM are often missing. European emails are hidden here and should not be treated as a mailing list.
 - This is a private research tool, unlisted, and not for mass outreach. The public test URL, if one is running, lasts only while the local static server and tunnel processes are up.
+
+## Rebuilding region extracts
+
+Regional PBF files come from [Geofabrik](https://download.geofabrik.de) (for example `north-america/us/kansas-latest.osm.pbf`). The extractor keeps POIs whose tags match enabled rows in `config/categories.json`, plus name, address (`addr:*`), phone, email, website, coordinates, and OSM id. Heuristic fit matches the in-app formula. European extracts omit emails (GDPR). Usage:
+
+```bash
+python3 scripts/extract_region.py --pbf /tmp/osm-extracts/kansas-latest.osm.pbf --region US-KS --name Kansas --out data/regions/US-KS.json --geojson-feature data/geo/us-states.geojson
+```
 
 ## Visual theme
 
