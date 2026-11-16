@@ -160,6 +160,13 @@
     "name": "Michigan",
     "totalMatched": 4797
   },
+  "US-MN": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:00:32Z",
+    "name": "Minnesota",
+    "totalMatched": 2842
+  },
   "US-OH": {
     "capped": true,
     "count": 500,
