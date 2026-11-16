@@ -195,6 +195,13 @@
     "name": "Finland",
     "totalMatched": 4031
   },
+  "GB": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T19:46:09Z",
+    "name": "United Kingdom",
+    "totalMatched": 32081
+  },
   "GR": {
     "capped": true,
     "count": 500,
