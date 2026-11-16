@@ -20,6 +20,13 @@
     "name": "Manitoba",
     "totalMatched": 721
   },
+  "CA-NB": {
+    "capped": false,
+    "count": 480,
+    "extractedAt": "2026-11-16T05:58:27Z",
+    "name": "New Brunswick",
+    "totalMatched": 480
+  },
   "CA-ON": {
     "capped": true,
     "count": 500,
