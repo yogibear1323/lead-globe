@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,9 +10,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%2308BEC8%27/%3E%3C/svg%3E">
   <link rel="stylesheet" href="landing.css">
+  <script src="landing.js" defer></script>
 </head>
 <body class="landing">
+  <div class="bg-stage" aria-hidden="true">
+    <div class="bg-fallback"></div>
+    <div id="bg-globe"></div>
+    <div class="bg-scrim"></div>
+    <div class="bg-grid"></div>
+  </div>
   <header class="top">
     <div class="brand">
       <a class="mark" href="index.html" aria-label="Lead Globe home" style="text-decoration:none">RW</a>
@@ -28,8 +36,8 @@
 
   <main>
     <section class="hero" aria-labelledby="hero-title">
-      <div>
-        <div class="kicker">Interactive 3D business globe</div>
+      <div class="hero-copy glass">
+        <div class="kicker pill-kicker"><span class="live-dot"></span>Interactive 3D business globe</div>
         <h1 id="hero-title">Search businesses <em>around the world</em> with a spin of the globe.</h1>
         <p class="lead">Lead Globe is an interactive 3D globe. Spin it, click any US state, Canadian province or territory, or European country, and a list of local businesses opens right away, with contact details (phone, website, and email where available) on each card.</p>
         <div class="cta-row">
@@ -45,13 +53,15 @@
           <li>European countries</li>
         </ul>
       </div>
+      <div class="hero-side">
       <figure class="preview">
         <img src="assets/preview-kansas-static.jpg" width="1200" height="678" alt="Lead Globe with Kansas selected and a list of businesses with contact details" loading="eager">
         <figcaption>Click a region · business list opens instantly</figcaption>
       </figure>
+      </div>
     </section>
 
-    <section id="how" aria-labelledby="how-title">
+    <section id="how" class="reveal" aria-labelledby="how-title">
       <div class="kicker">How it works</div>
       <h2 id="how-title">From a spin of the globe to a business card</h2>
       <ol class="steps">
@@ -60,7 +70,7 @@
         <li><h3>Filter by category</h3><p>Narrow the list by business type, minimum fit, or a search term, and sort by fit or name.</p></li>
         <li><h3>Personal outreach panel</h3><p>Open a business to see editable email and call scripts for one-to-one outreach. Nothing is sent automatically; one recipient at a time.</p></li>
       </ol>
-      <div class="two">
+      <div class="two reveal">
         <div class="panel-card">
           <h3>Where the listings come from</h3>
           <p>Business listings come from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> (© OpenStreetMap contributors, ODbL), a public, community-maintained map. No bought or scraped lists are used.</p>
@@ -76,7 +86,7 @@
       </div>
     </section>
 
-    <section id="dataearners" aria-labelledby="de-title">
+    <section id="dataearners" class="reveal" aria-labelledby="de-title">
       <div class="kicker">For business owners</div>
       <h2 id="de-title">Explore whether your company’s data could be licensed</h2>
       <div class="opportunity">
@@ -94,11 +104,13 @@
       </div>
     </section>
 
-    <section class="final" aria-labelledby="final-title">
-      <div class="kicker">Ready?</div>
-      <h2 id="final-title">Pick a spot on the map and start exploring</h2>
-      <p class="lead">Businesses across the US, Canada, and Europe, a click away.</p>
-      <a class="iv-btn lg" href="globe.html">Launch App</a>
+    <section class="final reveal" aria-labelledby="final-title">
+      <div class="final-card">
+        <div class="kicker">Ready?</div>
+        <h2 id="final-title">Pick a spot on the map and start exploring</h2>
+        <p class="lead">Businesses across the US, Canada, and Europe, a click away.</p>
+        <a class="iv-btn lg" href="globe.html">Launch App</a>
+      </div>
     </section>
   </main>
 
