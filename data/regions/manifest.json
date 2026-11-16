@@ -251,6 +251,13 @@
     "name": "Ohio",
     "totalMatched": 5432
   },
+  "US-OK": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:39:19Z",
+    "name": "Oklahoma",
+    "totalMatched": 1979
+  },
   "US-TX": {
     "capped": true,
     "count": 500,
