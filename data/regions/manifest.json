@@ -48,12 +48,26 @@
     "name": "Northwest Territories",
     "totalMatched": 60
   },
+  "CA-NU": {
+    "capped": false,
+    "count": 12,
+    "extractedAt": "2026-11-16T06:25:16Z",
+    "name": "Nunavut",
+    "totalMatched": 12
+  },
   "CA-ON": {
     "capped": true,
     "count": 500,
     "extractedAt": "2026-11-16T04:54:52Z",
     "name": "Ontario",
     "totalMatched": 8391
+  },
+  "CA-PE": {
+    "capped": false,
+    "count": 54,
+    "extractedAt": "2026-11-16T06:25:25Z",
+    "name": "Prince Edward Island",
+    "totalMatched": 54
   },
   "CA-QC": {
     "capped": true,
