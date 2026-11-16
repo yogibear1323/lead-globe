@@ -4,6 +4,12 @@ An independent partner’s internal research tool for browsing a seed lead list 
 
 Live site: [https://yogibear1323.github.io/lead-globe/](https://yogibear1323.github.io/lead-globe/)
 
+## Pages
+
+- `index.html` — home screen. Explains what Lead Globe is, how it works, where the data comes from, and the DataEarners invite (Data Asset Profile) with a link to the invite page. Every **Launch App** button opens the globe.
+- `globe.html` — the globe app itself: [https://yogibear1323.github.io/lead-globe/globe.html](https://yogibear1323.github.io/lead-globe/globe.html). It lives on its own page.
+- Both pages are `noindex`.
+
 Outreach CTA: [https://robertwalker.dataearns.com/invite](https://robertwalker.dataearns.com/invite)
 
 Personal, one-at-a-time outreach only, per DataEarners partner rules. Do not blast this list. Honor opt-outs the same day. This tool does not contact anyone.
@@ -16,16 +22,16 @@ From this folder:
 python3 -m http.server 8765 --bind 127.0.0.1
 ```
 
-Then open http://127.0.0.1:8765/
+Then open http://127.0.0.1:8765/ (home) or http://127.0.0.1:8765/globe.html (globe app)
 
-Optional query flags for screenshots or testing:
+Optional query flags for screenshots or testing (on `globe.html`):
 
-- `/?shot=overview` — default globe view
-- `/?region=US-AZ` — select Arizona (seed pins)
-- `/?region=US-KS` — select Kansas and load the prebuilt OpenStreetMap list
-- `/?region=US-DE` — select Delaware and load its prebuilt list (Search live for more is optional)
-- `/?region=LU` — select Luxembourg (emails hidden; GDPR note)
-- `/?shot=outreach` or `/?lead=Televerde` — open the outreach panel for a selected business (Televerde by default)
+- `globe.html?shot=overview` — default globe view
+- `globe.html?region=US-AZ` — select Arizona (seed pins)
+- `globe.html?region=US-KS` — select Kansas and load the prebuilt OpenStreetMap list
+- `globe.html?region=US-DE` — select Delaware and load its prebuilt list (Search live for more is optional)
+- `globe.html?region=LU` — select Luxembourg (emails hidden; GDPR note)
+- `globe.html?shot=outreach` or `globe.html?lead=Televerde` — open the outreach panel for a selected business (Televerde by default)
 
 ## What it does
 

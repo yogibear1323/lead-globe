@@ -180,7 +180,7 @@ def main():
         cdp = CDP(ws)
         try:
             # 1) overview
-            open_page(cdp, BASE + "/?shot=overview")
+            open_page(cdp, BASE + "/globe.html?shot=overview")
             # Earth textures often lag the "ready" hook in headless Chrome.
             time.sleep(8)
             globe = eval_js(cdp, "document.documentElement.dataset.globe")
@@ -194,7 +194,7 @@ def main():
             screenshot(cdp, SHOTS / "overview.png")
 
             # 2) Arizona seed pins
-            open_page(cdp, BASE + "/?region=US-AZ")
+            open_page(cdp, BASE + "/globe.html?region=US-AZ")
             wait_js(cdp, "document.documentElement.dataset.region === 'US-AZ'", timeout=30)
             # wait a moment for pins
             time.sleep(2)
@@ -208,7 +208,7 @@ def main():
             screenshot(cdp, SHOTS / "arizona-seed.png")
 
             # 3) Delaware Overpass
-            open_page(cdp, BASE + "/?region=US-DE")
+            open_page(cdp, BASE + "/globe.html?region=US-DE")
             wait_js(cdp, "document.documentElement.dataset.region === 'US-DE'", timeout=30)
             try:
                 wait_js(
@@ -238,7 +238,7 @@ def main():
             else:
                 results["fail"].append(f"Kansas query shape unexpected: {q!r}")
             eval_js(cdp, "try{Object.keys(localStorage).forEach(k=>{if(k.indexOf('leadglobe')===0)localStorage.removeItem(k)})}catch(e){}")
-            open_page(cdp, BASE + "/?region=US-KS")
+            open_page(cdp, BASE + "/globe.html?region=US-KS")
             wait_js(cdp, "document.documentElement.dataset.region === 'US-KS'", timeout=30)
             try:
                 wait_js(
@@ -262,7 +262,7 @@ def main():
             screenshot(cdp, SHOTS / "kansas-osm.png")
 
             # 4) Outreach panel (Televerde has a published email)
-            open_page(cdp, BASE + "/?shot=outreach")
+            open_page(cdp, BASE + "/globe.html?shot=outreach")
             wait_js(cdp, "document.documentElement.dataset.outreach === 'ready'", timeout=40)
             time.sleep(2)
             name = eval_js(cdp, "document.documentElement.dataset.selectedLead")
