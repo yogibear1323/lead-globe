@@ -132,6 +132,13 @@
     "name": "Monaco",
     "totalMatched": 1
   },
+  "MK": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T07:58:40Z",
+    "name": "North Macedonia",
+    "totalMatched": 805
+  },
   "MT": {
     "capped": false,
     "count": 284,
@@ -495,5 +502,12 @@
     "extractedAt": "2026-11-16T04:31:47Z",
     "name": "Wyoming",
     "totalMatched": 336
+  },
+  "XK": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T07:58:58Z",
+    "name": "Kosovo",
+    "totalMatched": 1324
   }
 }
