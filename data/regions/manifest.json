@@ -132,6 +132,13 @@
     "name": "Louisiana",
     "totalMatched": 1402
   },
+  "US-MA": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T02:53:46Z",
+    "name": "Massachusetts",
+    "totalMatched": 2638
+  },
   "US-MD": {
     "capped": true,
     "count": 500,
