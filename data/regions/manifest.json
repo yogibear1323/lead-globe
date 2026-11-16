@@ -90,6 +90,13 @@
     "name": "Idaho",
     "totalMatched": 1275
   },
+  "US-IL": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T02:27:42Z",
+    "name": "Illinois",
+    "totalMatched": 5162
+  },
   "US-KS": {
     "capped": true,
     "count": 500,
