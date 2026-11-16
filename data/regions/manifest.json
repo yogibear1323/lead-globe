@@ -1,4 +1,18 @@
 {
+  "AD": {
+    "capped": false,
+    "count": 65,
+    "extractedAt": "2026-11-16T07:54:20Z",
+    "name": "Andorra",
+    "totalMatched": 65
+  },
+  "AL": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T07:54:16Z",
+    "name": "Albania",
+    "totalMatched": 1493
+  },
   "CA-AB": {
     "capped": true,
     "count": 500,
