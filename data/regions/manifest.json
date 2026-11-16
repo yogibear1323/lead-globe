@@ -13,6 +13,13 @@
     "name": "British Columbia",
     "totalMatched": 3298
   },
+  "CA-MB": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T05:53:45Z",
+    "name": "Manitoba",
+    "totalMatched": 721
+  },
   "CA-ON": {
     "capped": true,
     "count": 500,
