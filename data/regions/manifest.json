@@ -167,6 +167,13 @@
     "name": "Minnesota",
     "totalMatched": 2842
   },
+  "US-MO": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:05:57Z",
+    "name": "Missouri",
+    "totalMatched": 2422
+  },
   "US-MS": {
     "capped": true,
     "count": 500,
