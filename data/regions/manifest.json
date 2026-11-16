@@ -230,6 +230,13 @@
     "name": "Malta",
     "totalMatched": 284
   },
+  "RO": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T08:52:42Z",
+    "name": "Romania",
+    "totalMatched": 7337
+  },
   "RS": {
     "capped": true,
     "count": 500,
