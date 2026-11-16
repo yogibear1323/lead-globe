@@ -334,5 +334,12 @@
     "extractedAt": "2026-11-16T04:19:03Z",
     "name": "Washington",
     "totalMatched": 5156
+  },
+  "US-WV": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T04:20:30Z",
+    "name": "West Virginia",
+    "totalMatched": 752
   }
 }
