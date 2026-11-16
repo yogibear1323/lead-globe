@@ -27,11 +27,11 @@ Optional query flags for screenshots or testing:
 ## What it does
 
 - Clickable polygons for all US states (plus DC), Canadian provinces and territories, and European countries (plus Cyprus). Hover highlights a region; click zooms the globe and filters the side list.
-- On a region click, one live Overpass query at a time loads matching OSM businesses (timeout, cap of about 300, backoff, `localStorage` cache per region + enabled categories).
+- Clicking any US state (plus DC), Canadian province or territory, or European country opens the list panel right away. OpenStreetMap businesses are loaded with area queries keyed to ISO 3166-2 (US/Canada) or ISO 3166-1 (Europe), one category chunk at a time. Large regions (for example Texas, California, Ontario, Germany, France) use a tighter first wave so results appear before timeout; use Load more for the rest, up to a cap of about 300. Failed responses are not cached. Russia is drawn but not auto-queried.
 - Seed leads (Phoenix-metro research list) are merged with OSM rows and marked `seed` or `OSM`.
 - OSM fit scores are **heuristic** (1–5), labelled as such, based on category base fit and whether a name, website, or phone is tagged. They are not a Mode or DataEarners decision.
 - Emails are included only when OSM tags them. For European regions, emails are hidden and a GDPR note is shown (also omitted from CSV export).
-- Min-fit filter and CSV export apply to the visible list.
+- Min-fit filter and CSV export apply to the visible list. Selecting a state, province, or country opens the list panel right away, shows a loading state while OpenStreetMap results come in, and lists every visible business with name, category, address, phone, public email, website, and fit on the card itself.
 - Medical, dental, and insurance categories exist in the config but are **disabled by default**.
 - Selecting a pin or card opens an **outreach panel** with category-specific email and call scripts from `config/scripts.json`. Placeholders are filled from the business (`{business_name}`, `{city}`, `{category}`); `{first_name}` is left for you to fill. Copy a script, or use **Open in email** to create a single-recipient `mailto:` draft in your own mail client — only when a published email is listed. The button is disabled, with a note and the phone number, if no email is published. There is no auto-send, no multi-select, and no BCC.
 - The CTA and every script use [https://robertwalker.dataearns.com/invite](https://robertwalker.dataearns.com/invite), the business-facing invite page (“You've been invited. This is about your company.”). The similarly named `robertwalker.dataearners.com/invite` is a different, team/partner recruitment page, so it is not used here.
@@ -55,7 +55,7 @@ No code changes are required for ordinary additions.
 
 - Seed pins are city-level approximations, not rooftop-accurate.
 - OSM coverage and tags vary widely. Many real businesses are missing; some tagged shops are small or a weak fit. Heuristic scores can be wrong.
-- Overpass may throttle, time out, or return a partial cap of 300. Only one query runs at a time. Russia is drawn but not auto-queried (too large for a useful 25-second / 300-result search).
+- Overpass may throttle, time out, or return a partial cap of 300. Queries run one category at a time (area filter by ISO 3166 code) against several public mirrors, and failed responses are not cached. If a region comes up empty, use Retry. Russia is drawn but not auto-queried (too large for a useful search).
 - European country polygons are 50m Natural Earth: a few microstates are included; some dependencies (Faroe Islands, Crown dependencies, Åland) are omitted on purpose.
 - Emails on OSM are often missing. European emails are hidden here and should not be treated as a mailing list.
 - This is a private research tool, unlisted, and not for mass outreach. The public test URL, if one is running, lasts only while the local static server and tunnel processes are up.

@@ -2,7 +2,7 @@
   "version": 1,
   "comment": "Category labels should stay stable so the side-panel filter stays useful when seed and OSM rows are merged. Medical, dental, and insurance are present but disabled by default. To add a category, add an object here \u2014 no code changes needed. Each queries[] item is an OSM tag key/value used in a single Overpass union.",
   "resultCap": 300,
-  "overpassTimeoutSec": 45,
+  "overpassTimeoutSec": 20,
   "categories": [
     {
       "id": "home-services",

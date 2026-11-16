@@ -56,7 +56,7 @@
       </p>
     </section>
 
-    <aside class="panel">
+    <aside class="panel" id="list-panel">
       <div class="panel-head">
         <div class="kicker">Research list</div>
         <div class="filters">
@@ -96,6 +96,10 @@
         </div>
         <p class="count" id="count"></p>
         <p class="status" id="status"></p>
+        <div class="osm-actions">
+          <button type="button" class="iv-btn-ghost osm-retry" id="osm-retry" hidden>Retry</button>
+          <button type="button" class="iv-btn-ghost osm-more" id="osm-more" hidden>Load more</button>
+        </div>
         <p class="gdpr" id="gdpr" hidden>European region: emails from OpenStreetMap are hidden (GDPR). Use published business contacts only if you later reach out yourself, one at a time.</p>
       </div>
       <div class="list" id="list"></div>

@@ -7,9 +7,9 @@
   const OVERPASS_ENDPOINTS = [
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
-    "https://overpass.openstreetmap.fr/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
   ];
-  const CACHE_PREFIX = "leadglobe:osm:v1:";
+  const CACHE_PREFIX = "leadglobe:osm:v2:";
   const RESULT_CAP = 300;
 
   const seedLeads = (Array.isArray(window.LEADS) ? window.LEADS : []).map((l) => ({
@@ -31,9 +31,12 @@
     attrib: document.getElementById("attrib"),
     list: document.getElementById("list"),
     detail: document.getElementById("detail"),
+    panel: document.getElementById("list-panel") || document.querySelector(".panel"),
     globe: document.getElementById("globe"),
     hint: document.getElementById("globe-hint"),
     exportBtn: document.getElementById("export-btn"),
+    retry: document.getElementById("osm-retry"),
+    more: document.getElementById("osm-more"),
   };
 
   let categoryConfig = { categories: [], resultCap: RESULT_CAP, overpassTimeoutSec: 25 };
@@ -48,6 +51,10 @@
   let queryGen = 0;
   let queryInFlight = false;
   let queuedRegionId = null;
+  let queuedForce = false;
+  let queuedMore = false;
+  let endpointHealth = {};
+  let osmProgress = {};
 
   function fitColor(fit) {
     if (fit >= 5) return "#08BEC8";
@@ -102,6 +109,50 @@
     return !!(selectedRegion && (selectedRegion.properties.privacy === "eu" || selectedRegion.setMeta?.hideEmail));
   }
 
+  function visibleEmail(l) {
+    if (!l || !l.email) return "";
+    if (hideEmail() && l.source === "OSM") return "";
+    return String(l.email).trim();
+  }
+
+  function openListPanel() {
+    const panel = els.panel || document.getElementById("list-panel") || document.querySelector(".panel");
+    if (!panel) return;
+    panel.classList.add("is-open");
+    document.documentElement.dataset.listOpen = selectedRegion ? "region" : "seed";
+    if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) {
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  function contactRows(l) {
+    const email = visibleEmail(l);
+    const hiddenEu = hideEmail() && l.source === "OSM" && l.email;
+    const rows = [];
+    if (l.address) {
+      rows.push(`<div class="card-row"><span class="lbl">Address</span><span>${escapeHtml(l.address)}</span></div>`);
+    }
+    if (l.phone) {
+      const tel = String(l.phone).replace(/[^\d+]/g, "");
+      rows.push(
+        `<div class="card-row"><span class="lbl">Phone</span><a href="tel:${escapeHtml(tel || l.phone)}" data-contact="1">${escapeHtml(l.phone)}</a></div>`
+      );
+    }
+    if (email) {
+      rows.push(
+        `<div class="card-row"><span class="lbl">Email</span><a href="mailto:${escapeHtml(email)}" data-contact="1">${escapeHtml(email)}</a></div>`
+      );
+    } else if (hiddenEu) {
+      rows.push(`<div class="card-row"><span class="lbl">Email</span><span>Hidden (GDPR)</span></div>`);
+    }
+    if (l.website) {
+      rows.push(
+        `<div class="card-row"><span class="lbl">Website</span><a href="${escapeHtml(l.website)}" target="_blank" rel="noopener" data-contact="1">${escapeHtml(l.website)}</a></div>`
+      );
+    }
+    return rows.length ? `<div class="card-contact">${rows.join("")}</div>` : "";
+  }
+
   function filtered() {
     const needle = els.q.value.trim().toLowerCase();
     const cat = els.cat.value;
@@ -109,7 +160,7 @@
     const minFit = Number(els.minFit.value || 1);
     const rows = allLeads().filter((l) => {
       if (Number(l.fit) < minFit) return false;
-      if (cat !== "All" && l.category !== cat) return false;
+      if (cat && cat !== "All" && cat.toLowerCase() !== "all" && l.category !== cat) return false;
       if (!needle) return true;
       const blob = [l.name, l.category, l.city, l.phone, l.email, l.reason, l.address, l.source].join(" ").toLowerCase();
       return blob.includes(needle);
@@ -138,6 +189,7 @@
     root.dataset.osmPins = String(rows.filter((r) => r.source === "OSM").length);
     root.dataset.selectedLead = selectedLead ? selectedLead.name || selectedLead.key : "";
     root.dataset.outreach = selectedLead ? "ready" : "hidden";
+    root.dataset.listOpen = selectedRegion ? "region" : "seed";
     window.LeadGlobe = window.LeadGlobe || {};
     window.LeadGlobe.ready = true;
     window.LeadGlobe.getVisible = () => rows.slice();
@@ -188,27 +240,53 @@
     const rows = filtered();
     const total = allLeads().length;
     const place = selectedRegion ? selectedRegion.properties.name : "the seed list";
-    els.count.textContent = `Showing ${rows.length} of ${total} in ${place}.`;
+    const osmState = document.documentElement.dataset.osm;
+    if (selectedRegion && osmState === "loading") {
+      els.count.textContent = total
+        ? `Loading… showing ${rows.length} of ${total} in ${place} so far.`
+        : `Loading OpenStreetMap businesses in ${place}…`;
+    } else {
+      els.count.textContent = `Showing ${rows.length} of ${total} in ${place}.`;
+    }
     els.gdpr.hidden = !hideEmail();
     if (!rows.length) {
-      els.list.innerHTML = '<p class="empty">No leads match those filters.</p>';
+      const osm = document.documentElement.dataset.osm;
+      let msg = "No leads match those filters.";
+      let kind = "";
+      if (selectedRegion && osm === "loading") {
+        msg = "Loading OpenStreetMap businesses for this region…";
+        kind = "loading";
+      } else if (selectedRegion && osm === "error") {
+        msg = "The OpenStreetMap query failed or timed out. Use Retry, or try again in a moment.";
+        kind = "error";
+      } else if (selectedRegion && (osm === "ok" || osm === "cached")) {
+        msg = "No businesses matched in this region for the current filters.";
+      }
+      els.list.innerHTML = `<p class="empty${kind ? " is-" + kind : ""}">${msg}</p>`;
     } else {
-      els.list.innerHTML = rows
-        .map((l) => {
-          const on = selectedLead && selectedLead.key === l.key ? " is-on" : "";
-          const heuristic = l.fitKind === "heuristic" ? '<span class="kind">heuristic</span>' : "";
-          return `<button type="button" class="card${on}" data-key="${escapeHtml(l.key)}">
+      const loadingBanner =
+        selectedRegion && osmState === "loading"
+          ? '<p class="empty is-loading list-loading">Loading more OpenStreetMap businesses for this region…</p>'
+          : "";
+      els.list.innerHTML =
+        loadingBanner +
+        rows
+          .map((l) => {
+            const on = selectedLead && selectedLead.key === l.key ? " is-on" : "";
+            const heuristic = l.fitKind === "heuristic" ? '<span class="kind">heuristic</span>' : "";
+            return `<article class="card${on}" data-key="${escapeHtml(l.key)}" tabindex="0">
             <div class="card-top">
               <h2>${escapeHtml(l.name)}</h2>
               <span class="fit f${Math.min(5, Math.max(1, l.fit))}">FIT ${l.fit}${heuristic}</span>
             </div>
-            <div class="meta">${escapeHtml(l.category)} · ${escapeHtml(l.city || l.properties?.name || "")} · <span class="badge ${l.source === "seed" ? "seed" : "osm"}">${escapeHtml(l.source)}</span></div>
-            <div class="reason">${escapeHtml(l.reason || "")}</div>
-          </button>`;
-        })
-        .join("");
+            <div class="meta">${escapeHtml(l.category)} · ${escapeHtml(l.city || "")} · <span class="badge ${l.source === "seed" ? "seed" : "osm"}">${escapeHtml(l.source)}</span></div>
+            ${contactRows(l)}
+          </article>`;
+          })
+          .join("");
     }
     renderDetail();
+    openListPanel();
     if (globe) globe.htmlElementsData(rows);
     els.attrib.innerHTML = selectedRegion
       ? (osmByRegion[selectedRegion.properties.id] ? OSM_ATTRIB + " " : "") + NE_ATTRIB
@@ -569,6 +647,8 @@
       els.hint.innerHTML =
         "<b>Click a state, province, or European country</b> to zoom in, filter the list, and (where allowed) load matching OpenStreetMap businesses. Seed pins for Arizona are city-level, not rooftop-accurate.";
       setStatus("");
+      showRetry(false);
+      showMore(false);
       document.documentElement.dataset.osm = "idle";
       if (globe && !opts.silent) globe.pointOfView({ lat: 33.45, lng: -112.07, altitude: 0.95 }, 800);
     }
@@ -586,37 +666,88 @@
       const raw = localStorage.getItem(cacheKey(regionId));
       if (!raw) return null;
       const data = JSON.parse(raw);
-      if (!data || !Array.isArray(data.leads)) return null;
+      // v2 caches must be marked ok. Never reuse a failure or a malformed entry.
+      if (!data || data.ok !== true || !Array.isArray(data.leads)) return null;
       return data;
     } catch (e) {
       return null;
     }
   }
 
-  function writeCache(regionId, leads) {
+  function writeCache(regionId, leads, prog) {
     try {
-      localStorage.setItem(cacheKey(regionId), JSON.stringify({ ts: Date.now(), regionId, leads }));
+      localStorage.setItem(
+        cacheKey(regionId),
+        JSON.stringify({
+          ok: true,
+          ts: Date.now(),
+          regionId,
+          leads,
+          nextCat: prog && prog.nextCat,
+          moreAvailable: !!(prog && prog.moreAvailable),
+          capped: !!(prog && prog.capped),
+        })
+      );
     } catch (e) {
       /* quota — ignore */
     }
   }
 
-  function buildOverpassQuery(region) {
+  function clearCache(regionId) {
+    try {
+      localStorage.removeItem(cacheKey(regionId));
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function showRetry(show) {
+    if (!els.retry) return;
+    els.retry.hidden = !show;
+  }
+
+  function showMore(show) {
+    if (!els.more) return;
+    els.more.hidden = !show;
+  }
+
+  function areaSetQL(region) {
     const p = region.properties;
-    const timeout = categoryConfig.overpassTimeoutSec || 25;
-    const cap = categoryConfig.resultCap || RESULT_CAP;
-    const lines = [];
-    enabledCategories().forEach((cat) => {
-      (cat.queries || []).forEach((q) => {
-        const k = String(q.key).replace(/"/g, "");
-        const v = String(q.value).replace(/"/g, "");
-        lines.push(`  nwr["${k}"="${v}"](area.a);`);
-      });
+    const tag = String(p.overpassAreaTag || "ISO3166-1").replace(/"/g, "");
+    const val = String(p.overpassAreaValue || p.id).replace(/"/g, "");
+    // US states and Canadian provinces are admin_level 4; European countries are 2.
+    const admin = tag === "ISO3166-2" ? '["admin_level"="4"]' : tag === "ISO3166-1" ? '["admin_level"="2"]' : "";
+    // Prefer the admin-level match, but also accept a plain ISO match if admin_level is missing.
+    return `(
+  area["${tag}"="${val}"]${admin};
+  area["${tag}"="${val}"];
+)->.a;`;
+  }
+
+  function regionSpanDeg(region) {
+    const b = (region && region.properties && region.properties.bbox) || [];
+    if (b.length < 4) return 0;
+    return Math.abs(Number(b[2]) - Number(b[0])) * Math.abs(Number(b[3]) - Number(b[1]));
+  }
+
+  function firstWavePlan(region) {
+    const span = regionSpanDeg(region);
+    // Large states/provinces/countries (TX, CA, ON, DE, FR, etc.) get a tighter first wave
+    // so something lands in the list before Overpass times out.
+    if (span > 80) return { catCap: 20, waveCap: 80, budgetMs: 35000, timeoutSec: 18 };
+    if (span > 20) return { catCap: 25, waveCap: 120, budgetMs: 40000, timeoutSec: 20 };
+    return { catCap: 40, waveCap: 200, budgetMs: 45000, timeoutSec: 20 };
+  }
+
+  function buildOverpassQuery(region, category, cap, timeoutSec) {
+    const timeout = timeoutSec || categoryConfig.overpassTimeoutSec || 20;
+    const lines = (category.queries || []).map((q) => {
+      const k = String(q.key).replace(/"/g, "");
+      const v = String(q.value).replace(/"/g, "");
+      return `  nwr["${k}"="${v}"](area.a);`;
     });
-    const tag = p.overpassAreaTag || "ISO3166-1";
-    const val = p.overpassAreaValue || p.id;
     return `[out:json][timeout:${timeout}];
-area["${tag}"="${val}"]->.a;
+${areaSetQL(region)}
 (
 ${lines.join("\n")}
 );
@@ -627,12 +758,30 @@ out center tags ${cap};`;
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  async function fetchOverpass(query) {
+  function usableEndpoints() {
+    const now = Date.now();
+    return OVERPASS_ENDPOINTS.filter((u) => !endpointHealth[u] || endpointHealth[u].until < now);
+  }
+
+  function markEndpoint(url, ok) {
+    if (ok) {
+      delete endpointHealth[url];
+      return;
+    }
+    const prev = (endpointHealth[url] && endpointHealth[url].fails) || 0;
+    endpointHealth[url] = { fails: prev + 1, until: Date.now() + Math.min(120000, 20000 * (prev + 1)) };
+  }
+
+  async function fetchOverpass(query, opts) {
+    opts = opts || {};
     let lastErr = null;
-    for (let attempt = 0; attempt < OVERPASS_ENDPOINTS.length; attempt++) {
-      const url = OVERPASS_ENDPOINTS[attempt % OVERPASS_ENDPOINTS.length];
+    const timeoutMs = opts.timeoutMs || (categoryConfig.overpassTimeoutSec || 20) * 1000 + 5000;
+    const endpoints = usableEndpoints();
+    const maxAttempts = Math.min(opts.maxAttempts || endpoints.length, endpoints.length);
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const url = endpoints[attempt];
       const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), (categoryConfig.overpassTimeoutSec || 25) * 1000 + 5000);
+      const t = setTimeout(() => ctrl.abort(), timeoutMs);
       try {
         const res = await fetch(url, {
           method: "POST",
@@ -641,18 +790,33 @@ out center tags ${cap};`;
           signal: ctrl.signal,
         });
         clearTimeout(t);
-        if (res.status === 429 || res.status === 504 || res.status === 502) {
-          lastErr = new Error("Overpass " + res.status);
-          await sleep(Math.min(8000, 1500 * Math.pow(2, attempt)));
+        if (res.status === 429 || res.status === 504 || res.status === 502 || res.status === 503) {
+          lastErr = new Error("Overpass " + res.status + " from " + url);
+          markEndpoint(url, false);
+          await sleep(Math.min(4000, 800 * Math.pow(2, attempt)));
           continue;
         }
-        if (!res.ok) throw new Error("Overpass HTTP " + res.status);
-        return await res.json();
+        if (!res.ok) throw new Error("Overpass HTTP " + res.status + " from " + url);
+        const data = await res.json();
+        const remark = data && data.remark ? String(data.remark) : "";
+        const timedOut = /timeout|out of memory|error/i.test(remark);
+        if (timedOut && !(data.elements && data.elements.length)) {
+          lastErr = new Error("Overpass remark: " + remark);
+          await sleep(Math.min(8000, 1200 * Math.pow(2, attempt)));
+          continue;
+        }
+        if (timedOut) data._partial = remark;
+        markEndpoint(url, true);
+        return data;
       } catch (err) {
         clearTimeout(t);
         lastErr = err;
-        await sleep(Math.min(8000, 1500 * Math.pow(2, attempt)));
+        markEndpoint(url, false);
+        await sleep(Math.min(4000, 800 * Math.pow(2, attempt)));
       }
+    }
+    if (!endpoints.length) {
+      throw lastErr || new Error("All Overpass mirrors recently failed; try Retry in a moment");
     }
     throw lastErr || new Error("Overpass request failed");
   }
@@ -734,50 +898,191 @@ out center tags ${cap};`;
     return out;
   }
 
-  async function requestOsm(region) {
+  function applyProgress(region, collected, prog) {
     const id = region.properties.id;
-    const cached = readCache(id);
+    osmByRegion[id] = collected;
+    osmProgress[id] = prog;
+    if (selectedRegion && selectedRegion.properties.id === id) {
+      document.documentElement.dataset.osmMore = prog && prog.moreAvailable ? "yes" : "no";
+      showMore(!!(prog && prog.moreAvailable));
+      renderList();
+    }
+  }
+
+  async function requestOsm(region, opts) {
+    opts = opts || {};
+    const id = region.properties.id;
+    if (opts.force) {
+      clearCache(id);
+      delete osmProgress[id];
+      osmByRegion[id] = [];
+    }
+    const cached = opts.force || opts.more ? null : readCache(id);
     if (cached) {
       osmByRegion[id] = ensureKeys(cached.leads);
-      setStatus(`Loaded ${cached.leads.length} OpenStreetMap rows from cache.`, "muted");
+      const more = !!cached.moreAvailable;
+      osmProgress[id] = {
+        nextCat: cached.nextCat || enabledCategories().length,
+        moreAvailable: more,
+        capped: !!cached.capped,
+      };
+      setStatus(
+        cached.leads.length
+          ? `Loaded ${cached.leads.length} OpenStreetMap rows from cache.` +
+            (more ? " More results are available." : "")
+          : "No OpenStreetMap businesses were cached for this region.",
+        "muted"
+      );
       document.documentElement.dataset.osm = "cached";
+      showRetry(true);
+      showMore(more);
+      document.documentElement.dataset.osmMore = more ? "yes" : "no";
       renderList();
       return;
     }
     if (queryInFlight) {
       queuedRegionId = id;
+      queuedForce = !!opts.force;
+      queuedMore = !!opts.more;
+      queryGen += 1; // stop the in-flight region at the next category boundary
       setStatus("Waiting for the previous OpenStreetMap query to finish…", "muted");
       return;
     }
     const gen = ++queryGen;
     queryInFlight = true;
+    const cap = categoryConfig.resultCap || RESULT_CAP;
+    const cats = enabledCategories();
+    const plan = firstWavePlan(region);
+    const prog0 = osmProgress[id] || { nextCat: 0, moreAvailable: false, capped: false };
+    const startCat = opts.more ? prog0.nextCat || 0 : 0;
+    const collected = opts.more && osmByRegion[id] ? osmByRegion[id].slice() : [];
+    const seen = new Set(collected.map((l) => l.osmId || l.key));
+    const waveCap = opts.more ? cap : Math.min(cap, plan.waveCap);
+    const catCap = plan.catCap;
+    const budgetMs = opts.more ? 60000 : plan.budgetMs;
+    const started = Date.now();
+    let failures = 0;
+    let lastErr = null;
+    let partial = false;
+    let stoppedForBudget = false;
     document.documentElement.dataset.osm = "loading";
-    setStatus("Querying OpenStreetMap (Overpass) for this region…");
+    showRetry(false);
+    if (!opts.more) showMore(false);
+    setStatus(
+      startCat
+        ? "Loading more OpenStreetMap businesses…"
+        : "Querying OpenStreetMap (Overpass) for this region…",
+      "loading"
+    );
+    renderList();
     try {
-      const data = await fetchOverpass(buildOverpassQuery(region));
-      if (gen !== queryGen && queuedRegionId) {
-        /* a newer click is queued; still store this result */
+      let i = startCat;
+      for (; i < cats.length; i++) {
+        if (collected.length >= waveCap) {
+          stoppedForBudget = collected.length >= cap ? false : true;
+          break;
+        }
+        if (gen !== queryGen) break;
+        if (Date.now() - started > budgetMs && collected.length) {
+          stoppedForBudget = true;
+          break;
+        }
+        const cat = cats[i];
+        setStatus(
+          `Querying OpenStreetMap (${i + 1} of ${cats.length}: ${cat.label})… ${collected.length} so far.`,
+          "loading"
+        );
+        try {
+          const remain = Math.min(catCap, waveCap - collected.length);
+          const data = await fetchOverpass(
+            buildOverpassQuery(region, cat, remain, plan.timeoutSec),
+            { timeoutMs: plan.timeoutSec * 1000 + 5000, maxAttempts: 2 }
+          );
+          if (data && data._partial) partial = true;
+          const leads = osmToLeads(data.elements || [], region);
+          let added = 0;
+          leads.forEach((l) => {
+            const k = l.osmId || l.key;
+            if (seen.has(k)) return;
+            seen.add(k);
+            collected.push(l);
+            added += 1;
+          });
+          if (added && data.elements && data.elements.length >= remain) partial = true;
+          // Show results as they arrive so the list fills right away.
+          applyProgress(region, collected, {
+            nextCat: i + 1,
+            moreAvailable: i + 1 < cats.length || collected.length >= waveCap,
+            capped: collected.length >= cap,
+          });
+        } catch (err) {
+          failures += 1;
+          lastErr = err;
+          if (!collected.length && failures >= 2) break;
+        }
       }
-      const leads = osmToLeads(data.elements || [], region);
-      osmByRegion[id] = leads;
-      writeCache(id, leads);
-      if (selectedRegion && selectedRegion.properties.id === id) {
-        setStatus(`Loaded ${leads.length} OpenStreetMap businesses (capped at ${categoryConfig.resultCap || RESULT_CAP}).`);
-        document.documentElement.dataset.osm = "ok";
-        renderList();
-      }
-    } catch (err) {
-      if (selectedRegion && selectedRegion.properties.id === id) {
-        setStatus("OpenStreetMap query failed or timed out. Seed rows still show if any are in this region. Try again in a moment.", "error");
-        document.documentElement.dataset.osm = "error";
+      const moreAvailable = i < cats.length || collected.length >= waveCap && collected.length < cap || collected.length >= cap;
+      const reallyMore = i < cats.length || (partial && collected.length < cap);
+      const prog = {
+        nextCat: i,
+        moreAvailable: reallyMore,
+        capped: collected.length >= cap,
+      };
+      osmProgress[id] = prog;
+      osmByRegion[id] = collected;
+      if (collected.length) {
+        writeCache(id, collected, prog);
+        if (selectedRegion && selectedRegion.properties.id === id) {
+          const bits = [];
+          if (prog.capped) bits.push(`capped at ${cap}`);
+          else if (prog.moreAvailable) bits.push("more available");
+          if (failures) bits.push(`${failures} categor${failures === 1 ? "y" : "ies"} failed`);
+          setStatus(
+            `Loaded ${collected.length} OpenStreetMap businesses` +
+              (bits.length ? " (" + bits.join("; ") + ")" : "") +
+              "."
+          );
+          document.documentElement.dataset.osm = "ok";
+          document.documentElement.dataset.osmMore = prog.moreAvailable ? "yes" : "no";
+          showRetry(!!failures);
+          showMore(!!prog.moreAvailable);
+          renderList();
+        }
+      } else if (failures) {
+        if (selectedRegion && selectedRegion.properties.id === id) {
+          const why = lastErr && lastErr.message ? " (" + lastErr.message + ")" : "";
+          setStatus(
+            "OpenStreetMap query failed or timed out" +
+              why +
+              ". Seed rows still show if any are in this region. Use Retry, or try again in a moment.",
+            "error"
+          );
+          document.documentElement.dataset.osm = "error";
+          showRetry(true);
+          showMore(false);
+          renderList();
+        }
+      } else {
+        writeCache(id, [], { nextCat: cats.length, moreAvailable: false, capped: false });
+        if (selectedRegion && selectedRegion.properties.id === id) {
+          setStatus("No OpenStreetMap businesses matched in this region for the enabled categories.");
+          document.documentElement.dataset.osm = "ok";
+          showRetry(true);
+          showMore(false);
+          renderList();
+        }
       }
     } finally {
       queryInFlight = false;
       if (queuedRegionId) {
         const next = queuedRegionId;
+        const forceNext = queuedForce;
+        const moreNext = queuedMore;
         queuedRegionId = null;
+        queuedForce = false;
+        queuedMore = false;
         const r = regions.find((x) => x.properties.id === next);
-        if (r) requestOsm(r);
+        if (r) requestOsm(r, { force: forceNext, more: moreNext });
       }
     }
   }
@@ -862,8 +1167,18 @@ out center tags ${cap};`;
   }
 
   els.list.addEventListener("click", (e) => {
+    if (e.target.closest("a[data-contact], a[href]")) return;
     const card = e.target.closest("[data-key]");
     if (card) selectLead(card.getAttribute("data-key"), true);
+  });
+  els.list.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    if (e.target.closest("a[href]")) return;
+    const card = e.target.closest("[data-key]");
+    if (card) {
+      e.preventDefault();
+      selectLead(card.getAttribute("data-key"), true);
+    }
   });
   els.detail.addEventListener("change", (e) => {
     if (e.target && e.target.id === "outreach-script" && selectedLead) {
@@ -898,6 +1213,16 @@ out center tags ${cap};`;
   els.minFit.addEventListener("change", renderList);
   els.region.addEventListener("change", () => selectRegion(els.region.value || null));
   els.exportBtn.addEventListener("click", exportCsv);
+  if (els.retry) {
+    els.retry.addEventListener("click", () => {
+      if (selectedRegion) requestOsm(selectedRegion, { force: true });
+    });
+  }
+  if (els.more) {
+    els.more.addEventListener("click", () => {
+      if (selectedRegion) requestOsm(selectedRegion, { more: true });
+    });
+  }
 
   async function loadJson(path) {
     const res = await fetch(path);
@@ -982,6 +1307,15 @@ out center tags ${cap};`;
       getVisible: () => filtered(),
       getRegions: () => regions.map((r) => r.properties),
       getSelected: () => selectedLead,
+      requestOsm: (id, force) => {
+        const r = regions.find((x) => x.properties.id === id) || selectedRegion;
+        if (r) return requestOsm(r, { force: !!force });
+      },
+      buildOverpassQuery: (id, catId) => {
+        const r = regions.find((x) => x.properties.id === id);
+        const cat = enabledCategories().find((c) => c.id === catId) || enabledCategories()[0];
+        return r && cat ? buildOverpassQuery(r, cat, 50) : "";
+      },
     };
 
     const params = new URLSearchParams(location.search);

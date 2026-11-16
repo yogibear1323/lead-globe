@@ -230,6 +230,37 @@ def main():
                 print("delaware fail", status, msg)
             screenshot(cdp, SHOTS / "delaware-osm.png")
 
+            # 3b) Kansas: area query shape + Overpass (or clear error + Retry)
+            q = eval_js(cdp, "window.LeadGlobe && window.LeadGlobe.buildOverpassQuery && window.LeadGlobe.buildOverpassQuery('US-KS','auto')")
+            print("kansas query shape", (q or "")[:240])
+            if q and 'ISO3166-2' in q and 'US-KS' in q and q.count('nwr[') <= 8:
+                results["ok"].append("Kansas Overpass query uses ISO3166-2 US-KS and is split by category")
+            else:
+                results["fail"].append(f"Kansas query shape unexpected: {q!r}")
+            eval_js(cdp, "try{Object.keys(localStorage).forEach(k=>{if(k.indexOf('leadglobe')===0)localStorage.removeItem(k)})}catch(e){}")
+            open_page(cdp, BASE + "/?region=US-KS")
+            wait_js(cdp, "document.documentElement.dataset.region === 'US-KS'", timeout=30)
+            try:
+                wait_js(
+                    cdp,
+                    "['ok','cached','error'].indexOf(document.documentElement.dataset.osm) >= 0",
+                    timeout=150,
+                )
+            except Exception as e:
+                print("kansas wait", e)
+            osm = int(eval_js(cdp, "document.documentElement.dataset.osmPins || '0'") or 0)
+            status = eval_js(cdp, "document.documentElement.dataset.osm")
+            retry = eval_js(cdp, "document.getElementById('osm-retry') && !document.getElementById('osm-retry').hidden")
+            msg = eval_js(cdp, "(document.getElementById('status')||{}).textContent||''")
+            print("kansas osm", status, osm, "retry", retry, msg)
+            if osm >= 1:
+                results["ok"].append(f"Kansas Overpass returned {osm} OSM pins ({status})")
+            elif status == "error" and retry:
+                results["ok"].append("Kansas shows a clear error state and Retry when Overpass is unreachable")
+            else:
+                results["fail"].append(f"Kansas unexpected: status={status} osm={osm} retry={retry} msg={msg}")
+            screenshot(cdp, SHOTS / "kansas-osm.png")
+
             # 4) Outreach panel (Televerde has a published email)
             open_page(cdp, BASE + "/?shot=outreach")
             wait_js(cdp, "document.documentElement.dataset.outreach === 'ready'", timeout=40)
