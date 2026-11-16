@@ -132,6 +132,13 @@
     "name": "Louisiana",
     "totalMatched": 1402
   },
+  "US-MD": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T02:50:29Z",
+    "name": "Maryland",
+    "totalMatched": 2810
+  },
   "US-ME": {
     "capped": true,
     "count": 500,
