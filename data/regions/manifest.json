@@ -335,6 +335,13 @@
     "name": "Washington",
     "totalMatched": 5156
   },
+  "US-WI": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T04:30:33Z",
+    "name": "Wisconsin",
+    "totalMatched": 2911
+  },
   "US-WV": {
     "capped": true,
     "count": 500,
