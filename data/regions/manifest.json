@@ -230,6 +230,13 @@
     "name": "Iceland",
     "totalMatched": 288
   },
+  "IT": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T18:37:08Z",
+    "name": "Italy",
+    "totalMatched": 34662
+  },
   "LI": {
     "capped": false,
     "count": 33,
