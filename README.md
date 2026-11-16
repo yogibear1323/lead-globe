@@ -2,6 +2,8 @@
 
 An independent partner’s internal research tool for browsing a seed lead list and expanding it with OpenStreetMap. **It is not an official DataEarners or Mode product.** No DataEarners or Mode logos are used.
 
+Live site: [https://yogibear1323.github.io/lead-globe/](https://yogibear1323.github.io/lead-globe/)
+
 Outreach CTA: [https://robertwalker.dataearns.com/invite](https://robertwalker.dataearns.com/invite)
 
 Personal, one-at-a-time outreach only, per DataEarners partner rules. Do not blast this list. Honor opt-outs the same day. This tool does not contact anyone.
