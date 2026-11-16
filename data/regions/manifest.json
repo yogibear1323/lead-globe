@@ -153,6 +153,13 @@
     "name": "Cyprus",
     "totalMatched": 664
   },
+  "CZ": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T12:41:33Z",
+    "name": "Czech Republic",
+    "totalMatched": 5901
+  },
   "DE": {
     "capped": true,
     "count": 500,
