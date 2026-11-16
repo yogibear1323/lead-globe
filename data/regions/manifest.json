@@ -104,6 +104,13 @@
     "name": "Yukon",
     "totalMatched": 32
   },
+  "CY": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T07:59:41Z",
+    "name": "Cyprus",
+    "totalMatched": 664
+  },
   "DE": {
     "capped": true,
     "count": 500,
@@ -131,6 +138,13 @@
     "extractedAt": "2026-11-16T07:58:13Z",
     "name": "Monaco",
     "totalMatched": 1
+  },
+  "ME": {
+    "capped": false,
+    "count": 447,
+    "extractedAt": "2026-11-16T07:59:19Z",
+    "name": "Montenegro",
+    "totalMatched": 447
   },
   "MK": {
     "capped": true,
