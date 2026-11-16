@@ -69,6 +69,13 @@
     "name": "Florida",
     "totalMatched": 6464
   },
+  "US-GA": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T02:20:46Z",
+    "name": "Georgia",
+    "totalMatched": 4385
+  },
   "US-KS": {
     "capped": true,
     "count": 500,
