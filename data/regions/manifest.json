@@ -188,6 +188,13 @@
     "name": "Montana",
     "totalMatched": 1165
   },
+  "US-NC": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:32:05Z",
+    "name": "North Carolina",
+    "totalMatched": 4975
+  },
   "US-NE": {
     "capped": true,
     "count": 500,
