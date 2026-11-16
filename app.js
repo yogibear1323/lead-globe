@@ -367,6 +367,9 @@
       [/retail|e-commerce|ecommerce/, "retail"],
       [/saas|software|\bapp\b/, "saas"],
       [/\bagenc/, "agencies"],
+      [/accounting|\bcpa\b|bookkeep|tax prep/, "accounting"],
+      [/manufactur|\bfactory\b|fabricat/, "manufacturing"],
+      [/\boil\b|oil and gas|oil & gas|\bgas\b|petroleum/, "oil-gas"],
     ];
     for (const [re, id] of rules) {
       if (re.test(lower) && packs[id]) return packs[id];
