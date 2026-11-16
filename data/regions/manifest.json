@@ -27,6 +27,13 @@
     "name": "Bulgaria",
     "totalMatched": 3491
   },
+  "BY": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T09:20:32Z",
+    "name": "Belarus",
+    "totalMatched": 4634
+  },
   "CA-AB": {
     "capped": true,
     "count": 500,
