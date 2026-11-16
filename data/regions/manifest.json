@@ -223,6 +223,13 @@
     "name": "Nevada",
     "totalMatched": 982
   },
+  "US-NY": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:25:29Z",
+    "name": "New York",
+    "totalMatched": 5690
+  },
   "US-OH": {
     "capped": true,
     "count": 500,
