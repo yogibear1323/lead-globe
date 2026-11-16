@@ -34,6 +34,13 @@
     "name": "Newfoundland and Labrador",
     "totalMatched": 318
   },
+  "CA-NT": {
+    "capped": false,
+    "count": 60,
+    "extractedAt": "2026-11-16T06:06:42Z",
+    "name": "Northwest Territories",
+    "totalMatched": 60
+  },
   "CA-ON": {
     "capped": true,
     "count": 500,
