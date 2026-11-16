@@ -6,6 +6,13 @@
     "name": "Alberta",
     "totalMatched": 2390
   },
+  "CA-BC": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T05:51:38Z",
+    "name": "British Columbia",
+    "totalMatched": 3298
+  },
   "CA-ON": {
     "capped": true,
     "count": 500,
