@@ -307,6 +307,13 @@
     "name": "Serbia",
     "totalMatched": 2546
   },
+  "SE": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T13:44:15Z",
+    "name": "Sweden",
+    "totalMatched": 5719
+  },
   "SI": {
     "capped": true,
     "count": 500,
