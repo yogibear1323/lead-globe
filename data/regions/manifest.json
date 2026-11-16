@@ -97,6 +97,13 @@
     "name": "Germany",
     "totalMatched": 104633
   },
+  "IE": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T07:53:44Z",
+    "name": "Ireland",
+    "totalMatched": 3836
+  },
   "US-AK": {
     "capped": false,
     "count": 303,
