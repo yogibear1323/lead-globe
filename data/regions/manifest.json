@@ -153,6 +153,13 @@
     "name": "Luxembourg",
     "totalMatched": 698
   },
+  "LV": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T08:07:21Z",
+    "name": "Latvia",
+    "totalMatched": 1275
+  },
   "MC": {
     "capped": false,
     "count": 1,
