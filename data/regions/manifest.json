@@ -1,9 +1,23 @@
 {
+  "US-DE": {
+    "capped": false,
+    "count": 384,
+    "extractedAt": "2026-11-16T00:45:52Z",
+    "name": "Delaware",
+    "totalMatched": 384
+  },
   "US-KS": {
-    "name": "Kansas",
-    "count": 500,
-    "totalMatched": 1372,
     "capped": true,
-    "extractedAt": "2026-11-16T00:42:26Z"
+    "count": 500,
+    "extractedAt": "2026-11-16T00:42:26Z",
+    "name": "Kansas",
+    "totalMatched": 1372
+  },
+  "US-TX": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T00:52:45Z",
+    "name": "Texas",
+    "totalMatched": 10597
   }
 }
