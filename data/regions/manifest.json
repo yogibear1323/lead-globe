@@ -167,6 +167,13 @@
     "name": "Liechtenstein",
     "totalMatched": 33
   },
+  "LT": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T08:23:16Z",
+    "name": "Lithuania",
+    "totalMatched": 1810
+  },
   "LU": {
     "capped": true,
     "count": 500,
