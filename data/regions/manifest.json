@@ -27,6 +27,13 @@
     "name": "New Brunswick",
     "totalMatched": 480
   },
+  "CA-NL": {
+    "capped": false,
+    "count": 318,
+    "extractedAt": "2026-11-16T06:00:44Z",
+    "name": "Newfoundland and Labrador",
+    "totalMatched": 318
+  },
   "CA-ON": {
     "capped": true,
     "count": 500,
