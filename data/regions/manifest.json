@@ -125,6 +125,13 @@
     "name": "Yukon",
     "totalMatched": 32
   },
+  "CH": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T10:00:31Z",
+    "name": "Switzerland",
+    "totalMatched": 9881
+  },
   "CY": {
     "capped": true,
     "count": 500,
