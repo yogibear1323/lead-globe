@@ -314,6 +314,13 @@
     "name": "Slovakia",
     "totalMatched": 3895
   },
+  "UA": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T11:55:50Z",
+    "name": "Ukraine",
+    "totalMatched": 11732
+  },
   "US-AK": {
     "capped": false,
     "count": 303,
