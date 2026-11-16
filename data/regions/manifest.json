@@ -62,6 +62,13 @@
     "name": "Delaware",
     "totalMatched": 384
   },
+  "US-FL": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T01:48:35Z",
+    "name": "Florida",
+    "totalMatched": 6464
+  },
   "US-KS": {
     "capped": true,
     "count": 500,
