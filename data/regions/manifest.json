@@ -327,5 +327,12 @@
     "extractedAt": "2026-11-16T03:59:09Z",
     "name": "Vermont",
     "totalMatched": 442
+  },
+  "US-WA": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T04:19:03Z",
+    "name": "Washington",
+    "totalMatched": 5156
   }
 }
