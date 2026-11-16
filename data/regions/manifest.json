@@ -230,6 +230,13 @@
     "name": "Serbia",
     "totalMatched": 2546
   },
+  "SI": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T08:36:38Z",
+    "name": "Slovenia",
+    "totalMatched": 2010
+  },
   "US-AK": {
     "capped": false,
     "count": 303,
