@@ -983,7 +983,7 @@ out center tags ${cap};`;
           break;
         }
         if (gen !== queryGen) break;
-        if (Date.now() - started > budgetMs && collected.length) {
+        if (Date.now() - started > budgetMs) {
           stoppedForBudget = true;
           break;
         }
@@ -1021,8 +1021,11 @@ out center tags ${cap};`;
           if (!collected.length && failures >= 2) break;
         }
       }
-      const moreAvailable = i < cats.length || collected.length >= waveCap && collected.length < cap || collected.length >= cap;
-      const reallyMore = i < cats.length || (partial && collected.length < cap);
+      if (stoppedForBudget && !collected.length && !failures) {
+        failures = 1;
+        lastErr = lastErr || new Error("Overpass first wave timed out before any results arrived");
+      }
+      const reallyMore = i < cats.length && collected.length < cap;
       const prog = {
         nextCat: i,
         moreAvailable: reallyMore,
