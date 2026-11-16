@@ -84,13 +84,17 @@
         <a class="iv-btn-ghost lg" href="globe.html">Launch App</a>
       </div>
       <div class="tour-frame">
-        <video id="tour-video" controls muted playsinline preload="metadata" poster="assets/video/lead-globe-tour-poster.jpg" width="1440" height="900">
-          <source src="assets/video/lead-globe-tour.webm" type="video/webm">
-          <source src="assets/video/lead-globe-tour.mp4" type="video/mp4">
-          Your browser can’t play this video. <a href="assets/video/lead-globe-tour.mp4">Download the tour (MP4)</a>.
+        <video id="tour-video" controls muted playsinline preload="metadata" poster="assets/video/lead-globe-tour-poster.jpg?v=2" width="1440" height="900">
+          <source src="assets/video/lead-globe-tour.webm?v=2" type="video/webm">
+          <source src="assets/video/lead-globe-tour.mp4?v=2" type="video/mp4">
+          Your browser can’t play this video. <a href="assets/video/lead-globe-tour.mp4?v=2">Download the tour (MP4)</a>.
         </video>
+        <button type="button" class="tour-sound" id="tour-sound" aria-label="Play the tour with sound from the beginning">
+          <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <span>Tap for sound</span>
+        </button>
       </div>
-      <p class="tour-cap">A silent walkthrough of the real site: pick a region, browse business cards, see published leadership, and open the personal outreach panel.</p>
+      <p class="tour-cap">A narrated walkthrough of the real site: pick a region, browse business cards, see published leadership, and open the personal outreach panel.</p>
     </section>
 
     <section class="stats reveal" aria-label="Coverage">

@@ -86,20 +86,35 @@
   }
 })();
 
-/* Video tour: autoplay muted only on desktop, only while visible, never with reduced motion. */
+/* Video tour: muted autoplay-on-view on desktop (never with reduced motion);
+   the "Tap for sound" button unmutes and restarts from the beginning. */
 (function () {
   var v = document.getElementById("tour-video");
+  var btn = document.getElementById("tour-sound");
   if (!v) return;
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var desktop = window.matchMedia("(min-width: 1000px)").matches;
-  if (reduce || !desktop || !("IntersectionObserver" in window)) return;
-  var userPaused = false;
+  var withSound = false, userPaused = false;
+  function hideBtn() { if (btn) btn.classList.add("is-hidden"); }
+  if (btn) {
+    btn.addEventListener("click", function () {
+      withSound = true; userPaused = false;
+      v.loop = false; v.muted = false; v.volume = 1;
+      try { v.currentTime = 0; } catch (e) {}
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+      hideBtn();
+    });
+  }
+  v.addEventListener("volumechange", function () { if (!v.muted) { withSound = true; hideBtn(); } });
+  v.addEventListener("ended", function () { if (withSound && btn) { btn.classList.remove("is-hidden"); btn.querySelector("span").textContent = "Replay with sound"; } });
   v.addEventListener("pause", function () { if (!v.dataset.auto) userPaused = true; delete v.dataset.auto; });
+  if (!desktop && btn) btn.querySelector("span").textContent = "Play with sound";
+  if (reduce || !desktop || !("IntersectionObserver" in window)) return;
   v.loop = true; v.muted = true;
   new IntersectionObserver(function (es) {
     es.forEach(function (e) {
       if (e.isIntersecting && e.intersectionRatio > 0.45) {
-        if (!userPaused && v.paused) { if (v.preload !== "auto") v.preload = "auto"; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+        if (!userPaused && v.paused && !withSound) { if (v.preload !== "auto") v.preload = "auto"; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
       } else if (!v.paused) { v.dataset.auto = "1"; v.pause(); }
     });
   }, { threshold: [0, 0.45, 0.8] }).observe(v);
