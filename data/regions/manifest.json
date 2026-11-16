@@ -272,6 +272,13 @@
     "name": "Pennsylvania",
     "totalMatched": 7497
   },
+  "US-RI": {
+    "capped": false,
+    "count": 311,
+    "extractedAt": "2026-11-16T03:47:40Z",
+    "name": "Rhode Island",
+    "totalMatched": 311
+  },
   "US-TX": {
     "capped": true,
     "count": 500,
