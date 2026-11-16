@@ -90,6 +90,13 @@
     "name": "Yukon",
     "totalMatched": 32
   },
+  "DE": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T07:43:07Z",
+    "name": "Germany",
+    "totalMatched": 104633
+  },
   "US-AK": {
     "capped": false,
     "count": 303,
