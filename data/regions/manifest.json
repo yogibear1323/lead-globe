@@ -279,6 +279,13 @@
     "name": "Rhode Island",
     "totalMatched": 311
   },
+  "US-SC": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:49:46Z",
+    "name": "South Carolina",
+    "totalMatched": 2560
+  },
   "US-TX": {
     "capped": true,
     "count": 500,
