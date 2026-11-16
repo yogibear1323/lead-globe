@@ -13,6 +13,13 @@
     "name": "Albania",
     "totalMatched": 1493
   },
+  "BA": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T08:09:13Z",
+    "name": "Bosnia and Herzegovina",
+    "totalMatched": 1647
+  },
   "CA-AB": {
     "capped": true,
     "count": 500,
