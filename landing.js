@@ -85,3 +85,22 @@
     }, { passive: true });
   }
 })();
+
+/* Video tour: autoplay muted only on desktop, only while visible, never with reduced motion. */
+(function () {
+  var v = document.getElementById("tour-video");
+  if (!v) return;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var desktop = window.matchMedia("(min-width: 1000px)").matches;
+  if (reduce || !desktop || !("IntersectionObserver" in window)) return;
+  var userPaused = false;
+  v.addEventListener("pause", function () { if (!v.dataset.auto) userPaused = true; delete v.dataset.auto; });
+  v.loop = true; v.muted = true;
+  new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting && e.intersectionRatio > 0.45) {
+        if (!userPaused && v.paused) { if (v.preload !== "auto") v.preload = "auto"; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      } else if (!v.paused) { v.dataset.auto = "1"; v.pause(); }
+    });
+  }, { threshold: [0, 0.45, 0.8] }).observe(v);
+})();
