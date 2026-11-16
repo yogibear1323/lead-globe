@@ -286,6 +286,13 @@
     "name": "South Carolina",
     "totalMatched": 2560
   },
+  "US-SD": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:54:27Z",
+    "name": "South Dakota",
+    "totalMatched": 753
+  },
   "US-TX": {
     "capped": true,
     "count": 500,
