@@ -34,6 +34,13 @@
     "name": "California",
     "totalMatched": 13905
   },
+  "US-CO": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T01:31:30Z",
+    "name": "Colorado",
+    "totalMatched": 3517
+  },
   "US-DC": {
     "capped": false,
     "count": 165,
