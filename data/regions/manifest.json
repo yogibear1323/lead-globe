@@ -139,6 +139,13 @@
     "name": "Germany",
     "totalMatched": 104633
   },
+  "DK": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T09:43:25Z",
+    "name": "Denmark",
+    "totalMatched": 4648
+  },
   "EE": {
     "capped": true,
     "count": 500,
