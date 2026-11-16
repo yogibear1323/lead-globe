@@ -5,12 +5,15 @@ from bs4 import BeautifulSoup
 UA="LeadGlobeLeadershipCheck/1.0 (+https://yogibear1323.github.io/lead-globe/; one-time check of published leadership pages, max 3 requests per site)"
 H={"User-Agent":UA,"Accept":"text/html"}
 def slug(s): return re.sub(r'[^a-z0-9]+','-',s.lower()).strip('-')
+import os
+SKIP=set(filter(None,os.environ.get('SKIP_REGIONS','').split(',')))  # regions already checked
+OUTFILE=os.environ.get('OUT','raw.json')
 cands=[]
-for l in json.load(open('seeds.json')):
+for l in ([] if os.environ.get('NO_SEEDS') else json.load(open('seeds.json'))):
     cands.append({"id":"seed:"+slug(l['name']),"name":l['name'],"website":l['website'],"region":"US-AZ"})
 for f in sorted(glob.glob('/tmp/lg/data/regions/*.json')):
     rid=f.split('/')[-1][:-5]
-    if not (rid.startswith('US-') or rid.startswith('CA-')): continue
+    if not (rid.startswith('US-') or rid.startswith('CA-')) or rid in SKIP: continue
     d=json.load(open(f)); ls=[l for l in d.get('leads',[]) if l.get('website')]
     ls.sort(key=lambda l:-(l.get('fit') or 0))
     for l in ls[:10]:
@@ -86,5 +89,5 @@ def check(c):
 if __name__=="__main__":
     print(len(cands),file=sys.stderr)
     with ThreadPoolExecutor(12) as ex: res=list(ex.map(check,cands))
-    json.dump(res,open('raw.json','w'),indent=1)
+    json.dump(res,open(OUTFILE,'w'),indent=1)
     print(sum(1 for r in res if r['people']),"with people",file=sys.stderr)

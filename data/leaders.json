@@ -1,8 +1,8 @@
 {
  "note": "Names and titles published by each company on its own website (team, leadership, or about page). Checked once per site with a few polite requests; robots.txt respected. No personal emails or direct phone numbers collected. US and Canada best-fit leads only.",
- "generatedAt": "2026-11-16T02:51:37Z",
- "checked": 286,
- "withLeaders": 40,
+ "generatedAt": "2026-11-16T06:59:38Z",
+ "checked": 685,
+ "withLeaders": 72,
  "leaders": {
   "seed:san-tan-ford": {
    "name": "San Tan Ford",
@@ -747,6 +747,490 @@
    ],
    "source": "https://www.americanwayexteriors.com/our-team/",
    "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/14041394107": {
+   "name": "AMP Plumbing",
+   "region": "CA-AB",
+   "people": [
+    {
+     "name": "Alex Papa",
+     "title": "Owner Operator"
+    }
+   ],
+   "source": "https://www.ampplumbing.ca/about-amp-plumbing",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/14116867601": {
+   "name": "Genesis Winnipeg",
+   "region": "CA-MB",
+   "people": [
+    {
+     "name": "Richard Eccleston",
+     "title": "General Manager"
+    }
+   ],
+   "source": "https://www.genesiswinnipeg.ca/en/about-us/team",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/11818209731": {
+   "name": "Next-Gen Plumbing and Heating Ltd.",
+   "region": "CA-MB",
+   "people": [
+    {
+     "name": "Nicholas Pirotton",
+     "title": "Owner/Operator"
+    }
+   ],
+   "source": "https://www.next-genplumbing.ca/about",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/8968532666": {
+   "name": "Al’s Ultra Car",
+   "region": "CA-NB",
+   "people": [
+    {
+     "name": "Al Williams",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://alsultracar.com/staff/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:way/386370742": {
+   "name": "BMW / Mini",
+   "region": "CA-NB",
+   "people": [
+    {
+     "name": "Christopher D. Bacich",
+     "title": "General Manager / Managing Partner"
+    }
+   ],
+   "source": "https://www.bmwmoncton.com/contactus.html",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:way/701204254": {
+   "name": "Centennial Nissan",
+   "region": "CA-PE",
+   "people": [
+    {
+     "name": "Trevor Leeco",
+     "title": "General Manager"
+    }
+   ],
+   "source": "https://www.centennialnissanofcharlottetown.com/en/our-team",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:way/212137259": {
+   "name": "Cape Cod Heat Pumps",
+   "region": "US-MA",
+   "people": [
+    {
+     "name": "Jared Grier",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://ccheatpumps.com/about-us/meet-the-team/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/12870550506": {
+   "name": "180 Contractors Roofing & Siding",
+   "region": "US-MI",
+   "people": [
+    {
+     "name": "Ken Locatelli",
+     "title": "Owner / Project Consultant"
+    },
+    {
+     "name": "Kenny Locatelli",
+     "title": "Owner / Project Consultant"
+    }
+   ],
+   "source": "https://www.180contractors.com/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/9527433489": {
+   "name": "AJ Alberts Plumbing",
+   "region": "US-MN",
+   "people": [
+    {
+     "name": "Steve Grohn",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://ajalberts.com/about",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/9514130517": {
+   "name": "APX Construction Group",
+   "region": "US-MN",
+   "people": [
+    {
+     "name": "Ryan Evenson",
+     "title": "CEO | President"
+    },
+    {
+     "name": "Mitch Rohlfing",
+     "title": "Chief Operating Officer"
+    },
+    {
+     "name": "Emilie Prange",
+     "title": "Chief Financial Officer"
+    },
+    {
+     "name": "Nate Host",
+     "title": "Vice President of Construction"
+    },
+    {
+     "name": "Jamie Jacobs",
+     "title": "Vice President of Sales + Marketing"
+    }
+   ],
+   "source": "https://apxconstructiongroup.com/our-team-apx/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/13645347880": {
+   "name": "Bone Dry Roofing",
+   "region": "US-MO",
+   "people": [
+    {
+     "name": "Gene Judd",
+     "title": "Owner & CEO"
+    },
+    {
+     "name": "Judd Haag",
+     "title": "CIO"
+    }
+   ],
+   "source": "https://bonedry.com/about/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/12492492849": {
+   "name": "Kasberg Siding and Remodel",
+   "region": "US-MT",
+   "people": [
+    {
+     "name": "Justin Kasberg",
+     "title": "Owner/Founder"
+    },
+    {
+     "name": "Tamar Kasberg",
+     "title": "Owner/Photographer"
+    }
+   ],
+   "source": "https://kasbergsidingandremodel.com/about-us/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/12881204961": {
+   "name": "Monarch Heating and Cooling LLC",
+   "region": "US-MT",
+   "people": [
+    {
+     "name": "Joe Miller",
+     "title": "CEO"
+    }
+   ],
+   "source": "https://monarchheatingandac.com/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/10188056351": {
+   "name": "Mountain Roofing",
+   "region": "US-MT",
+   "people": [
+    {
+     "name": "Dan Lord",
+     "title": "Owner, Visionary"
+    },
+    {
+     "name": "Emily Denis",
+     "title": "Owner, Integrator"
+    }
+   ],
+   "source": "https://mountain-roofing.com/about-us/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:way/1264360960": {
+   "name": "American Concrete Repair LLC",
+   "region": "US-ND",
+   "people": [
+    {
+     "name": "Nathan Bollschweiler",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://americanconcreterepair.com/about/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/11362522240": {
+   "name": "Autorama Auto Sales",
+   "region": "US-ND",
+   "people": [
+    {
+     "name": "Carter Heiser",
+     "title": "Owner & Lead Buyer"
+    }
+   ],
+   "source": "https://autoramaauto.com/about-us",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:way/751840698": {
+   "name": "AG Electrical Contractors Inc.",
+   "region": "US-NJ",
+   "people": [
+    {
+     "name": "Aldo Gallelli",
+     "title": "President"
+    }
+   ],
+   "source": "https://agelectric-inc.com/about-us/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:way/1261899069": {
+   "name": "Haarmeyer Electric",
+   "region": "US-NM",
+   "people": [
+    {
+     "name": "Nolan Venable",
+     "title": "Founder/President"
+    },
+    {
+     "name": "Michael Adams",
+     "title": "CEO"
+    },
+    {
+     "name": "Mark Edens",
+     "title": "CFO"
+    },
+    {
+     "name": "Chris Ault",
+     "title": "CIO"
+    },
+    {
+     "name": "Melissa Jones",
+     "title": "Vice President of Business Development"
+    },
+    {
+     "name": "Isaac Griner",
+     "title": "Vice President of Operations"
+    },
+    {
+     "name": "Leo Porras",
+     "title": "Vice President of Project Services"
+    },
+    {
+     "name": "Mary Banda",
+     "title": "Vice President of Supply Chain"
+    }
+   ],
+   "source": "https://matadoriande.com/about-us/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/12183645836": {
+   "name": "Affordable Roofing",
+   "region": "US-NY",
+   "people": [
+    {
+     "name": "Alan Campisano",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://www.roofingwny.com/about/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/14380092201": {
+   "name": "American Air Heating and Cooling, LLC",
+   "region": "US-NY",
+   "people": [
+    {
+     "name": "Gregory Immediato",
+     "title": "Co-Owner · Installation & Repair"
+    },
+    {
+     "name": "Nicholas Muscatello",
+     "title": "Co-Owner · Sales & Operations"
+    }
+   ],
+   "source": "https://www.americanairheatingandcooling.com/about-us",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/13120940488": {
+   "name": "McCann's Roofing and Construction",
+   "region": "US-OK",
+   "people": [
+    {
+     "name": "Eric Brown",
+     "title": "Owner"
+    },
+    {
+     "name": "Shay Brown",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://roofingbymccanns.com/about/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/13236415192": {
+   "name": "McCann's Roofing and Construction",
+   "region": "US-OK",
+   "people": [
+    {
+     "name": "Eric Brown",
+     "title": "Owner"
+    },
+    {
+     "name": "Shay Brown",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://roofingbymccanns.com/about/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:way/1123058236": {
+   "name": "Adroit Construction",
+   "region": "US-OR",
+   "people": [
+    {
+     "name": "Tom Walker",
+     "title": "CEO"
+    }
+   ],
+   "source": "https://adroitbuilt.com/meet-the-team/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/11766280247": {
+   "name": "AirMaster Heating & Cooling Specialists",
+   "region": "US-PA",
+   "people": [
+    {
+     "name": "Thomas Molieri",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://airmasterpa.com/about/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/12723058797": {
+   "name": "Legacy Heating & Cooling",
+   "region": "US-RI",
+   "people": [
+    {
+     "name": "Mike Iafrati",
+     "title": "Owner"
+    },
+    {
+     "name": "John Smith",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://www.legacyhvacri.com/about",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:way/674439991": {
+   "name": "Bolton James, Inc.",
+   "region": "US-SC",
+   "people": [
+    {
+     "name": "Donald Bolton",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://www.boltonjames.com/About/Our-Staff",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/11198534753": {
+   "name": "Billion Kia of Rapid City",
+   "region": "US-SD",
+   "people": [
+    {
+     "name": "Todd Jacobson",
+     "title": "General Manager"
+    }
+   ],
+   "source": "https://www.billionkiaofrapidcity.com/staff.aspx",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/13644579845": {
+   "name": "Bone Dry Roofing",
+   "region": "US-TN",
+   "people": [
+    {
+     "name": "Gene Judd",
+     "title": "Owner & CEO"
+    },
+    {
+     "name": "Judd Haag",
+     "title": "CIO"
+    }
+   ],
+   "source": "https://bonedry.com/about/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/5035419215": {
+   "name": "Certified Auto Brokers LLC",
+   "region": "US-TN",
+   "people": [
+    {
+     "name": "Tracy Sons",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://certifiedautobrokersllc.com/meetourstaff",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/12044738268": {
+   "name": "ACE Plumbing",
+   "region": "US-WA",
+   "people": [
+    {
+     "name": "Ryan Acevedo",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://www.aceplumbingllc.net/",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/9063027621": {
+   "name": "Neff's Repair Center",
+   "region": "US-WV",
+   "people": [
+    {
+     "name": "Cody Neff",
+     "title": "Owner · Lead Technician"
+    },
+    {
+     "name": "Joni Morgan",
+     "title": "General Manager"
+    }
+   ],
+   "source": "https://www.neffsrepaircenter.com/team",
+   "checkedAt": "2026-11-16T06:59:38Z"
+  },
+  "osm:node/13593968163": {
+   "name": "Owl Roofing",
+   "region": "US-WY",
+   "people": [
+    {
+     "name": "Tim Brown",
+     "title": "Co-Owner"
+    },
+    {
+     "name": "Bea Bonte",
+     "title": "Co-Owner"
+    },
+    {
+     "name": "Noah Bergland",
+     "title": "Co-Owner"
+    },
+    {
+     "name": "Anya Bergland",
+     "title": "Co-Owner"
+    },
+    {
+     "name": "Pedro Rodriguez",
+     "title": "Co-Founder, Field Production"
+    }
+   ],
+   "source": "https://owlroofing.com/about/",
+   "checkedAt": "2026-11-16T06:59:38Z"
   }
  }
 }
