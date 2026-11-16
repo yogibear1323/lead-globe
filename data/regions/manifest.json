@@ -244,6 +244,13 @@
     "name": "Malta",
     "totalMatched": 284
   },
+  "PT": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T09:37:31Z",
+    "name": "Portugal",
+    "totalMatched": 6709
+  },
   "RO": {
     "capped": true,
     "count": 500,
