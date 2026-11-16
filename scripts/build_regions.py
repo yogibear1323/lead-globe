@@ -73,35 +73,72 @@ def load_all_regions():
     return regions
 
 
+def expected_size(url: str) -> int:
+    try:
+        raw = subprocess.check_output(
+            ["curl", "-sSI", "-L", "--max-time", "30", "-A", UA, url],
+            text=True,
+            errors="replace",
+        )
+        lengths = re.findall(r"(?i)content-length:\s*(\d+)", raw)
+        return int(lengths[-1]) if lengths else 0
+    except Exception:
+        return 0
+
+
 def download(url: str, dest: Path, retries: int = 4) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.with_suffix(dest.suffix + ".part")
+    expect = expected_size(url)
     last_err = None
     for attempt in range(1, retries + 1):
         try:
-            if tmp.exists():
-                tmp.unlink()
-            print(f"  downloading {url} -> {dest} (try {attempt})", flush=True)
-            req = urllib.request.Request(url, headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=120) as r, tmp.open("wb") as f:
-                total = int(r.headers.get("Content-Length") or 0)
-                got = 0
-                t0 = time.time()
-                while True:
-                    chunk = r.read(1024 * 256)
-                    if not chunk:
-                        break
-                    f.write(chunk)
-                    got += len(chunk)
-                    if total and got % (1024 * 1024 * 50) < 1024 * 256:
-                        pct = 100 * got / total
-                        print(f"    {got/1e6:.1f}/{total/1e6:.1f} MB ({pct:.0f}%)", flush=True)
+            print(
+                f"  downloading {url} -> {dest} (try {attempt}"
+                + (f", expect {expect/1e6:.1f} MB" if expect else "")
+                + ")",
+                flush=True,
+            )
+            t0 = time.time()
+            cmd = [
+                "curl",
+                "-L",
+                "--fail",
+                "--retry",
+                "3",
+                "--retry-delay",
+                "2",
+                "--connect-timeout",
+                "30",
+                "--max-time",
+                "3600",
+                "-C",
+                "-",
+                "-A",
+                UA,
+                "-o",
+                str(tmp),
+                url,
+            ]
+            r = subprocess.run(cmd, capture_output=True, text=True)
+            if r.returncode != 0:
+                raise RuntimeError((r.stderr or r.stdout or "curl failed").strip()[-400:])
+            size = tmp.stat().st_size if tmp.exists() else 0
+            if size < 1000:
+                raise RuntimeError(f"download too small ({size} bytes)")
+            if expect and size != expect:
+                raise RuntimeError(f"truncated or incomplete download: got {size} of {expect} bytes")
             tmp.rename(dest)
             print(f"  saved {dest} ({dest.stat().st_size/1e6:.1f} MB) in {time.time()-t0:.1f}s", flush=True)
             return
         except Exception as e:
             last_err = e
             print(f"  download failed: {e}", flush=True)
+            # if resume is confused, start clean next try
+            if tmp.exists() and expect and tmp.stat().st_size > expect:
+                tmp.unlink()
+            elif attempt == retries and tmp.exists():
+                tmp.unlink()
             time.sleep(min(30, 2 ** attempt))
     raise RuntimeError(f"download failed after {retries} tries: {last_err}")
 
