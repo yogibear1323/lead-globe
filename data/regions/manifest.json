@@ -146,6 +146,13 @@
     "name": "Croatia",
     "totalMatched": 2076
   },
+  "HU": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T08:48:26Z",
+    "name": "Hungary",
+    "totalMatched": 5650
+  },
   "IE": {
     "capped": true,
     "count": 500,
