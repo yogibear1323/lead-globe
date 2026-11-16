@@ -286,6 +286,13 @@
     "name": "Malta",
     "totalMatched": 284
   },
+  "NO": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T14:19:33Z",
+    "name": "Norway",
+    "totalMatched": 4103
+  },
   "PT": {
     "capped": true,
     "count": 500,
