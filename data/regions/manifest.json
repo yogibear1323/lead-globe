@@ -139,6 +139,13 @@
     "name": "Estonia",
     "totalMatched": 1143
   },
+  "GR": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T09:00:40Z",
+    "name": "Greece",
+    "totalMatched": 5905
+  },
   "HR": {
     "capped": true,
     "count": 500,
