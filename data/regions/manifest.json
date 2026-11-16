@@ -118,6 +118,13 @@
     "name": "Kansas",
     "totalMatched": 1372
   },
+  "US-KY": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T02:41:56Z",
+    "name": "Kentucky",
+    "totalMatched": 1384
+  },
   "US-OH": {
     "capped": true,
     "count": 500,
