@@ -195,6 +195,13 @@
     "name": "Nebraska",
     "totalMatched": 938
   },
+  "US-NV": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:11:11Z",
+    "name": "Nevada",
+    "totalMatched": 982
+  },
   "US-OH": {
     "capped": true,
     "count": 500,
