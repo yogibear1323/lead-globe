@@ -153,6 +153,13 @@
     "name": "Maine",
     "totalMatched": 775
   },
+  "US-MI": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T02:57:32Z",
+    "name": "Michigan",
+    "totalMatched": 4797
+  },
   "US-OH": {
     "capped": true,
     "count": 500,
