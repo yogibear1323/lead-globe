@@ -202,6 +202,13 @@
     "name": "New Hampshire",
     "totalMatched": 1310
   },
+  "US-NJ": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T03:14:53Z",
+    "name": "New Jersey",
+    "totalMatched": 3246
+  },
   "US-NV": {
     "capped": true,
     "count": 500,
