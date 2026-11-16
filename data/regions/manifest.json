@@ -1,4 +1,18 @@
 {
+  "US-CA": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T01:06:59Z",
+    "name": "California",
+    "totalMatched": 13905
+  },
+  "US-DC": {
+    "capped": false,
+    "count": 165,
+    "extractedAt": "2026-11-16T01:07:18Z",
+    "name": "District of Columbia",
+    "totalMatched": 165
+  },
   "US-DE": {
     "capped": false,
     "count": 384,
