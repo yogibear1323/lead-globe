@@ -1,0 +1,752 @@
+{
+ "note": "Names and titles published by each company on its own website (team, leadership, or about page). Checked once per site with a few polite requests; robots.txt respected. No personal emails or direct phone numbers collected. US and Canada best-fit leads only.",
+ "generatedAt": "2026-11-16T02:51:37Z",
+ "checked": 286,
+ "withLeaders": 40,
+ "leaders": {
+  "seed:san-tan-ford": {
+   "name": "San Tan Ford",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Tim Hovik",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://santanford.com/about-the-owner",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:mark-taylor": {
+   "name": "Mark-Taylor",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Adam Greco",
+     "title": "Senior Director of Portfolio Development"
+    },
+    {
+     "name": "Ethan Kingsley",
+     "title": "Director of Portfolio Development"
+    }
+   ],
+   "source": "https://www.mark-taylor.com/investment-management/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:p-b-bell": {
+   "name": "P.B. Bell",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Justin Steltenpohl",
+     "title": "CEO"
+    }
+   ],
+   "source": "https://pbbell.com/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:chamberlin-associates": {
+   "name": "Chamberlin & Associates",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Jon Dixon",
+     "title": "Vice President of Operations"
+    },
+    {
+     "name": "Charlotte Warda",
+     "title": "VP of Client Relations"
+    },
+    {
+     "name": "Adolfo Reyes",
+     "title": "Director of Human Resources"
+    },
+    {
+     "name": "Christina Valencia",
+     "title": "Regional Vice President"
+    },
+    {
+     "name": "Stephanie Gittings",
+     "title": "Director of Marketing"
+    }
+   ],
+   "source": "https://www.ca-mgmt.com/about/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:bryten": {
+   "name": "Bryten",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Libby Ekre",
+     "title": "Principal, CPM®"
+    },
+    {
+     "name": "Joe Emerson",
+     "title": "Principal"
+    },
+    {
+     "name": "John Vranich",
+     "title": "Partner"
+    },
+    {
+     "name": "Ann Boomsma",
+     "title": "Partner"
+    }
+   ],
+   "source": "https://www.livebryten.com/who-we-are",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:liv-communities": {
+   "name": "Liv Communities",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Don Hoekstra",
+     "title": "VP of Construction and Design"
+    },
+    {
+     "name": "Eric Johnston",
+     "title": "Partner/Liv+ Development"
+    },
+    {
+     "name": "Heidi Arave",
+     "title": "Chief Operating Officer"
+    },
+    {
+     "name": "Anthony Shook",
+     "title": "Director of Human Resources"
+    },
+    {
+     "name": "Kevin Lindquist",
+     "title": "Chief Executive Officer"
+    },
+    {
+     "name": "Michelle Ulberg",
+     "title": "Vice President of Analytics"
+    }
+   ],
+   "source": "https://www.livcommunities.com/why-liv",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:televerde": {
+   "name": "Televerde",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Vince Barsolo",
+     "title": "Chief Executive Officer"
+    },
+    {
+     "name": "Alicia Rasta",
+     "title": "Vice President and Head of Global Sales"
+    },
+    {
+     "name": "Eric Crawford",
+     "title": "Vice President & Corporate Controller"
+    },
+    {
+     "name": "Yolanda Slan",
+     "title": "Chief People Officer"
+    },
+    {
+     "name": "Justin Vogel",
+     "title": "Global General Manager"
+    },
+    {
+     "name": "Chris Mercer",
+     "title": "Managing Director, EMEA"
+    },
+    {
+     "name": "Ashley Cruz",
+     "title": "Director of Information Technology"
+    },
+    {
+     "name": "Kent Hansen",
+     "title": "Director of Inbound Operations"
+    }
+   ],
+   "source": "https://televerde.com/about/leadership-team/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:nexa": {
+   "name": "Nexa",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Brian Salvatori",
+     "title": "VP of Operations & Strategic partnerships"
+    },
+    {
+     "name": "Christopher Osburn",
+     "title": "VP of Technology"
+    },
+    {
+     "name": "Garrett Robins",
+     "title": "Director of Sales"
+    }
+   ],
+   "source": "https://www.nexa.com/about/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:emerging-global-services": {
+   "name": "Emerging Global Services",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Sarina Brady",
+     "title": "Chief Operating Officer (COO)"
+    }
+   ],
+   "source": "https://www.poweredbyegs.com/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:bothwell-transport": {
+   "name": "Bothwell Transport",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Kai Bothwell",
+     "title": "Co-Owner & Founder"
+    }
+   ],
+   "source": "https://bothwelltransport.com/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:manley-creative": {
+   "name": "Manley Creative",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Jim Manley",
+     "title": "Founder & CEO"
+    },
+    {
+     "name": "Rich Beissel",
+     "title": "Chief Content Officer"
+    },
+    {
+     "name": "Crissy Saint",
+     "title": "Chief Growth Officer"
+    },
+    {
+     "name": "Jill Neidorf",
+     "title": "VP, Client Services"
+    },
+    {
+     "name": "Jason Allread",
+     "title": "Chief Operating Officer & Head of Production"
+    }
+   ],
+   "source": "https://manleycreative.com/about",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:quantum-leap-video-services": {
+   "name": "Quantum Leap Video Services",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Dennis Ford",
+     "title": "President / Owner"
+    },
+    {
+     "name": "Bill Davis",
+     "title": "Partner / Director & Creative Producer"
+    }
+   ],
+   "source": "https://www.qlpdigital.com/our-team",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:lectric-ebikes": {
+   "name": "Lectric eBikes",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Levi Conlow",
+     "title": "Chief Executive Officer"
+    },
+    {
+     "name": "Robby Deziel",
+     "title": "Chief Product Officer"
+    },
+    {
+     "name": "Brent Conlow",
+     "title": "Chief Experience Officer"
+    }
+   ],
+   "source": "https://lectricebikes.com/pages/about-us",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:sprouts-farmers-market": {
+   "name": "Sprouts Farmers Market",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Jack Sinclair",
+     "title": "Chief Executive Officer"
+    },
+    {
+     "name": "Curtis Valentine",
+     "title": "Chief Financial Officer"
+    },
+    {
+     "name": "Nick Konat",
+     "title": "President and Chief Operating Officer"
+    },
+    {
+     "name": "Don Clark",
+     "title": "Chief Merchandising Officer"
+    },
+    {
+     "name": "Amanda Rassi",
+     "title": "Chief Customer Officer"
+    },
+    {
+     "name": "Dustin Hamilton",
+     "title": "Chief Stores Officer"
+    },
+    {
+     "name": "Brandon Lombardi",
+     "title": "Chief Legal Officer and Chief Sustainability Officer"
+    },
+    {
+     "name": "Joseph Fortunato",
+     "title": "Chairman"
+    }
+   ],
+   "source": "https://www.sprouts.com/leadership/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "seed:nextiva": {
+   "name": "Nextiva",
+   "region": "US-AZ",
+   "people": [
+    {
+     "name": "Tomas Gorny",
+     "title": "Chairman, CEO, & Co-Founder"
+    },
+    {
+     "name": "Tracy Conrad",
+     "title": "Chief Amazing Officer, Co-Founder"
+    },
+    {
+     "name": "Ran Ezerzer",
+     "title": "Chief Technology Officer"
+    },
+    {
+     "name": "Anne Brennan",
+     "title": "Chief Financial Officer, Chief Operating Officer"
+    },
+    {
+     "name": "Yaniv Masjedi",
+     "title": "Chief Marketing Officer"
+    },
+    {
+     "name": "Chris Reaburn",
+     "title": "Chief Sales Officer"
+    },
+    {
+     "name": "Josh Lesavoy",
+     "title": "Chief Information Officer"
+    },
+    {
+     "name": "Seksom Suriyapa",
+     "title": "Chief Transformation Officer"
+    }
+   ],
+   "source": "https://www.nextiva.com/company/leadership",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:way/1477326258": {
+   "name": "Adam Rue Auto Sales",
+   "region": "US-AL",
+   "people": [
+    {
+     "name": "Adam Rue",
+     "title": "President"
+    }
+   ],
+   "source": "https://www.adamrueautosales.com/meetourstaff",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/13698822724": {
+   "name": "Benton Auto Sales",
+   "region": "US-AL",
+   "people": [
+    {
+     "name": "Brandon Benton",
+     "title": "Owner/Dealer Principal/Managing Partner"
+    },
+    {
+     "name": "Steven Benton",
+     "title": "Owner/Partner"
+    }
+   ],
+   "source": "https://bentonautosales.com/meetourstaff",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/11734526072": {
+   "name": "Collins & Son Roofing",
+   "region": "US-AR",
+   "people": [
+    {
+     "name": "Matt Collins",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://collinsandsonroofing.com/about/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/13423370822": {
+   "name": "Accurate Autoworks",
+   "region": "US-CA",
+   "people": [
+    {
+     "name": "Jon Smalldridge",
+     "title": "Owner/Operator"
+    }
+   ],
+   "source": "https://accurateautoworks.com/about-us-jon-smalldridge/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/7771039033": {
+   "name": "Adam & Son Automotive Repair",
+   "region": "US-CO",
+   "people": [
+    {
+     "name": "Dan Adam",
+     "title": "Founder & Owner"
+    }
+   ],
+   "source": "https://www.adamandson.com/about/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/9140696255": {
+   "name": "Zen Renovations",
+   "region": "US-DC",
+   "people": [
+    {
+     "name": "Peter Callington",
+     "title": "Director of Project Management"
+    },
+    {
+     "name": "Kate Wilson",
+     "title": "Director of Design"
+    },
+    {
+     "name": "Amber Niewald",
+     "title": "Director of Marketing"
+    }
+   ],
+   "source": "https://zen-renovations.com/about-zen-renovations",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/13130435830": {
+   "name": "Advantage HPE",
+   "region": "US-FL",
+   "people": [
+    {
+     "name": "Stephen Dobbins",
+     "title": "Owner & President"
+    }
+   ],
+   "source": "https://advantagehpe.com/about/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/5740378204": {
+   "name": "A&H Heating And Air Conditioning",
+   "region": "US-GA",
+   "people": [
+    {
+     "name": "Andy Castels",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://www.ahheatingair.com/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/9705663953": {
+   "name": "Acker Heating & Cooling",
+   "region": "US-GA",
+   "people": [
+    {
+     "name": "Bryan Acker",
+     "title": "Owner"
+    },
+    {
+     "name": "John Acker",
+     "title": "Owner/Vice President"
+    }
+   ],
+   "source": "https://www.ackerheatcool.com/meet-the-team",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/12731389969": {
+   "name": "Advanced Auto Transfers",
+   "region": "US-GA",
+   "people": [
+    {
+     "name": "Chrissy Land",
+     "title": "General Manager"
+    }
+   ],
+   "source": "https://autotransfers.com/the-sales-team/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/13919613832": {
+   "name": "ARAC Roof It Forward",
+   "region": "US-GA",
+   "people": [
+    {
+     "name": "Craig Stevens",
+     "title": "CoFounder & COO"
+    },
+    {
+     "name": "Matthew Howell",
+     "title": "Chief Operations Officer"
+    },
+    {
+     "name": "Terry Phillips",
+     "title": "Vice President of Sales and Marketing"
+    },
+    {
+     "name": "Mike Susits",
+     "title": "National General Manager"
+    },
+    {
+     "name": "John Phillips",
+     "title": "President and Founder"
+    },
+    {
+     "name": "Chris Asher",
+     "title": "Executive Director Of Sales And Promotions"
+    }
+   ],
+   "source": "https://www.roofitforward.com/our-team",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:way/1305165088": {
+   "name": "Albert C. Kobayashi, Inc.",
+   "region": "US-HI",
+   "people": [
+    {
+     "name": "Michael Young",
+     "title": "President And CEO"
+    }
+   ],
+   "source": "https://www.ack-inc.com/about/leadership/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/13108180563": {
+   "name": "Creative Partition Systems",
+   "region": "US-HI",
+   "people": [
+    {
+     "name": "Preston Lingaton",
+     "title": "Vice President / CPS Operation Manager"
+    }
+   ],
+   "source": "https://cpshi.com/about/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:way/1195162983": {
+   "name": "Asqueta Glass",
+   "region": "US-ID",
+   "people": [
+    {
+     "name": "Mike Lopo",
+     "title": "President / Owner"
+    },
+    {
+     "name": "Zach Lopo",
+     "title": "Co-Owner / Estimator & Installer"
+    },
+    {
+     "name": "Riley Lopo",
+     "title": "Co-Owner / Estimator & Installer"
+    }
+   ],
+   "source": "https://asquetaglass.com/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/13715992527": {
+   "name": "Crown Town Restoration, Inc.",
+   "region": "US-KS",
+   "people": [
+    {
+     "name": "Cory Nicholson",
+     "title": "President"
+    }
+   ],
+   "source": "https://crowntownrestoration.com/meet-the-team/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/13645515210": {
+   "name": "Bone Dry Roofing",
+   "region": "US-KY",
+   "people": [
+    {
+     "name": "Gene Judd",
+     "title": "Owner & CEO"
+    },
+    {
+     "name": "Judd Haag",
+     "title": "CIO"
+    }
+   ],
+   "source": "https://bonedry.com/about/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/13645536742": {
+   "name": "Bone Dry Roofing",
+   "region": "US-KY",
+   "people": [
+    {
+     "name": "Gene Judd",
+     "title": "Owner & CEO"
+    },
+    {
+     "name": "Judd Haag",
+     "title": "CIO"
+    }
+   ],
+   "source": "https://bonedry.com/about/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/14110021253": {
+   "name": "Bone Dry Roofing",
+   "region": "US-KY",
+   "people": [
+    {
+     "name": "Gene Judd",
+     "title": "Owner & CEO"
+    },
+    {
+     "name": "Judd Haag",
+     "title": "CIO"
+    }
+   ],
+   "source": "https://bonedry.com/about/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/13968462738": {
+   "name": "Flaherty Chevrolet",
+   "region": "US-KY",
+   "people": [
+    {
+     "name": "Travis Flaherty",
+     "title": "Owner"
+    },
+    {
+     "name": "Rachel Flaherty",
+     "title": "Vice President"
+    }
+   ],
+   "source": "https://www.flahertychevrolet.com/staff.aspx",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:way/1077150588": {
+   "name": "Karl Malone Toyota of Ruston",
+   "region": "US-LA",
+   "people": [
+    {
+     "name": "Joel Benton",
+     "title": "General Manager"
+    }
+   ],
+   "source": "https://www.karlmalonetoyotaofruston.com/staff.aspx",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/11054040578": {
+   "name": "Horch Roofing",
+   "region": "US-ME",
+   "people": [
+    {
+     "name": "Peter Horch",
+     "title": "President"
+    },
+    {
+     "name": "Taylor Canaday",
+     "title": "Chief Sales Officer"
+    },
+    {
+     "name": "Devin Deabler",
+     "title": "General Manager - Warren"
+    },
+    {
+     "name": "Kellie Russomano",
+     "title": "Director of Finance & IT"
+    },
+    {
+     "name": "Luke Noke",
+     "title": "General Manager - Hancock"
+    }
+   ],
+   "source": "https://horchroofing.com/our-team/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/11293413499": {
+   "name": "Horch Roofing",
+   "region": "US-ME",
+   "people": [
+    {
+     "name": "Peter Horch",
+     "title": "President"
+    },
+    {
+     "name": "Taylor Canaday",
+     "title": "Chief Sales Officer"
+    },
+    {
+     "name": "Devin Deabler",
+     "title": "General Manager - Warren"
+    },
+    {
+     "name": "Kellie Russomano",
+     "title": "Director of Finance & IT"
+    },
+    {
+     "name": "Luke Noke",
+     "title": "General Manager - Hancock"
+    }
+   ],
+   "source": "https://horchroofing.com/our-team/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/8814376002": {
+   "name": "All Claims Repairs Ohio",
+   "region": "US-OH",
+   "people": [
+    {
+     "name": "Ken Cash",
+     "title": "General Manager"
+    }
+   ],
+   "source": "https://www.allclaimsrepairs.com/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/11478628550": {
+   "name": "AM Roofing and Siding",
+   "region": "US-OH",
+   "people": [
+    {
+     "name": "Aaron Maddux",
+     "title": "Owner"
+    }
+   ],
+   "source": "https://amroofingandsiding.com/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  },
+  "osm:node/7764349260": {
+   "name": "American Way Exteriors",
+   "region": "US-OH",
+   "people": [
+    {
+     "name": "Stephen Moad",
+     "title": "Managing Partner"
+    }
+   ],
+   "source": "https://www.americanwayexteriors.com/our-team/",
+   "checkedAt": "2026-11-16T02:51:37Z"
+  }
+ }
+}

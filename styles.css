@@ -439,3 +439,13 @@ select option { background: #0b2340; color: var(--iv-ink); }
 .osm-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .45rem; }
 .osm-actions .iv-btn-ghost { margin: 0; }
 .osm-more, .osm-live { padding: .35rem .85rem; font-size: .78rem; }
+
+/* Published leadership (from each company's own website) */
+.card-leaders { margin-top: .45rem; padding-top: .4rem; border-top: 1px dashed rgba(8, 190, 200, .25); }
+.card-leaders .lbl { color: var(--iv-dim); font: 600 .64rem var(--iv-mono); letter-spacing: .08em; text-transform: uppercase; }
+.card-leaders .lbl a { color: var(--iv-teal); text-transform: none; letter-spacing: 0; margin-left: .35rem; }
+.card-leaders ul { list-style: none; margin: .25rem 0 0; padding: 0; display: grid; gap: .15rem; }
+.card-leaders li { display: flex; flex-wrap: wrap; gap: .1rem .45rem; font-size: .85rem; }
+.card-leaders .leader-name { font-weight: 600; }
+.card-leaders .leader-title { opacity: .8; }
+.detail .card-leaders { margin: .5rem 0; }

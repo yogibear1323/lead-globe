@@ -56,6 +56,7 @@
   let queuedMore = false;
   let endpointHealth = {};
   let osmProgress = {};
+  let leadersById = {}; // data/leaders.json: published leadership from each company's own site (US/Canada best-fit only)
 
   function fitColor(fit) {
     if (fit >= 5) return "#08BEC8";
@@ -124,6 +125,29 @@
     if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) {
       panel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  }
+
+  function leaderKey(l) {
+    if (l.osmId) return "osm:" + l.osmId;
+    if (l.source === "seed")
+      return "seed:" + String(l.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return "";
+  }
+
+  function leadersBlock(l) {
+    const k = leaderKey(l);
+    const rec = k && leadersById[k];
+    if (!rec || !Array.isArray(rec.people) || !rec.people.length) return "";
+    const people = rec.people
+      .map(
+        (p) =>
+          `<li><span class="leader-name">${escapeHtml(p.name)}</span><span class="leader-title">${escapeHtml(p.title || "")}</span></li>`
+      )
+      .join("");
+    const src = rec.source
+      ? ` <a href="${escapeHtml(rec.source)}" target="_blank" rel="noopener" data-contact="1">Source</a>`
+      : "";
+    return `<div class="card-leaders" data-leaders="${rec.people.length}"><div class="lbl">Leadership (from company website)${src}</div><ul>${people}</ul></div>`;
   }
 
   function contactRows(l) {
@@ -286,6 +310,7 @@
             </div>
             <div class="meta">${escapeHtml(l.category)} · ${escapeHtml(l.city || "")} · <span class="badge ${l.source === "seed" ? "seed" : "osm"}">${escapeHtml(l.source)}</span></div>
             ${contactRows(l)}
+            ${leadersBlock(l)}
           </article>`;
           })
           .join("");
@@ -534,6 +559,7 @@
       <h3>${escapeHtml(l.name)}</h3>
       <div class="meta">${escapeHtml(l.category)} · ${escapeHtml(l.city || "")} · fit ${escapeHtml(fitLine)} · <span class="badge ${l.source === "seed" ? "seed" : "osm"}">${escapeHtml(l.source)}</span></div>
       <p class="contact-line">${dash(l.phone)} · ${emailShown}</p>
+      ${leadersBlock(l)}
       <details class="more">
         <summary>Address, website, and notes</summary>
         <dl>
@@ -1320,11 +1346,14 @@ out center tags ${cap};`;
   async function init() {
     ensureKeys(seedLeads);
     try {
-      const [catCfg, regionCfg, scriptCfg] = await Promise.all([
+      const [catCfg, regionCfg, scriptCfg, leadersDoc] = await Promise.all([
         loadJson("config/categories.json"),
         loadJson("config/regions.json"),
         loadJson("config/scripts.json").catch(() => ({ categories: {}, inviteUrl: INVITE })),
+        loadJson("data/leaders.json").catch(() => ({ leaders: {} })),
       ]);
+      leadersById = (leadersDoc && leadersDoc.leaders) || {};
+      document.documentElement.dataset.leadersLoaded = String(Object.keys(leadersById).length);
       categoryConfig = catCfg;
       scriptConfig = scriptCfg || scriptConfig;
       if (scriptConfig.inviteUrl) {

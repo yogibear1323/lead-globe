@@ -94,3 +94,12 @@ nohup cloudflared tunnel --url http://localhost:8765 > /tmp/lead-globe-tunnel.lo
 Then read the `https://*.trycloudflare.com` URL from `/tmp/lead-globe-tunnel.log`. The link lasts only while those two processes are running. To bring it back, rerun the commands above (after stopping any stale process on port 8765) and use the new URL from the log. The page sends `noindex,nofollow` and `robots.txt` disallows all crawlers.
 
 On some locked-down networks, `cloudflared` can create a trycloudflare hostname but fail to connect to the Cloudflare edge (QUIC/HTTP2 on port 7844 blocked, or TLS to `*.v2.argotunnel.com` refused). In that case the hostname returns HTTP 530 until the tunnel is started on a network that can reach the edge. The app itself still works at http://127.0.0.1:8765/.
+
+## Published leadership (data/leaders.json)
+
+For US and Canada best-fit leads only (the 66 Phoenix seed leads plus the top 10 fit-rated businesses with a website in each US/Canada region file), cards show a **Leadership (from company website)** section with names and titles the company itself publishes on its own team, leadership, or about page, plus a **Source** link to that page.
+
+- Only the company's own website is checked (homepage plus at most two obvious team/leadership/about links), once, with a descriptive user agent, delays, and robots.txt respected. No third-party sites.
+- No personal emails or direct phone numbers are collected. Card contact stays the company's main phone and general email.
+- Nothing is guessed; if a site publishes no clear leadership, the section is omitted. European businesses are never included.
+- Keys: `seed:<slug of name>` for seed leads, `osm:<type>/<id>` for OpenStreetMap leads. Scripts: `scripts/leaders/`.
