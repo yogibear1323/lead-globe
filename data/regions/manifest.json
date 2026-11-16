@@ -6,6 +6,13 @@
     "name": "Ontario",
     "totalMatched": 8391
   },
+  "CA-YT": {
+    "capped": false,
+    "count": 32,
+    "extractedAt": "2026-11-16T04:59:46Z",
+    "name": "Yukon",
+    "totalMatched": 32
+  },
   "US-AK": {
     "capped": false,
     "count": 303,
