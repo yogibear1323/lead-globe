@@ -195,6 +195,13 @@
     "name": "Finland",
     "totalMatched": 4031
   },
+  "FR": {
+    "capped": true,
+    "count": 500,
+    "extractedAt": "2026-11-16T23:59:27Z",
+    "name": "France",
+    "totalMatched": 52982
+  },
   "GB": {
     "capped": true,
     "count": 500,
@@ -348,6 +355,9 @@
     "extractedAt": "2026-11-16T08:33:02Z",
     "name": "Serbia",
     "totalMatched": 2546
+  },
+  "RU": {
+    "error": "skipped (no Geofabrik extract or allowOverpass=false)"
   },
   "SE": {
     "capped": true,
