@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@500;600&display=swap">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%2308BEC8%27/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=heatmap1">
 </head>
 <body>
   <header class="top">
@@ -39,6 +39,18 @@
   <div class="app">
     <section class="stage" aria-label="Globe of research leads">
       <div id="globe"></div>
+      <div class="heat-ui">
+        <button type="button" class="iv-btn-ghost heat-toggle" id="heatmap-toggle" aria-pressed="false" aria-controls="heat-legend">Heatmap</button>
+        <aside class="heat-legend" id="heat-legend" hidden>
+          <div class="kicker">Businesses found</div>
+          <div class="heat-scale" aria-hidden="true"><span class="heat-bar"></span></div>
+          <div class="heat-scale-labels"><span>Low</span><span>High</span></div>
+          <p class="heat-note">Log scale of businesses found. Most lists are capped at 500.</p>
+          <ul>
+            <li><span class="swatch heat-none"></span> No data</li>
+          </ul>
+        </aside>
+      </div>
       <aside class="legend">
         <div class="kicker">Fit score</div>
         <ul>
@@ -112,6 +124,6 @@
 
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="leads.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=heatmap1"></script>
 </body>
 </html>

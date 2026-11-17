@@ -499,3 +499,73 @@ select option { background: #0b2340; color: var(--iv-ink); }
   .panel.has-lead .list { flex: 1 1 34%; min-height: 7rem; }
   .panel.has-lead .detail { flex: 1 1 66%; }
 }
+
+/* Heatmap overlay (toggle + legend). Hidden styles keep the off state identical. */
+.heat-ui {
+  position: absolute; right: 1.1rem; top: 1.1rem; z-index: 9;
+  display: flex; flex-direction: column; align-items: flex-end; gap: .55rem;
+  pointer-events: none;
+  max-width: min(16rem, calc(100% - 2rem));
+}
+.heat-toggle {
+  pointer-events: auto;
+  padding: .35rem .85rem;
+  font-size: .78rem;
+  width: auto;
+  background: var(--iv-panel);
+  backdrop-filter: blur(12px);
+}
+.heat-toggle[aria-pressed="true"] {
+  border-color: var(--iv-teal);
+  color: var(--iv-teal);
+  box-shadow: 0 0 0 1px rgba(8, 190, 200, .35);
+}
+.heat-legend {
+  pointer-events: none;
+  padding: .75rem .9rem;
+  border-radius: 16px;
+  border: 1px solid var(--iv-edge);
+  background: var(--iv-panel);
+  backdrop-filter: blur(12px);
+  min-width: 11.5rem;
+}
+.heat-scale { margin: .55rem 0 .25rem; }
+.heat-bar {
+  display: block; height: 10px; border-radius: 999px;
+  background: linear-gradient(90deg, #0c206e 0%, #6e24a0 30%, #e6562a 58%, #ffb030 82%, #fffae6 100%);
+  box-shadow: 0 0 12px rgba(230, 86, 42, .25);
+}
+.heat-scale-labels {
+  display: flex; justify-content: space-between;
+  font-size: .7rem; color: var(--iv-mute);
+}
+.heat-note {
+  margin: .4rem 0 0;
+  font-size: .68rem; line-height: 1.35; color: var(--iv-dim);
+}
+.heat-legend ul { list-style: none; margin: .45rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.heat-legend li { display: flex; align-items: center; gap: .5rem; font-size: .75rem; color: var(--iv-mute); }
+.swatch.heat-none {
+  background: rgba(148, 158, 172, .55);
+  box-shadow: none;
+  border: 1px solid rgba(180, 188, 200, .5);
+}
+.heat-tip {
+  font: 600 .76rem Inter, system-ui, sans-serif;
+  color: #e8f0ff;
+  background: rgba(7, 22, 42, .92);
+  border: 1px solid rgba(120, 170, 255, .28);
+  border-radius: 10px;
+  padding: .4rem .55rem;
+  line-height: 1.35;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.heat-tip b { display: block; color: #fff; font-size: .8rem; margin-bottom: .15rem; }
+.heat-tip div { font-weight: 500; color: #c5d2e6; font-size: .72rem; }
+@media (max-width: 900px) {
+  .heat-ui { right: .7rem; top: 4.6rem; }
+  .heat-legend { min-width: 9.5rem; padding: .6rem .7rem; }
+  .heat-note { display: none; }
+  .heat-toggle { padding: .3rem .7rem; font-size: .72rem; }
+}

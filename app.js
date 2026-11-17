@@ -38,6 +38,8 @@
     retry: document.getElementById("osm-retry"),
     more: document.getElementById("osm-more"),
     live: document.getElementById("osm-live"),
+    heatToggle: document.getElementById("heatmap-toggle"),
+    heatLegend: document.getElementById("heat-legend"),
   };
 
   let categoryConfig = { categories: [], resultCap: RESULT_CAP, overpassTimeoutSec: 25 };
@@ -49,6 +51,11 @@
   let selectedRegion = null;
   let hoveredRegion = null;
   let globe = null;
+  const HEAT_KEY = "leadglobe:heatmap";
+  let heatmapOn = readHeatPref();
+  let heatManifest = {};
+  let heatMin = 1;
+  let heatMax = 1;
   let queryGen = 0;
   let queryInFlight = false;
   let queuedRegionId = null;
@@ -73,6 +80,119 @@
   }
   function dash(s) {
     return s ? escapeHtml(s) : "—";
+  }
+
+  function readHeatPref() {
+    try {
+      const v = localStorage.getItem("leadglobe:heatmap");
+      if (v === "off") return false;
+      if (v === "on") return true;
+    } catch (e) {}
+    return true;
+  }
+
+  function formatCount(n) {
+    const x = Number(n);
+    if (!Number.isFinite(x)) return "—";
+    return x.toLocaleString("en-US");
+  }
+
+  function heatRaw(id) {
+    const info = heatManifest[id];
+    if (!info || info.error) return null;
+    const n = info.totalMatched != null ? Number(info.totalMatched) : Number(info.count);
+    if (!Number.isFinite(n) || n < 0) return null;
+    return n;
+  }
+
+  function heatT(id) {
+    const n = heatRaw(id);
+    if (n == null) return null;
+    const lo = Math.log(1 + heatMin);
+    const hi = Math.log(1 + heatMax);
+    if (!(hi > lo)) return 0.5;
+    return Math.max(0, Math.min(1, (Math.log(1 + n) - lo) / (hi - lo)));
+  }
+
+  function lerpChan(a, b, t) {
+    return Math.round(a + (b - a) * t);
+  }
+
+  function heatRgb(t) {
+    const stops = [
+      [0, [12, 32, 110]],
+      [0.3, [110, 36, 160]],
+      [0.58, [230, 86, 42]],
+      [0.82, [255, 176, 48]],
+      [1, [255, 250, 230]],
+    ];
+    const x = Math.max(0, Math.min(1, t));
+    for (let i = 1; i < stops.length; i++) {
+      if (x <= stops[i][0]) {
+        const t0 = stops[i - 1][0];
+        const t1 = stops[i][0];
+        const u = (x - t0) / (t1 - t0);
+        const c0 = stops[i - 1][1];
+        const c1 = stops[i][1];
+        return [lerpChan(c0[0], c1[0], u), lerpChan(c0[1], c1[1], u), lerpChan(c0[2], c1[2], u)];
+      }
+    }
+    return stops[stops.length - 1][1];
+  }
+
+  function heatRgba(t, a) {
+    const c = heatRgb(t);
+    return "rgba(" + c[0] + ", " + c[1] + ", " + c[2] + ", " + a + ")";
+  }
+
+  function applyHeatManifest(man) {
+    heatManifest = man && typeof man === "object" ? man : {};
+    let lo = Infinity;
+    let hi = 0;
+    Object.keys(heatManifest).forEach((id) => {
+      const n = heatRaw(id);
+      if (n == null) return;
+      if (n < lo) lo = n;
+      if (n > hi) hi = n;
+    });
+    heatMin = Number.isFinite(lo) ? lo : 1;
+    heatMax = hi > 0 ? hi : 1;
+  }
+
+  function regionLabel(d) {
+    const name = escapeHtml(d.properties.name);
+    if (!heatmapOn) return name;
+    const id = d.properties.id;
+    const info = heatManifest[id] || {};
+    const raw = heatRaw(id);
+    if (raw == null) {
+      return '<div class="heat-tip"><b>' + name + "</b><div>No prebuilt list</div></div>";
+    }
+    const found = info.totalMatched != null ? info.totalMatched : raw;
+    const listed = info.count != null ? info.count : raw;
+    return (
+      '<div class="heat-tip"><b>' +
+      name +
+      "</b><div>" +
+      formatCount(found) +
+      " businesses found</div><div>" +
+      formatCount(listed) +
+      " in list</div></div>"
+    );
+  }
+
+  function setHeatmap(on) {
+    heatmapOn = !!on;
+    try {
+      localStorage.setItem(HEAT_KEY, heatmapOn ? "on" : "off");
+    } catch (e) {}
+    document.documentElement.dataset.heatmap = heatmapOn ? "on" : "off";
+    if (els.heatToggle) {
+      els.heatToggle.setAttribute("aria-pressed", heatmapOn ? "true" : "false");
+      els.heatToggle.textContent = heatmapOn ? "Heatmap on" : "Heatmap";
+    }
+    if (els.heatLegend) els.heatLegend.hidden = !heatmapOn;
+    paintPolygons();
   }
 
   function enabledCategories() {
@@ -644,22 +764,37 @@
       .polygonsData(regions)
       .polygonGeoJsonGeometry((d) => d.geometry)
       .polygonCapColor((d) => {
+        if (heatmapOn) {
+          const t = heatT(d.properties.id);
+          if (t == null) return "rgba(148, 158, 172, 0.16)";
+          if (selectedRegion && d.properties.id === selectedRegion.properties.id) return heatRgba(t, 0.92);
+          if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return heatRgba(Math.min(1, t + 0.08), 0.86);
+          return heatRgba(t, 0.72);
+        }
         if (selectedRegion && d.properties.id === selectedRegion.properties.id) return "rgba(8, 190, 200, 0.42)";
         if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return "rgba(8, 190, 200, 0.28)";
         return "rgba(8, 116, 201, 0.10)";
       })
-      .polygonSideColor(() => "rgba(8, 116, 201, 0.12)")
+      .polygonSideColor(() => (heatmapOn ? "rgba(20, 24, 48, 0.35)" : "rgba(8, 116, 201, 0.12)"))
       .polygonStrokeColor((d) => {
         if (selectedRegion && d.properties.id === selectedRegion.properties.id) return "#08BEC8";
         if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return "#6ff3f0";
+        if (heatmapOn) return heatRaw(d.properties.id) == null ? "rgba(160, 170, 185, 0.28)" : "rgba(8, 12, 28, 0.35)";
         return "rgba(120, 170, 255, 0.28)";
       })
       .polygonAltitude((d) => {
+        if (heatmapOn) {
+          const t = heatT(d.properties.id);
+          const base = t == null ? 0.003 : 0.003 + t * 0.016;
+          if (selectedRegion && d.properties.id === selectedRegion.properties.id) return base + 0.008;
+          if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return base + 0.005;
+          return base;
+        }
         if (selectedRegion && d.properties.id === selectedRegion.properties.id) return 0.012;
         if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return 0.009;
         return 0.003;
       })
-      .polygonLabel((d) => d.properties.name);
+      .polygonLabel((d) => regionLabel(d));
   }
 
   function selectRegion(id, opts) {
@@ -1349,12 +1484,14 @@ out center tags ${cap};`;
   async function init() {
     ensureKeys(seedLeads);
     try {
-      const [catCfg, regionCfg, scriptCfg, leadersDoc] = await Promise.all([
+      const [catCfg, regionCfg, scriptCfg, leadersDoc, manifestDoc] = await Promise.all([
         loadJson("config/categories.json"),
         loadJson("config/regions.json"),
         loadJson("config/scripts.json").catch(() => ({ categories: {}, inviteUrl: INVITE })),
         loadJson("data/leaders.json").catch(() => ({ leaders: {} })),
+        loadJson("data/regions/manifest.json").catch(() => ({})),
       ]);
+      applyHeatManifest(manifestDoc);
       leadersById = (leadersDoc && leadersDoc.leaders) || {};
       document.documentElement.dataset.leadersLoaded = String(Object.keys(leadersById).length);
       categoryConfig = catCfg;
@@ -1381,6 +1518,10 @@ out center tags ${cap};`;
 
     fillCategorySelect();
     fillRegionSelect();
+    setHeatmap(heatmapOn);
+    if (els.heatToggle) {
+      els.heatToggle.addEventListener("click", () => setHeatmap(!heatmapOn));
+    }
 
     if (typeof Globe === "function") {
       globe = Globe()(els.globe)
@@ -1425,6 +1566,9 @@ out center tags ${cap};`;
 
     window.LeadGlobe = {
       ready: true,
+      setHeatmap: (on) => setHeatmap(on),
+      heatmapOn: () => heatmapOn,
+      heatValue: (id) => heatRaw(id),
       selectRegion: (id, opts) => selectRegion(id, opts),
       selectLead: (key, fly) => selectLead(key, fly),
       findLead: (q) => findLeadByQuery(q),
