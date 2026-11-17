@@ -9,7 +9,24 @@
   --glass-strong: rgba(6, 22, 44, .72);
   --glass-edge: rgba(140, 220, 255, .22);
 }
-body.landing { overflow-x: hidden; overflow-y: auto; height: auto; min-height: 100%; background: #020c1a; }
+/* styles.css sets html,body { height:100% } and body { overflow:hidden } for the
+   globe app. On the landing page those lock iOS/WebKit vertical scrolling,
+   especially overflow-x:hidden on html (it becomes a 100vh scrollport). */
+html.landing-page,
+body.landing {
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+  background: #020c1a;
+}
+body.landing {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+.bg-stage, #bg-globe, #bg-globe canvas {
+  pointer-events: none !important;
+  touch-action: pan-y;
+}
 
 /* ---------- Background stage ---------- */
 .bg-stage { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
@@ -316,7 +333,12 @@ body.globe-on .bg-fallback::after { opacity: 0; transition: opacity 1.6s ease; }
 /* Narrow landing header and tap targets. Desktop rules above are unchanged. */
 @media (max-width: 768px) {
   :root { --header-h: 56px; }
-  html, body.landing { overflow-x: hidden; max-width: 100%; -webkit-text-size-adjust: 100%; }
+  html.landing-page, body.landing {
+    max-width: 100%;
+    -webkit-text-size-adjust: 100%;
+    height: auto;
+    overflow: visible;
+  }
   .landing .top {
     height: var(--header-h);
     height: calc(var(--header-h) + env(safe-area-inset-top, 0px));

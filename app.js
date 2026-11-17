@@ -1732,6 +1732,7 @@ out center tags ${cap};`;
       selectRegion: (id, opts) => selectRegion(id, opts),
       closePanel: () => closeListPanel(),
       panelOpen: () => !!(els.panel && els.panel.classList.contains("is-open")),
+      pointOfView: () => (globe && globe.pointOfView ? globe.pointOfView() : null),
       selectLead: (key, fly) => selectLead(key, fly),
       findLead: (q) => findLeadByQuery(q),
       getVisible: () => filtered(),

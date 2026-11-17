@@ -17,9 +17,11 @@
 
   // Background globe: only on capable, wide screens without reduced motion.
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var small = window.matchMedia("(max-width: 760px)").matches;
+  var small = window.matchMedia("(max-width: 768px)").matches;
+  var coarse = window.matchMedia("(pointer: coarse)").matches;
   var hasGL = (function () { try { var c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch (e) { return false; } })();
-  if (reduce || small || !hasGL) return;
+  // Decorative only — never on narrow or touch UIs, where a WebGL canvas can eat vertical swipes.
+  if (reduce || small || coarse || !hasGL) return;
 
   // Approximate city centres across the covered regions (decorative, not business data).
   var C = [
@@ -66,6 +68,8 @@
     try { g.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5)); } catch (e) {}
     var ctl = g.controls();
     ctl.autoRotate = true; ctl.autoRotateSpeed = 0.55; ctl.enableZoom = false; ctl.enablePan = false; ctl.enableRotate = false;
+    ctl.enabled = false;
+    try { el.style.pointerEvents = "none"; if (el.querySelector("canvas")) el.querySelector("canvas").style.pointerEvents = "none"; } catch (e) {}
     g.pointOfView({ lat: 42, lng: -45, altitude: 2.1 }, 0);
 
     document.addEventListener("visibilitychange", function () {

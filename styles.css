@@ -856,8 +856,15 @@ select option { background: #0b2340; color: var(--iv-ink); }
     font-size: .85rem;
   }
 
-  .list { padding: .65rem .7rem; gap: .55rem; flex: 1 1 auto; min-height: 0; overflow: auto; background: #071f3b;
-    display: flex; flex-direction: column; align-content: stretch; }
+  /* Keep the globe canvas as a drag surface; let the list sheet pan vertically. */
+  #globe, #globe canvas { touch-action: none; }
+  .list, .detail, .panel-head {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+  .list { padding: .65rem .7rem; gap: .55rem; flex: 1 1 auto; min-height: 0; overflow: auto; overflow-y: auto; background: #071f3b;
+    display: flex; flex-direction: column; align-content: stretch; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
   .card, .card:hover { transform: none; background: #0d335c; }
   .card {
     flex: 0 0 auto;
