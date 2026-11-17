@@ -40,7 +40,28 @@
     live: document.getElementById("osm-live"),
     heatToggle: document.getElementById("heatmap-toggle"),
     heatLegend: document.getElementById("heat-legend"),
+    panelBack: document.getElementById("panel-back"),
+    filtersToggle: document.getElementById("filters-toggle"),
+    filters: document.getElementById("filters"),
+    regionStats: document.getElementById("region-stats"),
+    keyToggle: document.getElementById("key-toggle"),
+    listToggle: document.getElementById("list-toggle"),
+    bannerDismiss: document.getElementById("banner-dismiss"),
+    banner: document.getElementById("compliance-banner"),
   };
+
+
+  const BANNER_KEY = "leadglobe:banner";
+  const MOBILE_MQ = "(max-width: 768px)";
+
+  function isMobileUi() {
+    return !!(window.matchMedia && window.matchMedia(MOBILE_MQ).matches);
+  }
+
+  function isTouchUi() {
+    if (isMobileUi()) return true;
+    return !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  }
 
   let categoryConfig = { categories: [], resultCap: RESULT_CAP, overpassTimeoutSec: 25 };
   let scriptConfig = { categories: {}, inviteUrl: INVITE, reviewNote: "" };
@@ -160,6 +181,7 @@
   }
 
   function regionLabel(d) {
+    if (isTouchUi()) return "";
     const name = escapeHtml(d.properties.name);
     if (!heatmapOn) return name;
     const id = d.properties.id;
@@ -237,14 +259,89 @@
     return String(l.email).trim();
   }
 
+  function updateRegionStats() {
+    const el = els.regionStats;
+    if (!el) return;
+    if (!selectedRegion) {
+      el.hidden = true;
+      el.innerHTML = "";
+      return;
+    }
+    const id = selectedRegion.properties.id;
+    const name = selectedRegion.properties.name || id;
+    const info = heatManifest[id] || {};
+    const raw = heatRaw(id);
+    let body;
+    if (raw == null) {
+      body = "<div>No prebuilt list</div>";
+    } else {
+      const found = info.totalMatched != null ? info.totalMatched : raw;
+      const listed = info.count != null ? info.count : raw;
+      body =
+        "<div>Businesses found: " +
+        formatCount(found) +
+        "</div><div>Businesses in list: " +
+        formatCount(listed) +
+        "</div>";
+    }
+    el.hidden = false;
+    el.innerHTML = "<b>" + escapeHtml(name) + "</b>" + body;
+  }
+
+  function setHint(longHtml, shortText) {
+    if (!els.hint) return;
+    const short = shortText || "Tap a state, province, or country to open its business list.";
+    els.hint.innerHTML =
+      '<span class="hint-long">' +
+      longHtml +
+      '</span><span class="hint-short">' +
+      escapeHtml(short) +
+      "</span>";
+  }
+
+  function setKeysOpen(on) {
+    document.body.classList.toggle("keys-open", !!on);
+    if (els.keyToggle) els.keyToggle.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+
+  function setFiltersOpen(on) {
+    if (els.filters) els.filters.classList.toggle("is-open", !!on);
+    if (els.filtersToggle) {
+      els.filtersToggle.setAttribute("aria-expanded", on ? "true" : "false");
+      els.filtersToggle.textContent = on ? "Hide filters" : "Filters";
+    }
+  }
+
+  function applyBannerPref() {
+    let collapsed = false;
+    try {
+      collapsed = localStorage.getItem(BANNER_KEY) === "collapsed";
+    } catch (e) {}
+    document.body.classList.toggle("banner-collapsed", isMobileUi() && collapsed);
+  }
+
   function openListPanel() {
     const panel = els.panel || document.getElementById("list-panel") || document.querySelector(".panel");
     if (!panel) return;
     panel.classList.add("is-open");
     document.documentElement.dataset.listOpen = selectedRegion ? "region" : "seed";
-    if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) {
+    updateRegionStats();
+    if (isMobileUi()) {
+      document.body.classList.add("sheet-open");
+      setKeysOpen(false);
+      window.scrollTo(0, 0);
+    } else if (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) {
       panel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  }
+
+  function closeListPanel() {
+    const panel = els.panel || document.getElementById("list-panel") || document.querySelector(".panel");
+    if (!panel) return;
+    panel.classList.remove("is-open");
+    document.body.classList.remove("sheet-open");
+    document.documentElement.dataset.listOpen = "";
+    if (selectedLead) selectLead(null, false);
   }
 
   function leaderKey(l) {
@@ -382,6 +479,7 @@
   }
 
   function renderList() {
+    updateRegionStats();
     const rows = filtered();
     const total = allLeads().length;
     const place = selectedRegion ? selectedRegion.properties.name : "the seed list";
@@ -436,7 +534,9 @@
           .join("");
     }
     renderDetail();
-    openListPanel();
+    // Desktop side panel is always on-screen; keep the existing is-open hook.
+    // On mobile the list is a sheet — open it only from a region tap, List, or a deep link.
+    if (!isMobileUi()) openListPanel();
     if (globe) globe.htmlElementsData(rows);
     els.attrib.innerHTML = selectedRegion
       ? (osmByRegion[selectedRegion.properties.id] ? OSM_ATTRIB + " " : "") + NE_ATTRIB
@@ -804,7 +904,10 @@
     selectedLead = null;
     els.region.value = r ? r.properties.id : "";
     if (r) {
-      els.hint.innerHTML = `<b>${escapeHtml(r.properties.name)}.</b> The list is filtered to this region. Seed rows (if any) stay marked seed; OpenStreetMap rows are labelled heuristic.`;
+      setHint(
+        `<b>${escapeHtml(r.properties.name)}.</b> The list is filtered to this region. Seed rows (if any) stay marked seed; OpenStreetMap rows are labelled heuristic.`,
+        "Tap another region on the globe, or use Back to globe."
+      );
       zoomToRegion(r);
       if (!opts.skipStatic) {
         loadStaticRegion(r);
@@ -814,8 +917,10 @@
         showLiveSearch(false);
       }
     } else {
-      els.hint.innerHTML =
-        "<b>Click a state, province, or European country</b> to zoom in and open a prebuilt list of matching OpenStreetMap businesses. You can optionally search live OpenStreetMap for more. Seed pins for Arizona are city-level, not rooftop-accurate.";
+      setHint(
+        "<b>Click a state, province, or European country</b> to zoom in and open a prebuilt list of matching OpenStreetMap businesses. You can optionally search live OpenStreetMap for more. Seed pins for Arizona are city-level, not rooftop-accurate.",
+        "Tap a state, province, or country to open its business list."
+      );
       setStatus("");
       showRetry(false);
       showMore(false);
@@ -1402,7 +1507,60 @@ out center tags ${cap};`;
     return wrap;
   }
 
-  function sizeGlobe() {
+  function bindMobileChrome() {
+    applyBannerPref();
+    if (els.bannerDismiss) {
+      els.bannerDismiss.addEventListener("click", () => {
+        try {
+          localStorage.setItem(BANNER_KEY, "collapsed");
+        } catch (e) {}
+        applyBannerPref();
+        sizeGlobe();
+      });
+    }
+    if (els.panelBack) {
+      els.panelBack.addEventListener("click", () => closeListPanel());
+    }
+    if (els.listToggle) {
+      els.listToggle.addEventListener("click", () => openListPanel());
+    }
+    if (els.keyToggle) {
+      els.keyToggle.addEventListener("click", () => {
+        setKeysOpen(!document.body.classList.contains("keys-open"));
+      });
+    }
+    if (els.filtersToggle) {
+      els.filtersToggle.addEventListener("click", () => {
+        const open = !(els.filters && els.filters.classList.contains("is-open"));
+        setFiltersOpen(open);
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if (!isMobileUi()) return;
+      if (selectedLead) {
+        selectLead(null, false);
+        return;
+      }
+      if (els.panel && els.panel.classList.contains("is-open")) {
+        closeListPanel();
+        return;
+      }
+      if (document.body.classList.contains("keys-open")) setKeysOpen(false);
+    });
+    window.addEventListener("resize", () => {
+      applyBannerPref();
+      if (!isMobileUi()) {
+        document.body.classList.remove("sheet-open");
+        setKeysOpen(false);
+        if (els.filters) els.filters.classList.add("is-open");
+      } else if (els.filters && !els.filters.classList.contains("is-open")) {
+        setFiltersOpen(false);
+      }
+    });
+  }
+
+    function sizeGlobe() {
     if (!globe) return;
     const r = els.globe.getBoundingClientRect();
     globe.width(Math.max(320, r.width)).height(Math.max(280, r.height));
@@ -1522,6 +1680,7 @@ out center tags ${cap};`;
     if (els.heatToggle) {
       els.heatToggle.addEventListener("click", () => setHeatmap(!heatmapOn));
     }
+    bindMobileChrome();
 
     if (typeof Globe === "function") {
       globe = Globe()(els.globe)
@@ -1538,6 +1697,7 @@ out center tags ${cap};`;
         .htmlElement(pinEl)
         .htmlAltitude(0.01)
         .onPolygonHover((d) => {
+          if (isTouchUi()) return;
           hoveredRegion = d || null;
           paintPolygons();
         })
@@ -1570,6 +1730,8 @@ out center tags ${cap};`;
       heatmapOn: () => heatmapOn,
       heatValue: (id) => heatRaw(id),
       selectRegion: (id, opts) => selectRegion(id, opts),
+      closePanel: () => closeListPanel(),
+      panelOpen: () => !!(els.panel && els.panel.classList.contains("is-open")),
       selectLead: (key, fly) => selectLead(key, fly),
       findLead: (q) => findLeadByQuery(q),
       getVisible: () => filtered(),

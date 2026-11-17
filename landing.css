@@ -311,3 +311,32 @@ body.globe-on .bg-fallback::after { opacity: 0; transition: opacity 1.6s ease; }
 .tour-sound .feather { width: 22px; height: 22px; stroke-width: 2.2; }
 .tour-sound.is-hidden { opacity: 0; pointer-events: none; }
 @media (max-width: 560px) { .tour-sound { padding: .8rem 1.2rem; font-size: .95rem; } }
+
+
+/* Narrow landing header and tap targets. Desktop rules above are unchanged. */
+@media (max-width: 768px) {
+  :root { --header-h: 56px; }
+  html, body.landing { overflow-x: hidden; max-width: 100%; -webkit-text-size-adjust: 100%; }
+  .landing .top {
+    height: var(--header-h);
+    height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+    padding: env(safe-area-inset-top, 0px) .75rem 0 .75rem;
+    gap: .5rem;
+  }
+  .landing .titles h1 { font-size: 1rem; white-space: nowrap; }
+  .landing .top-launch {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 1rem;
+    font-size: .9rem;
+  }
+  .landing main { padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); }
+  .landing .hero-copy p.lead { font-size: 1rem; line-height: 1.55; }
+  .landing .cta-row .iv-btn,
+  .landing .cta-row .iv-btn-ghost {
+    min-height: 44px;
+  }
+  .pill-kicker { font-size: .68rem; letter-spacing: .12em; }
+  .chips { flex-wrap: wrap; }
+  .chips li { max-width: 100%; overflow-wrap: anywhere; }
+}

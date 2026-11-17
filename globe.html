@@ -2,43 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
   <title>Robert Walker · Lead Globe (private research tool)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@500;600&display=swap">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%2308BEC8%27/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=heatmap1">
+  <link rel="stylesheet" href="styles.css?v=mobile1">
 </head>
 <body>
   <header class="top">
     <div class="brand">
       <a class="mark" href="index.html" title="Lead Globe home" aria-label="Lead Globe home" style="text-decoration:none">RW</a>
       <div class="titles">
-        <h1>Robert Walker · Lead Globe (private research tool)</h1>
+        <h1>
+          <span class="title-full">Robert Walker · Lead Globe (private research tool)</span>
+          <span class="title-short">Lead Globe</span>
+        </h1>
         <p>An independent partner’s internal research tool. Not an official DataEarners or Mode product.</p>
       </div>
     </div>
     <div class="top-actions">
       <button type="button" class="iv-btn-ghost" id="export-btn">
         <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Export CSV
+        <span class="label-full">Export CSV</span><span class="label-short">Export</span>
       </button>
       <a class="iv-btn" href="https://robertwalker.dataearns.com/invite" target="_blank" rel="noopener">
         <svg class="feather" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Invite page
+        <span class="label-full">Invite page</span><span class="label-short">Invite</span>
       </a>
     </div>
   </header>
 
-  <div class="banner" role="note">
-    Personal, one-at-a-time outreach only, per DataEarners partner rules. Do not blast this list. Honor opt-outs the same day. This tool does not contact anyone.
+  <div class="banner" role="note" id="compliance-banner">
+    <span class="banner-text" id="banner-text">Personal, one-at-a-time outreach only, per DataEarners partner rules. Do not blast this list. Honor opt-outs the same day. This tool does not contact anyone.</span>
+    <button type="button" class="banner-dismiss mobile-only" id="banner-dismiss" aria-label="Dismiss notice">×</button>
   </div>
 
   <div class="app">
     <section class="stage" aria-label="Globe of research leads">
       <div id="globe"></div>
+      <div class="stage-tools mobile-only">
+        <button type="button" class="iv-btn-ghost stage-tool" id="key-toggle" aria-pressed="false" aria-controls="fit-legend">Key</button>
+        <button type="button" class="iv-btn-ghost stage-tool" id="list-toggle">List</button>
+      </div>
       <div class="heat-ui">
         <button type="button" class="iv-btn-ghost heat-toggle" id="heatmap-toggle" aria-pressed="false" aria-controls="heat-legend">Heatmap</button>
         <aside class="heat-legend" id="heat-legend" hidden>
@@ -51,7 +59,7 @@
           </ul>
         </aside>
       </div>
-      <aside class="legend">
+      <aside class="legend" id="fit-legend">
         <div class="kicker">Fit score</div>
         <ul>
           <li><span class="swatch" style="color:#08BEC8;background:#08BEC8"></span> 5 — strongest matches</li>
@@ -64,15 +72,19 @@
         </ul>
       </aside>
       <p class="globe-hint" id="globe-hint">
-        <b>Click a state, province, or European country</b>
-        to zoom in and open a prebuilt list of matching OpenStreetMap businesses with contact details. You can optionally search live OpenStreetMap for more. Seed pins for Arizona are city-level, not rooftop-accurate.
+        <span class="hint-long"><b>Click a state, province, or European country</b> to zoom in and open a prebuilt list of matching OpenStreetMap businesses with contact details. You can optionally search live OpenStreetMap for more. Seed pins for Arizona are city-level, not rooftop-accurate.</span>
+        <span class="hint-short">Tap a state, province, or country to open its business list.</span>
       </p>
     </section>
 
     <aside class="panel" id="list-panel">
       <div class="panel-head">
+        <div class="panel-toolbar mobile-only">
+          <button type="button" class="iv-btn-ghost panel-back" id="panel-back">Back to globe</button>
+        </div>
         <div class="kicker">Research list</div>
-        <div class="filters">
+        <p class="region-stats" id="region-stats" hidden></p>
+        <div class="filters" id="filters">
           <label class="field">Region
             <select id="region">
               <option value="">All seed leads</option>
@@ -107,6 +119,7 @@
             </label>
           </div>
         </div>
+        <button type="button" class="iv-btn-ghost filters-toggle mobile-only" id="filters-toggle" aria-expanded="false" aria-controls="filters">Filters</button>
         <p class="count" id="count"></p>
         <p class="status" id="status"></p>
         <div class="osm-actions">
@@ -124,6 +137,6 @@
 
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="leads.js"></script>
-  <script src="app.js?v=heatmap1"></script>
+  <script src="app.js?v=mobile1"></script>
 </body>
 </html>
