@@ -380,6 +380,13 @@
     "name": "Slovakia",
     "totalMatched": 3895
   },
+  "SM": {
+    "capped": false,
+    "count": 7,
+    "extractedAt": "2026-11-17T00:13:10Z",
+    "name": "San Marino",
+    "totalMatched": 10
+  },
   "UA": {
     "capped": true,
     "count": 500,
@@ -743,6 +750,9 @@
     "extractedAt": "2026-11-16T04:31:47Z",
     "name": "Wyoming",
     "totalMatched": 336
+  },
+  "VA": {
+    "error": "skipped (no dedicated Geofabrik extract; Overpass returned no category-matching businesses inside the Vatican polygon)"
   },
   "XK": {
     "capped": true,
