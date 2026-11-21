@@ -876,6 +876,9 @@
     els.open = document.getElementById("az-outreach-open");
     els.back = document.getElementById("az-outreach-back");
     els.desk = document.getElementById("az-desk");
+    els.deskModal = document.getElementById("az-desk-modal");
+    els.deskBackdrop = document.getElementById("az-desk-modal-backdrop");
+    els.deskClose = document.getElementById("az-desk-x");
     els.deskTitle = document.getElementById("az-desk-title");
     els.flag = document.getElementById("az-outreach-flag");
     els.globeFlag = document.getElementById("outreach-globe-flag");
@@ -972,6 +975,7 @@
     els.complete.hidden = !done;
     els.complete.classList.toggle("is-on", done);
     if (els.batchBar) els.batchBar.hidden = done;
+    if (els.desk) els.desk.classList.toggle("is-complete", done);
     if (els.panel) els.panel.classList.toggle("is-complete", done);
     if (!done) {
       els.complete.innerHTML = "";
@@ -1482,12 +1486,14 @@
 
   function setOpen(on) {
     if (!els.desk) return;
+    if (els.deskModal) els.deskModal.hidden = !on;
     els.desk.hidden = !on;
-    if (els.panel) els.panel.classList.toggle("has-outreach", !!on);
+    if (els.panel) els.panel.classList.remove("has-outreach");
     document.body.classList.toggle("az-outreach-open", !!on);
     document.documentElement.dataset.azOutreach = on ? "open" : "closed";
     if (on) {
       document.documentElement.dataset.listOpen = "az-outreach";
+      try { els.desk.focus({ preventScroll: true }); } catch (e) {}
     }
   }
 
@@ -1543,6 +1549,17 @@
     }
     els.open.addEventListener("click", () => openDesk());
     if (els.back) els.back.addEventListener("click", () => closeDesk());
+    if (els.deskClose) els.deskClose.addEventListener("click", () => closeDesk());
+    if (els.deskBackdrop) els.deskBackdrop.addEventListener("click", () => closeDesk());
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if (els.deskModal && !els.deskModal.hidden) {
+        const chooser = document.getElementById("mail-chooser");
+        const gate = document.getElementById("az-gate");
+        if ((chooser && !chooser.hidden) || (gate && !gate.hidden)) return;
+        closeDesk();
+      }
+    });
     if (els.build) {
       els.build.addEventListener("click", async () => {
         await ensureData(viewRegion);

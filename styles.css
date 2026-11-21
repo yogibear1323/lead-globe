@@ -1029,35 +1029,75 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
   width: auto;
   flex: none;
 }
+.az-desk-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 1.5rem;
+}
+.az-desk-modal[hidden] { display: none !important; }
+.az-desk-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 10, 22, .62);
+}
 .az-desk {
-  display: none;
+  position: relative;
+  z-index: 1;
+  display: flex;
   flex-direction: column;
   min-height: 0;
-  background: rgba(7, 31, 59, .98);
-  border-top: 1px solid var(--iv-edge);
+  width: min(980px, 100%);
+  height: min(920px, 100%);
+  max-height: 100%;
+  overflow: hidden;
+  background: #071f3b;
+  border: 1px solid var(--iv-edge);
+  border-radius: 22px;
+  box-shadow: 0 28px 80px rgba(0,0,0,.5);
 }
-.panel.has-outreach .az-desk { display: flex; flex: 1 1 auto; min-height: 0; }
-.panel.has-outreach .panel-head,
-.panel.has-outreach .list,
-.panel.has-outreach .detail { display: none; }
 .az-desk-bar {
   display: flex;
   align-items: center;
-  gap: .7rem;
-  padding: .7rem .9rem;
+  flex-wrap: wrap;
+  gap: .55rem .7rem;
+  padding: .7rem 1rem;
   border-bottom: 1px solid var(--iv-edge);
   flex: none;
+  min-width: 0;
 }
 .az-desk-bar .iv-btn-ghost { width: auto; padding: .4rem .85rem; }
+.az-desk-bar .kicker { min-width: 0; flex: 1 1 auto; }
+.az-desk-x {
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  border: 1px solid var(--iv-edge);
+  border-radius: 999px;
+  background: rgba(7, 31, 59, .95);
+  color: var(--iv-ink);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  flex: none;
+}
+.az-desk-x:hover { border-color: var(--iv-teal); color: var(--iv-teal); }
 .az-desk-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
-  padding: .85rem .9rem 1.2rem;
+  -webkit-overflow-scrolling: touch;
+  padding: .85rem 1rem 1.3rem;
   display: grid;
   gap: .8rem;
   align-content: start;
 }
+body.az-outreach-open { overflow: hidden; }
+body.az-outreach-open .stage,
+body.az-outreach-open .globe-hint { visibility: hidden; pointer-events: none; }
 .az-compliance {
   margin: 0;
   font-size: .78rem;
@@ -1141,12 +1181,14 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
   .az-actions .iv-btn-ghost,
   .az-log-actions .iv-btn-ghost,
   .az-import-label { min-height: 44px; padding: 0 .9rem; }
-  .panel.has-outreach .az-desk {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    background: #071f3b;
+  .az-desk-modal { padding: .55rem; align-items: stretch; }
+  .az-desk {
+    width: 100%;
+    height: calc(100dvh - 1.1rem);
+    max-height: calc(100dvh - 1.1rem);
+    border-radius: 16px;
   }
+  .az-desk-x { width: 44px; height: 44px; font-size: 1.5rem; }
   .az-desk-body { padding: .75rem .8rem calc(1rem + env(safe-area-inset-bottom, 0px)); }
   .az-draft .field textarea,
   .az-settings-grid textarea,
@@ -1154,7 +1196,7 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
   .az-draft .field textarea[id^="az-body-"] { min-height: 12rem; }
 }
 
-.panel.has-outreach .attrib { display: none; }
+
 .az-complete {
   display: none;
   border: 1px solid rgba(8, 190, 200, .45);
@@ -1168,11 +1210,12 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
 .az-complete p { margin: 0 0 .5rem; font-size: .85rem; line-height: 1.45; color: var(--iv-mute); }
 .az-complete p:last-child { margin-bottom: 0; }
 .az-complete .az-counts { color: var(--iv-ink); }
-.panel.has-outreach.is-complete #az-batch-bar { display: none; }
+.az-desk.is-complete #az-batch-bar { display: none; }
 .az-flag {
   display: none;
   align-items: center;
   width: auto;
+  max-width: 100%;
   padding: .2rem .65rem;
   border-radius: 999px;
   border: 1px solid rgba(8, 190, 200, .4);
@@ -1182,7 +1225,10 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
   font-weight: 650;
   letter-spacing: .04em;
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
+  flex: 0 1 auto;
 }
 .az-flag.is-on { display: inline-flex; }
 .az-flag.is-done {
@@ -1202,10 +1248,9 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
 #az-debug-complete { width: auto; margin-top: .6rem; }
 
 @media (max-width: 768px) {
-  body.az-outreach-open .stage,
-  body.az-outreach-open .globe-hint { visibility: hidden; pointer-events: none; }
   .heat-ui .globe-flag { max-width: 11rem; }
   .az-complete { padding: .85rem .8rem; }
+  .az-desk-bar .kicker { flex: 1 1 8rem; }
 }
 
 

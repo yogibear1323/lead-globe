@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@500;600&display=swap">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%2308BEC8%27/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=mail4">
+  <link rel="stylesheet" href="styles.css?v=mail5">
 </head>
 <body>
   <header class="top">
@@ -134,11 +134,19 @@
         <p class="gdpr" id="gdpr" hidden>European region: emails from OpenStreetMap are hidden (GDPR). Use published business contacts only if you later reach out yourself, one at a time.</p>
       </div>
       <div class="list" id="list"></div>
-      <section class="az-desk" id="az-desk" hidden>
+
+      <p class="attrib" id="attrib"></p>
+    </aside>
+  </div>
+
+      <div class="az-desk-modal" id="az-desk-modal" hidden>
+        <div class="az-desk-modal-backdrop" id="az-desk-modal-backdrop"></div>
+      <section class="az-desk" id="az-desk" role="dialog" aria-modal="true" aria-labelledby="az-desk-title" tabindex="-1">
         <div class="az-desk-bar">
           <button type="button" class="iv-btn-ghost" id="az-outreach-back">Back to list</button>
           <div class="kicker" id="az-desk-title">Arizona outreach</div>
           <div class="az-flag" id="az-outreach-flag" hidden></div>
+          <button type="button" class="az-desk-x" id="az-desk-x" aria-label="Close outreach">×</button>
         </div>
         <div class="az-desk-body" id="az-desk-body">
           <p class="az-compliance" id="az-compliance"></p>
@@ -202,9 +210,7 @@
           </details>
         </div>
       </section>
-      <p class="attrib" id="attrib"></p>
-    </aside>
-  </div>
+      </div>
 
   <div class="lead-modal" id="lead-modal" hidden>
     <div class="lead-modal-backdrop" id="lead-modal-backdrop"></div>
@@ -218,8 +224,8 @@
 
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="leads.js"></script>
-  <script src="mail-chooser.js?v=mail4"></script>
-  <script src="app.js?v=mail4"></script>
-  <script src="outreach.js?v=mail4"></script>
+  <script src="mail-chooser.js?v=mail5"></script>
+  <script src="app.js?v=mail5"></script>
+  <script src="outreach.js?v=mail5"></script>
 </body>
 </html>
