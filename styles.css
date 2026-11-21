@@ -180,14 +180,8 @@ body {
   overflow: hidden;
 }
 .panel.has-lead .list {
-  flex: 1 1 48%;
-  min-height: 8rem;
-}
-.panel.has-lead .detail {
-  flex: 1 1 52%;
-  max-height: none;
+  flex: 1 1 auto;
   min-height: 0;
-  overflow: auto;
 }
 .panel.is-open { box-shadow: -18px 0 40px rgba(0,0,0,.25); }
 .panel-head { padding: 1rem 1rem .75rem; border-bottom: 1px solid var(--iv-edge); }
@@ -496,8 +490,7 @@ select option { background: #0b2340; color: var(--iv-ink); }
   .filters > label.field:nth-child(3) { order: 2; }
   .filters > label.field:nth-child(2) { order: 3; grid-column: 1 / -1; }
   .filters > .filter-row { order: 4; grid-column: 1 / -1; }
-  .panel.has-lead .list { flex: 1 1 34%; min-height: 7rem; }
-  .panel.has-lead .detail { flex: 1 1 66%; }
+  .panel.has-lead .list { flex: 1 1 auto; min-height: 0; }
 }
 
 /* Heatmap overlay (toggle + legend). Hidden styles keep the off state identical. */
@@ -892,18 +885,6 @@ select option { background: #0b2340; color: var(--iv-ink); }
   }
 
   .panel.has-lead .list { flex: 1 1 auto; min-height: 0; }
-  .panel.has-lead .detail {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    flex: none;
-    max-height: none;
-    min-height: 0;
-    overflow: auto;
-    padding: .85rem .9rem calc(1rem + env(safe-area-inset-bottom, 0px));
-    background: rgba(7, 31, 59, .98);
-    border-top: 0;
-  }
   .detail-close {
     min-height: 44px;
     padding: 0 .9rem;
@@ -922,4 +903,114 @@ select option { background: #0b2340; color: var(--iv-ink); }
   .app,
   .top,
   .banner { max-width: 100vw; }
+}
+
+
+/* ---------- Centered business detail modal ---------- */
+.lead-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem 3.4rem;
+}
+.lead-modal[hidden] { display: none !important; }
+.lead-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 10, 22, .62);
+}
+.lead-modal-card {
+  position: relative;
+  z-index: 1;
+  width: min(920px, calc(100vw - 6.5rem));
+  max-height: min(86vh, 920px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #071f3b;
+  border: 1px solid var(--iv-edge);
+  border-radius: 22px;
+  box-shadow: 0 28px 80px rgba(0,0,0,.5);
+  padding: 1.35rem 1.7rem 1.5rem;
+  outline: none;
+}
+.lead-modal-card .detail {
+  border-top: 0;
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+  background: transparent;
+}
+.lead-modal-card .detail-head { padding-right: 2.6rem; }
+.lead-modal-x {
+  position: sticky;
+  top: 0;
+  float: right;
+  z-index: 3;
+  width: 36px;
+  height: 36px;
+  margin: 0 0 .4rem .6rem;
+  border: 1px solid var(--iv-edge);
+  border-radius: 999px;
+  background: rgba(7, 31, 59, .95);
+  color: var(--iv-ink);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lead-modal-x:hover { border-color: var(--iv-teal); color: var(--iv-teal); }
+.lead-modal-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--iv-edge);
+  background: #0d335c;
+  color: var(--iv-ink);
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.lead-modal-prev { left: max(.6rem, calc(50vw - min(920px, calc(100vw - 6.5rem)) / 2 - 3.3rem)); }
+.lead-modal-next { right: max(.6rem, calc(50vw - min(920px, calc(100vw - 6.5rem)) / 2 - 3.3rem)); }
+.lead-modal-nav:hover { border-color: var(--iv-teal); color: var(--iv-teal); }
+.lead-modal-nav:disabled { opacity: .35; cursor: default; }
+body.lead-modal-open { overflow: hidden; }
+/* globe.gl's 3D canvas/pins otherwise paint over the modal */
+body.lead-modal-open .stage,
+body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
+
+@media (max-width: 768px) {
+  .lead-modal { padding: .55rem; align-items: stretch; }
+  .lead-modal-card {
+    width: 100%;
+    max-width: none;
+    height: calc(100dvh - 1.1rem);
+    max-height: calc(100dvh - 1.1rem);
+    border-radius: 16px;
+    padding: .9rem .9rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+  .lead-modal-x {
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+  }
+  .lead-modal-nav {
+    width: 44px;
+    height: 44px;
+    position: absolute;
+    top: auto;
+    bottom: calc(.7rem + env(safe-area-inset-bottom, 0px));
+    transform: none;
+  }
+  .lead-modal-prev { left: .7rem; }
+  .lead-modal-next { right: .7rem; }
+  .lead-modal-card .detail { padding-bottom: 3.6rem; }
 }

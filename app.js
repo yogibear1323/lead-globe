@@ -48,6 +48,12 @@
     listToggle: document.getElementById("list-toggle"),
     bannerDismiss: document.getElementById("banner-dismiss"),
     banner: document.getElementById("compliance-banner"),
+    leadModal: document.getElementById("lead-modal"),
+    leadBackdrop: document.getElementById("lead-modal-backdrop"),
+    leadCard: document.getElementById("lead-modal-card"),
+    leadClose: document.getElementById("lead-modal-x"),
+    leadPrev: document.getElementById("lead-modal-prev"),
+    leadNext: document.getElementById("lead-modal-next"),
   };
 
 
@@ -740,21 +746,62 @@
     }
   }
 
+  function setLeadModal(on) {
+    if (els.leadModal) {
+      els.leadModal.hidden = !on;
+    }
+    document.body.classList.toggle("lead-modal-open", !!on);
+    document.documentElement.dataset.leadModal = on ? "open" : "closed";
+    if (on && els.leadCard && typeof els.leadCard.focus === "function") {
+      try { els.leadCard.focus({ preventScroll: true }); } catch (e) { els.leadCard.focus(); }
+    }
+  }
+
+  function leadNeighbors() {
+    const list = filtered();
+    const i = selectedLead ? list.findIndex((x) => x.key === selectedLead.key) : -1;
+    return {
+      list: list,
+      index: i,
+      prev: i > 0 ? list[i - 1] : null,
+      next: i >= 0 && i < list.length - 1 ? list[i + 1] : null,
+    };
+  }
+
+  function updateLeadModalNav() {
+    const n = leadNeighbors();
+    if (els.leadPrev) {
+      els.leadPrev.disabled = !n.prev;
+      els.leadPrev.hidden = false;
+    }
+    if (els.leadNext) {
+      els.leadNext.disabled = !n.next;
+      els.leadNext.hidden = false;
+    }
+    if (els.leadModal) {
+      els.leadModal.dataset.leadIndex = n.index >= 0 ? String(n.index + 1) : "";
+      els.leadModal.dataset.leadCount = String(n.list.length);
+    }
+  }
+
   function renderDetail() {
     const l = selectedLead;
     if (!l) {
       els.detail.hidden = true;
       els.detail.innerHTML = "";
-      if (els.detail.closest(".panel")) els.detail.closest(".panel").classList.remove("has-lead");
+      if (els.panel) els.panel.classList.remove("has-lead");
       els.detail.dataset.leadKey = "";
       document.documentElement.dataset.outreach = "hidden";
       document.documentElement.dataset.outreachCategory = "";
       document.documentElement.dataset.outreachMailto = "";
       document.documentElement.dataset.selectedLead = "";
+      setLeadModal(false);
       return;
     }
     els.detail.hidden = false;
-    if (els.detail.closest(".panel")) els.detail.closest(".panel").classList.add("has-lead");
+    if (els.panel) els.panel.classList.remove("has-lead");
+    setLeadModal(true);
+    updateLeadModalNav();
     const site = l.website
       ? `<a href="${escapeHtml(l.website)}" target="_blank" rel="noopener">${escapeHtml(l.website)}</a>`
       : "—";
@@ -777,13 +824,12 @@
     els.detail.innerHTML = `
       <div class="detail-head">
         <div class="kicker">Selected lead</div>
-        <button type="button" class="iv-btn-ghost detail-close" id="detail-close">Back to list</button>
       </div>
-      <h3>${escapeHtml(l.name)}</h3>
+      <h3 id="lead-modal-title">${escapeHtml(l.name)}</h3>
       <div class="meta">${escapeHtml(l.category)} · ${escapeHtml(l.city || "")} · fit ${escapeHtml(fitLine)} · <span class="badge ${l.source === "seed" ? "seed" : "osm"}">${escapeHtml(l.source)}</span></div>
       <p class="contact-line">${dash(l.phone)} · ${emailShown}</p>
       ${leadersBlock(l)}
-      <details class="more">
+      <details class="more" open>
         <summary>Address, website, and notes</summary>
         <dl>
           <dt>Address</dt><dd>${dash(l.address)}</dd>
@@ -1584,6 +1630,43 @@ out center tags ${cap};`;
       selectLead(card.getAttribute("data-key"), true);
     }
   });
+  function closeLeadModal() {
+    selectLead(null, false);
+  }
+
+  function stepLead(dir) {
+    const n = leadNeighbors();
+    const next = dir < 0 ? n.prev : n.next;
+    if (next) selectLead(next.key, false);
+  }
+
+  if (els.leadBackdrop) {
+    els.leadBackdrop.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeLeadModal();
+    });
+  }
+  if (els.leadClose) {
+    els.leadClose.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeLeadModal();
+    });
+  }
+  if (els.leadPrev) els.leadPrev.addEventListener("click", (e) => { e.preventDefault(); stepLead(-1); });
+  if (els.leadNext) els.leadNext.addEventListener("click", (e) => { e.preventDefault(); stepLead(1); });
+  document.addEventListener("keydown", (e) => {
+    if (!els.leadModal || els.leadModal.hidden) return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeLeadModal();
+      return;
+    }
+    const tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (e.key === "ArrowLeft") { e.preventDefault(); stepLead(-1); }
+    if (e.key === "ArrowRight") { e.preventDefault(); stepLead(1); }
+  });
+
   els.detail.addEventListener("change", (e) => {
     if (e.target && e.target.id === "outreach-script" && selectedLead) {
       applyScriptChoice(selectedLead, e.target.value, false);
