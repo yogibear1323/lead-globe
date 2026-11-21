@@ -1116,6 +1116,64 @@
     if (on && els.leadCard && typeof els.leadCard.focus === "function") {
       try { els.leadCard.focus({ preventScroll: true }); } catch (e) { els.leadCard.focus(); }
     }
+    if (on && els.leadCard) els.leadCard.scrollTop = 0;
+    syncGlobeLock();
+  }
+
+  function layersLocked() {
+    const b = document.body.classList;
+    return b.contains("lead-modal-open") || b.contains("az-outreach-open") || b.contains("mail-chooser-open");
+  }
+
+  function setGlobeInteractive(on) {
+    try {
+      if (!globe || typeof globe.controls !== "function") return;
+      const c = globe.controls();
+      if (!c) return;
+      c.enabled = !!on;
+      if ("enableZoom" in c) c.enableZoom = !!on;
+      if ("enableRotate" in c) c.enableRotate = !!on;
+    } catch (err) {}
+  }
+
+  function syncGlobeLock() {
+    setGlobeInteractive(!layersLocked());
+  }
+
+  function isVerticallyScrollable(el) {
+    if (!el || el.nodeType !== 1) return false;
+    const st = window.getComputedStyle(el);
+    const oy = st.overflowY;
+    if (oy !== "auto" && oy !== "scroll") return false;
+    return el.scrollHeight > el.clientHeight + 1;
+  }
+
+  function bindLayerScrollGuards() {
+    if (bindLayerScrollGuards.done) return;
+    bindLayerScrollGuards.done = true;
+    new MutationObserver(syncGlobeLock).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    document.addEventListener(
+      "wheel",
+      (e) => {
+        if (!layersLocked()) return;
+        e.stopPropagation();
+        let node = e.target && e.target.nodeType === 1 ? e.target : e.target && e.target.parentElement;
+        while (node && node !== document.body) {
+          if (isVerticallyScrollable(node)) return;
+          node = node.parentElement;
+        }
+        const scroller = document.body.classList.contains("lead-modal-open")
+          ? els.leadCard
+          : document.body.classList.contains("az-outreach-open")
+            ? document.getElementById("az-desk-body")
+            : document.querySelector(".mail-chooser-panel");
+        if (scroller && scroller.scrollHeight > scroller.clientHeight + 1) {
+          scroller.scrollTop += e.deltaY;
+        }
+        if (e.cancelable) e.preventDefault();
+      },
+      { capture: true, passive: false }
+    );
   }
 
   function leadNeighbors() {
@@ -1195,6 +1253,8 @@
       .map((s) => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.label)}</option>`)
       .join("");
     els.detail.innerHTML = `
+      <button type="button" class="iv-btn-ghost outreach-jump" id="outreach-jump">Outreach ↓</button>
+      <div class="detail-main">
       <div class="detail-head">
         <div class="kicker">Selected lead</div>
       </div>
@@ -1212,6 +1272,7 @@
           <dt>OSM</dt><dd>${osm}</dd>
         </dl>
       </details>
+      </div>
       <section class="outreach" id="outreach" data-category="${escapeHtml(pack.id || "generic")}" data-region-kind="${escapeHtml(kind)}">
         <div class="kicker">Outreach</div>
         <p class="outreach-log-status" id="outreach-log-status" hidden></p>
@@ -2076,6 +2137,17 @@ out center tags ${cap};`;
       selectLead(null, false);
       return;
     }
+    if (e.target && (e.target.id === "outreach-jump" || (e.target.closest && e.target.closest("#outreach-jump")))) {
+      e.preventDefault();
+      const section = document.getElementById("outreach");
+      const card = els.leadCard;
+      if (section && card) {
+        const top = Math.max(0, section.offsetTop - 8);
+        if (typeof card.scrollTo === "function") card.scrollTo({ top: top, behavior: "smooth" });
+        else card.scrollTop = top;
+      }
+      return;
+    }
     if (e.target && e.target.id === "outreach-copy") {
       e.preventDefault();
       copyOutreach();
@@ -2209,6 +2281,7 @@ out center tags ${cap};`;
       els.heatToggle.addEventListener("click", () => setHeatmap(!heatmapOn));
     }
     bindMobileChrome();
+    bindLayerScrollGuards();
 
     if (typeof Globe === "function") {
       globe = Globe()(els.globe)
@@ -2241,6 +2314,7 @@ out center tags ${cap};`;
       }
       paintPolygons();
       sizeGlobe();
+      syncGlobeLock();
       window.addEventListener("resize", sizeGlobe);
       // Keep the canvas matched to the stage when the side panel changes width.
       if ("ResizeObserver" in window) {

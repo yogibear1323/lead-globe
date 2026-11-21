@@ -201,7 +201,7 @@ input[type="search"]:focus, select:focus { border-color: var(--iv-teal); box-sha
 select option { background: #0b2340; color: var(--iv-ink); }
 .count { margin: .7rem 0 0; font-size: .78rem; color: var(--iv-mute); }
 
-.list { flex: 1; overflow: auto; padding: .7rem; display: grid; align-content: start; gap: .5rem; }
+.list { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; padding: .7rem; display: grid; align-content: start; gap: .5rem; }
 .card {
   text-align: left; width: 100%;
   padding: .8rem .85rem;
@@ -907,6 +907,68 @@ select option { background: #0b2340; color: var(--iv-ink); }
 }
 
 
+
+
+/* Short laptop / scaled Windows viewports: don't let filters eat the list */
+@media (min-width: 769px) and (max-height: 800px) {
+  .panel-head {
+    flex: 0 0 auto;
+    max-height: 46%;
+    overflow: auto;
+    padding: .7rem .9rem .55rem;
+    scrollbar-width: auto;
+    scrollbar-color: #08BEC8 rgba(8, 190, 200, .2);
+  }
+  .panel-head::-webkit-scrollbar { width: 10px; }
+  .panel-head::-webkit-scrollbar-thumb { background: #08BEC8; border-radius: 999px; border: 2px solid #071f3b; }
+  .filters { gap: .4rem; margin-top: .45rem; }
+  .count, .status { margin-top: .4rem; }
+  .list {
+    flex: 1 1 auto;
+    min-height: 12rem;
+  }
+}
+@media (min-width: 769px) and (max-height: 640px) {
+  .panel-head { max-height: 42%; padding: .55rem .8rem .45rem; }
+  .list { min-height: 10rem; }
+}
+
+/* Always-visible scrollbars (not overlay / not hidden) on the card, desk, and list */
+.lead-modal-card,
+.az-desk-body,
+.list {
+  scrollbar-width: auto;
+  scrollbar-color: #08BEC8 rgba(8, 190, 200, .2);
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+.lead-modal-card::-webkit-scrollbar,
+.az-desk-body::-webkit-scrollbar,
+.list::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  background: rgba(4, 24, 46, .95);
+}
+.lead-modal-card::-webkit-scrollbar-track,
+.az-desk-body::-webkit-scrollbar-track,
+.list::-webkit-scrollbar-track {
+  background: rgba(4, 24, 46, .95);
+  border-left: 1px solid var(--iv-edge);
+}
+.lead-modal-card::-webkit-scrollbar-thumb,
+.az-desk-body::-webkit-scrollbar-thumb,
+.list::-webkit-scrollbar-thumb {
+  background: #08BEC8;
+  border-radius: 999px;
+  border: 2px solid #071f3b;
+  min-height: 2.4rem;
+}
+.lead-modal-card::-webkit-scrollbar-thumb:hover,
+.az-desk-body::-webkit-scrollbar-thumb:hover,
+.list::-webkit-scrollbar-thumb:hover {
+  background: #4fd1c5;
+}
+
 /* ---------- Centered business detail modal ---------- */
 .lead-modal {
   position: fixed;
@@ -915,7 +977,7 @@ select option { background: #0b2340; color: var(--iv-ink); }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2.2rem 3.4rem;
+  padding: .75rem 1rem;
 }
 .lead-modal[hidden] { display: none !important; }
 .lead-modal-backdrop {
@@ -926,15 +988,19 @@ select option { background: #0b2340; color: var(--iv-ink); }
 .lead-modal-card {
   position: relative;
   z-index: 1;
-  width: min(920px, calc(100vw - 6.5rem));
-  max-height: min(86vh, 920px);
-  overflow: auto;
+  width: min(1120px, calc(100vw - 2rem));
+  max-height: calc(100vh - 1.5rem);
+  max-height: calc(100dvh - 1.5rem);
+  max-height: calc(100svh - 1.5rem);
+  overflow-x: hidden;
+  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   background: #071f3b;
   border: 1px solid var(--iv-edge);
   border-radius: 22px;
   box-shadow: 0 28px 80px rgba(0,0,0,.5);
-  padding: 1.35rem 1.7rem 1.5rem;
+  padding: 1.15rem 1.3rem 1.3rem;
   outline: none;
 }
 .lead-modal-card .detail {
@@ -979,14 +1045,50 @@ select option { background: #0b2340; color: var(--iv-ink); }
   display: grid;
   place-items: center;
 }
-.lead-modal-prev { left: max(.6rem, calc(50vw - min(920px, calc(100vw - 6.5rem)) / 2 - 3.3rem)); }
-.lead-modal-next { right: max(.6rem, calc(50vw - min(920px, calc(100vw - 6.5rem)) / 2 - 3.3rem)); }
+.lead-modal-prev { left: max(.35rem, calc(50vw - min(1120px, calc(100vw - 2rem)) / 2 - 3.1rem)); }
+.lead-modal-next { right: max(.35rem, calc(50vw - min(1120px, calc(100vw - 2rem)) / 2 - 3.1rem)); }
 .lead-modal-nav:hover { border-color: var(--iv-teal); color: var(--iv-teal); }
 .lead-modal-nav:disabled { opacity: .35; cursor: default; }
 body.lead-modal-open { overflow: hidden; }
 /* globe.gl's 3D canvas/pins otherwise paint over the modal */
 body.lead-modal-open .stage,
 body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
+
+.outreach-jump {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  width: auto;
+  margin: 0 2.6rem .7rem 0;
+  padding: .4rem .95rem;
+  font-size: .82rem;
+}
+@media (max-width: 899px) {
+  .outreach-jump { display: inline-flex; }
+}
+
+@media (min-width: 900px) {
+  .lead-modal-card .detail {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.35rem;
+  }
+  .lead-modal-card .detail-main {
+    flex: 1 1 46%;
+    min-width: 0;
+  }
+  .lead-modal-card .outreach {
+    flex: 1 1 54%;
+    margin-top: 0;
+    padding: 0 2.4rem 0 1.2rem;
+    border-top: 0;
+    border-left: 1px solid var(--iv-edge);
+    min-width: 0;
+  }
+  .lead-modal-card .outreach-jump { display: none !important; }
+}
 
 @media (max-width: 768px) {
   .lead-modal { padding: .55rem; align-items: stretch; }
@@ -1036,7 +1138,7 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.25rem 1.5rem;
+  padding: .75rem 1rem;
 }
 .az-desk-modal[hidden] { display: none !important; }
 .az-desk-modal-backdrop {
@@ -1052,7 +1154,9 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
   min-height: 0;
   width: min(980px, 100%);
   height: min(920px, 100%);
-  max-height: 100%;
+  max-height: calc(100vh - 1.5rem);
+  max-height: calc(100dvh - 1.5rem);
+  max-height: calc(100svh - 1.5rem);
   overflow: hidden;
   background: #071f3b;
   border: 1px solid var(--iv-edge);
@@ -1088,7 +1192,8 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
 .az-desk-body {
   flex: 1 1 auto;
   min-height: 0;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   padding: .85rem 1rem 1.3rem;
   display: grid;
