@@ -1499,6 +1499,24 @@ body.mail-chooser-open { overflow: hidden; }
   font-size: .82rem;
   line-height: 1.45;
 }
-.outreach-us-only[hidden] { display: none !important; }
+#outreach-profile-prompt[hidden],
+.outreach-us-only[hidden],
+.outreach-us-only:empty { display: none !important; }
+.outreach-profile-prompt {
+  margin: 0;
+  padding: .65rem .75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(246, 194, 107, .45);
+  background: rgba(245, 158, 11, .1);
+  color: var(--iv-ink);
+  font-size: .82rem;
+  line-height: 1.45;
+}
+.outreach-profile-prompt .iv-btn-ghost {
+  width: auto;
+  margin: .45rem 0 0;
+  min-height: 36px;
+}
 #outreach-script-wrap[hidden] { display: none !important; }
 #outreach-regenerate { width: auto; }
+#outreach-regenerate[hidden] { display: none !important; }

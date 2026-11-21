@@ -393,7 +393,7 @@
       );
     }
     if (email) {
-      const mail = outreachRegionKind() === "us"
+      const mail = outreachRegionKind(l) === "us"
         ? `<a href="mailto:${escapeHtml(email)}" data-contact="1">${escapeHtml(email)}</a>`
         : escapeHtml(email);
       rows.push(
@@ -445,8 +445,8 @@
     root.dataset.seedPins = String(rows.filter((r) => r.source === "seed").length);
     root.dataset.osmPins = String(rows.filter((r) => r.source === "OSM").length);
     root.dataset.selectedLead = selectedLead ? selectedLead.name || selectedLead.key : "";
-    root.dataset.outreach = selectedLead ? (outreachRegionKind() === "us" ? "ready" : "blocked") : "hidden";
-    root.dataset.outreachRegion = selectedLead ? outreachRegionKind() : "";
+    root.dataset.outreach = selectedLead ? (outreachRegionKind(selectedLead) === "us" ? "ready" : "blocked") : "hidden";
+    root.dataset.outreachRegion = selectedLead ? outreachRegionKind(selectedLead) : "";
     root.dataset.listOpen = selectedRegion ? "region" : "seed";
     window.LeadGlobe = window.LeadGlobe || {};
     window.LeadGlobe.ready = true;
@@ -721,9 +721,15 @@
   function generatedScriptItems(lead) {
     const az = window.AzOutreach;
     if (!lead || !az || typeof az.buildDraft !== "function") return [];
-    if (outreachRegionKind() !== "us") return [];
+    if (outreachRegionKind(lead) !== "us") return [];
     const items = [];
-    const def = az.buildDraft(lead);
+    let def;
+    try {
+      def = az.buildDraft(lead);
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
     items.push({
       id: "email-default",
       kind: "email",
@@ -817,18 +823,24 @@
     return !TERRITORIES[id];
   }
 
-  function outreachRegionKind() {
-    const id = regionIdOf();
-    if (!id) return "";
-    if (isUsRegionId(id)) return "us";
-    const privacy = selectedRegion && selectedRegion.properties && selectedRegion.properties.privacy;
-    if (id.indexOf("CA-") === 0 || privacy === "ca") return "ca";
-    if (privacy === "eu" || hideEmail()) return "eu";
-    return "other";
+  function leadRegionId(lead) {
+    if (lead && lead.regionId) return lead.regionId;
+    return regionIdOf();
   }
 
-  function usOnlyNote() {
-    const kind = outreachRegionKind();
+  function outreachRegionKind(lead) {
+    const target = lead || selectedLead;
+    const id = leadRegionId(target);
+    if (isUsRegionId(id)) return "us";
+    const privacy = selectedRegion && selectedRegion.properties && selectedRegion.properties.privacy;
+    if ((id && id.indexOf("CA-") === 0) || privacy === "ca") return "ca";
+    if (privacy === "eu" || (id && hideEmail())) return "eu";
+    if (id || target) return "other";
+    return "";
+  }
+
+  function usOnlyNote(lead) {
+    const kind = outreachRegionKind(lead);
     if (kind === "ca") {
       return "Outreach drafts are US-only. This region is in Canada, so this tool does not prepare an email or call script (CASL). Honor local rules if you later reach out yourself, one at a time.";
     }
@@ -839,6 +851,10 @@
       return "Outreach drafts are US-only. This tool does not prepare an email or call script for this region.";
     }
     return "";
+  }
+
+  function profileIsReady() {
+    return !!(window.AzOutreach && AzOutreach.profileReady && AzOutreach.profileReady());
   }
 
   function usesOutreachDraft(lead) {
@@ -883,7 +899,7 @@
     const item = scriptItems(scriptPackFor(lead), lead).find((s) => s.id === fields.scriptId);
     const isCall = !!(item && item.kind === "call");
     if (!a) return;
-    if (outreachRegionKind() !== "us") {
+    if (outreachRegionKind(lead) !== "us") {
       a.removeAttribute("href");
       a.setAttribute("aria-disabled", "true");
       a.setAttribute("disabled", "disabled");
@@ -897,7 +913,7 @@
       document.documentElement.dataset.outreachMailto = "blocked";
       document.documentElement.dataset.outreachDraft = "blocked";
       document.documentElement.dataset.outreachStatus = "";
-      document.documentElement.dataset.outreachRegion = outreachRegionKind();
+      document.documentElement.dataset.outreachRegion = outreachRegionKind(lead);
       return;
     }
     if (isCall) {
@@ -1155,12 +1171,20 @@
       : "—";
     const emailShown = hideEmail() && l.source === "OSM"
       ? "Hidden (GDPR)"
-      : (publishedEmail(l) && outreachRegionKind() === "us"
+      : (publishedEmail(l) && outreachRegionKind(l) === "us"
           ? `<a href="mailto:${escapeHtml(publishedEmail(l))}" data-contact="1">${escapeHtml(publishedEmail(l))}</a>`
           : (publishedEmail(l) ? escapeHtml(publishedEmail(l)) : dash(l.email)));
     const fitLine = l.fitKind === "heuristic" ? `heuristic ${l.fit}` : String(l.fit);
     const pack = scriptPackFor(l);
     const items = scriptItems(pack, l);
+    const kind = outreachRegionKind(l);
+    const showScripts = kind === "us" && items.length > 0;
+    const blockedNote = usOnlyNote(l) || (
+      kind === "us"
+        ? "The outreach draft could not be generated. Add your sending details in Outreach, or reload the page."
+        : ""
+    );
+    const needsProfile = kind === "us" && !profileIsReady();
     const prev = els.detail.dataset.leadKey === l.key ? currentOutreachFields().scriptId : "";
     const chosen = items.some((s) => s.id === prev) ? prev : (items[0] && items[0].id) || "";
     const review = escapeHtml(
@@ -1188,11 +1212,12 @@
           <dt>OSM</dt><dd>${osm}</dd>
         </dl>
       </details>
-      <section class="outreach" id="outreach" data-category="${escapeHtml(pack.id || "generic")}" data-region-kind="${escapeHtml(outreachRegionKind())}">
+      <section class="outreach" id="outreach" data-category="${escapeHtml(pack.id || "generic")}" data-region-kind="${escapeHtml(kind)}">
         <div class="kicker">Outreach</div>
         <p class="outreach-log-status" id="outreach-log-status" hidden></p>
-        <p class="outreach-us-only" id="outreach-us-only" ${outreachRegionKind() === "us" ? "hidden" : ""}>${escapeHtml(usOnlyNote())}</p>
-        <div id="outreach-script-wrap" ${outreachRegionKind() === "us" ? "" : "hidden"}>
+        <p class="outreach-us-only" id="outreach-us-only" ${!showScripts && blockedNote ? "" : "hidden"}>${escapeHtml(blockedNote)}</p>
+        <p class="outreach-profile-prompt" id="outreach-profile-prompt" ${needsProfile ? "" : "hidden"}>Add your name and physical mailing address so the draft's signature and CAN-SPAM opt-out are complete. <button type="button" class="iv-btn-ghost" id="outreach-open-settings">Add your sending details</button></p>
+        <div id="outreach-script-wrap" ${showScripts ? "" : "hidden"}>
         <p class="outreach-note">${review}</p>
         <label class="field">Script
           <select id="outreach-script">${options}</select>
@@ -1216,8 +1241,8 @@
       </section>
     `;
     els.detail.dataset.leadKey = l.key;
-    document.documentElement.dataset.outreach = outreachRegionKind() === "us" ? "ready" : "blocked";
-    document.documentElement.dataset.outreachRegion = outreachRegionKind();
+    document.documentElement.dataset.outreach = showScripts ? "ready" : "blocked";
+    document.documentElement.dataset.outreachRegion = kind;
     document.documentElement.dataset.outreachCategory = pack.id || "generic";
     document.documentElement.dataset.selectedLead = l.name || l.key;
     applyScriptChoice(l, chosen, false);
@@ -2056,6 +2081,17 @@ out center tags ${cap};`;
       copyOutreach();
       return;
     }
+    if (e.target && (e.target.id === "outreach-open-settings" || (e.target.closest && e.target.closest("#outreach-open-settings")))) {
+      e.preventDefault();
+      const open = window.LeadGlobe && window.LeadGlobe.openOutreach;
+      Promise.resolve(open ? open() : null).finally(() => {
+        const settings = document.getElementById("az-settings");
+        if (settings) settings.open = true;
+        const name = document.getElementById("az-name");
+        if (name && typeof name.focus === "function") name.focus();
+      });
+      return;
+    }
     if (e.target && e.target.id === "outreach-regenerate") {
       e.preventDefault();
       if (selectedLead) applyScriptChoice(selectedLead, currentOutreachFields().scriptId, false);
@@ -2068,7 +2104,7 @@ out center tags ${cap};`;
       if (!selectedLead || !window.MailChooser) return;
       const email = publishedEmail(selectedLead);
       const isChange = mail.id === "outreach-mail-change";
-      if (outreachRegionKind() !== "us") return;
+      if (outreachRegionKind(selectedLead) !== "us") return;
       if (usesOutreachDraft(selectedLead) && window.AzOutreach && AzOutreach.openLeadMail) {
         const fields = currentOutreachFields();
         const item = scriptItems(scriptPackFor(selectedLead), selectedLead).find((s) => s.id === fields.scriptId);
