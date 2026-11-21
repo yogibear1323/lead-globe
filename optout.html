@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Opt out · Robert Walker / Lead Globe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <style>
+    :root { --bg:#04182e; --ink:#e8f0fb; --mute:#9fb1cf; --teal:#08BEC8; --edge:rgba(120,170,255,.16); }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100dvh;
+      font: 16px/1.55 Inter, system-ui, sans-serif;
+      background: radial-gradient(ellipse at 50% 0%, #0b3563 0%, #04182e 70%);
+      color: var(--ink);
+    }
+    main { max-width: 36rem; margin: 0 auto; padding: 3rem 1.25rem 4rem; }
+    .mark {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: grid; place-items: center;
+      color: #04182e; font-weight: 800;
+      background: radial-gradient(circle at 35% 30%, #6ff3f0, var(--teal) 55%, #009D8D);
+      margin-bottom: 1.25rem;
+    }
+    h1 { font-size: 1.7rem; letter-spacing: -.03em; margin: 0 0 .6rem; }
+    p { color: var(--mute); margin: 0 0 1rem; }
+    .card {
+      border: 1px solid var(--edge); border-radius: 18px;
+      padding: 1.1rem 1.15rem; background: rgba(13,51,96,.5);
+      margin: 1.2rem 0;
+    }
+    .iv-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; padding: 0 1.2rem; border-radius: 999px;
+      background: linear-gradient(100deg, var(--teal), #4fd1c5);
+      color: #04182e; font-weight: 700; text-decoration: none;
+    }
+    .iv-btn.is-off { opacity: .5; pointer-events: none; }
+    .fine { font-size: .82rem; color: #6f84a8; }
+    a.quiet { color: var(--teal); }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="mark" aria-hidden="true">RW</div>
+    <h1>You’re opted out.</h1>
+    <p>Thank you. You will not be contacted again about this by Robert Walker, an independent DataEarners referral partner.</p>
+    <div class="card">
+      <p>This is a static page, so it cannot update a mailing list by itself. Please also send a one-line message so Robert can record the opt-out on his side.</p>
+      <p><a class="iv-btn" id="unsub-mail" href="mailto:?subject=Unsubscribe&amp;body=Unsubscribe">Email “Unsubscribe”</a></p>
+      <p class="fine" id="note">If the button does not address the original sender, reply “unsubscribe” to the email you received and I will not email you again.</p>
+    </div>
+    <p class="fine">This page is not an official DataEarners or data licensing company website. Questions about the program itself should go through the page you were sent, if you still want them. If you only wanted to opt out, you do not need to do anything else.</p>
+  </main>
+  <script>
+    (function () {
+      var q = new URLSearchParams(location.search);
+      var to = (q.get("to") || "").trim();
+      var id = (q.get("b") || "").trim();
+      var body = "Unsubscribe";
+      if (id) body += "\n\nReference: " + id;
+      var href = "mailto:" + (to ? encodeURIComponent(to) : "") +
+        "?subject=" + encodeURIComponent("Unsubscribe") +
+        "&body=" + encodeURIComponent(body);
+      var a = document.getElementById("unsub-mail");
+      a.href = href;
+      document.documentElement.dataset.optout = "ready";
+      document.documentElement.dataset.optoutTo = to ? "yes" : "no";
+      document.documentElement.dataset.optoutId = id || "";
+    })();
+  </script>
+</body>
+</html>

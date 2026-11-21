@@ -1014,3 +1014,195 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
   .lead-modal-next { right: .7rem; }
   .lead-modal-card .detail { padding-bottom: 3.6rem; }
 }
+
+/* ---------- Arizona outreach drafting desk (new UI only) ---------- */
+.kicker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+}
+.az-open {
+  padding: .35rem .85rem;
+  font-size: .78rem;
+  width: auto;
+  flex: none;
+}
+.az-desk {
+  display: none;
+  flex-direction: column;
+  min-height: 0;
+  background: rgba(7, 31, 59, .98);
+  border-top: 1px solid var(--iv-edge);
+}
+.panel.has-outreach .az-desk { display: flex; flex: 1 1 auto; min-height: 0; }
+.panel.has-outreach .panel-head,
+.panel.has-outreach .list,
+.panel.has-outreach .detail { display: none; }
+.az-desk-bar {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .7rem .9rem;
+  border-bottom: 1px solid var(--iv-edge);
+  flex: none;
+}
+.az-desk-bar .iv-btn-ghost { width: auto; padding: .4rem .85rem; }
+.az-desk-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: .85rem .9rem 1.2rem;
+  display: grid;
+  gap: .8rem;
+  align-content: start;
+}
+.az-compliance {
+  margin: 0;
+  font-size: .78rem;
+  line-height: 1.45;
+  color: var(--iv-mute);
+  background: rgba(8, 190, 200, .08);
+  border: 1px solid rgba(8, 190, 200, .28);
+  border-radius: 12px;
+  padding: .65rem .75rem;
+}
+.az-card {
+  border: 1px solid var(--iv-edge);
+  border-radius: 14px;
+  padding: .2rem .75rem .7rem;
+  background: var(--iv-panel);
+}
+.az-card > summary {
+  cursor: pointer;
+  font-weight: 650;
+  font-size: .88rem;
+  padding: .65rem 0;
+  color: var(--iv-ink);
+  list-style: none;
+}
+.az-card > summary::-webkit-details-marker { display: none; }
+.az-card > summary::after { content: " ▾"; color: var(--iv-teal); font-size: .75em; }
+.az-settings-grid { display: grid; gap: .55rem; }
+.az-hint { margin: .35rem 0 0; font-size: .75rem; line-height: 1.4; color: var(--iv-dim); }
+.az-hint.is-warn { color: #f6c26b; }
+.az-stats { font-size: .85rem; line-height: 1.45; color: var(--iv-ink); }
+.az-stats p { margin: 0 0 .35rem; }
+.az-batch-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  align-items: end;
+}
+.az-batch-bar .field { flex: 1 1 8rem; }
+.az-batch-bar .iv-btn { width: auto; padding: .55rem 1rem; }
+.az-batch-title { margin: 0 0 .4rem; font-size: .95rem; }
+.az-empty, .az-hint { font-size: .8rem; color: var(--iv-mute); }
+.az-draft {
+  border: 1px solid var(--iv-edge);
+  border-radius: 16px;
+  padding: .85rem .9rem 1rem;
+  background: var(--iv-panel);
+  display: grid;
+  gap: .45rem;
+  margin: 0 0 .75rem;
+}
+.az-draft.is-done { opacity: .72; }
+.az-draft-top { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+.az-draft h3 { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: -.02em; }
+.az-draft .badge.ready { color: var(--iv-teal); border-color: rgba(8, 190, 200, .4); }
+.az-draft .badge.contacted { color: #6fb6ff; }
+.az-draft .badge.opted-out { color: #f6c26b; }
+.az-draft textarea { min-height: 2.4rem; width: 100%; }
+.az-draft .field textarea { min-height: 3rem; }
+.az-draft .field textarea[id^="az-body-"] { min-height: 14rem; font-size: .82rem; line-height: 1.45; }
+.az-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .25rem; }
+.az-actions .iv-btn,
+.az-actions .iv-btn-ghost { width: auto; justify-content: center; }
+.az-actions.compact { margin-top: .2rem; }
+.az-alt-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .65rem; }
+.az-alt-list li { display: grid; gap: .3rem; padding: .55rem 0; border-bottom: 1px solid var(--iv-edge); }
+.az-log-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .6rem; }
+.az-log-actions .iv-btn-ghost,
+.az-import-label { width: auto; cursor: pointer; }
+.az-log-table { width: 100%; border-collapse: collapse; font-size: .75rem; }
+.az-log-table th, .az-log-table td {
+  text-align: left; padding: .35rem .4rem; border-bottom: 1px solid var(--iv-edge);
+  vertical-align: top; word-break: break-word;
+}
+.az-log-table th { color: var(--iv-dim); font-weight: 650; }
+
+@media (max-width: 768px) {
+  .az-open { min-height: 44px; padding: 0 .9rem; font-size: .82rem; }
+  .az-desk-bar .iv-btn-ghost,
+  .az-batch-bar .iv-btn,
+  .az-actions .iv-btn,
+  .az-actions .iv-btn-ghost,
+  .az-log-actions .iv-btn-ghost,
+  .az-import-label { min-height: 44px; padding: 0 .9rem; }
+  .panel.has-outreach .az-desk {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    background: #071f3b;
+  }
+  .az-desk-body { padding: .75rem .8rem calc(1rem + env(safe-area-inset-bottom, 0px)); }
+  .az-draft .field textarea,
+  .az-settings-grid textarea,
+  .az-settings-grid input { font-size: 16px; min-height: 44px; }
+  .az-draft .field textarea[id^="az-body-"] { min-height: 12rem; }
+}
+
+.panel.has-outreach .attrib { display: none; }
+.az-complete {
+  display: none;
+  border: 1px solid rgba(8, 190, 200, .45);
+  border-radius: 16px;
+  padding: .9rem 1rem 1rem;
+  background: rgba(8, 190, 200, .1);
+  color: var(--iv-ink);
+}
+.az-complete.is-on { display: block; }
+.az-complete h3 { margin: 0 0 .4rem; font-size: 1.05rem; letter-spacing: -.02em; }
+.az-complete p { margin: 0 0 .5rem; font-size: .85rem; line-height: 1.45; color: var(--iv-mute); }
+.az-complete p:last-child { margin-bottom: 0; }
+.az-complete .az-counts { color: var(--iv-ink); }
+.panel.has-outreach.is-complete #az-batch-bar { display: none; }
+.az-flag {
+  display: none;
+  align-items: center;
+  width: auto;
+  padding: .2rem .65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(8, 190, 200, .4);
+  background: rgba(8, 190, 200, .12);
+  color: var(--iv-teal);
+  font-size: .7rem;
+  font-weight: 650;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.az-flag.is-on { display: inline-flex; }
+.az-flag.is-done {
+  border-color: rgba(246, 194, 107, .55);
+  background: rgba(246, 194, 107, .14);
+  color: #f6c26b;
+}
+.heat-ui .globe-flag {
+  margin: 0 0 .4rem;
+  max-width: 16rem;
+  white-space: normal;
+  line-height: 1.3;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: .75rem;
+}
+#az-debug-complete { width: auto; margin-top: .6rem; }
+
+@media (max-width: 768px) {
+  body.az-outreach-open .stage,
+  body.az-outreach-open .globe-hint { visibility: hidden; pointer-events: none; }
+  .heat-ui .globe-flag { max-width: 11rem; }
+  .az-complete { padding: .85rem .8rem; }
+}

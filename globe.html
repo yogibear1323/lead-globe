@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@500;600&display=swap">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%2308BEC8%27/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css?v=card1">
+  <link rel="stylesheet" href="styles.css?v=outreach1">
 </head>
 <body>
   <header class="top">
@@ -48,6 +48,7 @@
         <button type="button" class="iv-btn-ghost stage-tool" id="list-toggle">List</button>
       </div>
       <div class="heat-ui">
+        <div class="az-flag globe-flag" id="outreach-globe-flag" hidden></div>
         <button type="button" class="iv-btn-ghost heat-toggle" id="heatmap-toggle" aria-pressed="false" aria-controls="heat-legend">Heatmap</button>
         <aside class="heat-legend" id="heat-legend" hidden>
           <div class="kicker">Businesses found</div>
@@ -82,7 +83,10 @@
         <div class="panel-toolbar mobile-only">
           <button type="button" class="iv-btn-ghost panel-back" id="panel-back">Back to globe</button>
         </div>
-        <div class="kicker">Research list</div>
+        <div class="kicker-row">
+          <div class="kicker">Research list</div>
+          <button type="button" class="iv-btn-ghost az-open" id="az-outreach-open" hidden>Outreach</button>
+        </div>
         <p class="region-stats" id="region-stats" hidden></p>
         <div class="filters" id="filters">
           <label class="field">Region
@@ -130,6 +134,63 @@
         <p class="gdpr" id="gdpr" hidden>European region: emails from OpenStreetMap are hidden (GDPR). Use published business contacts only if you later reach out yourself, one at a time.</p>
       </div>
       <div class="list" id="list"></div>
+      <section class="az-desk" id="az-desk" hidden>
+        <div class="az-desk-bar">
+          <button type="button" class="iv-btn-ghost" id="az-outreach-back">Back to list</button>
+          <div class="kicker" id="az-desk-title">Arizona outreach</div>
+          <div class="az-flag" id="az-outreach-flag" hidden></div>
+        </div>
+        <div class="az-desk-body" id="az-desk-body">
+          <p class="az-compliance" id="az-compliance"></p>
+          <details class="az-card" id="az-settings">
+            <summary>Your sending details (saved on this device)</summary>
+            <div class="az-settings-grid">
+              <label class="field">Your name
+                <input id="az-name" type="text" autocomplete="name" placeholder="Robert Walker">
+              </label>
+              <label class="field">Your email
+                <input id="az-email" type="email" autocomplete="email" placeholder="you@example.com">
+              </label>
+              <label class="field">Physical mailing address (required for CAN-SPAM)
+                <textarea id="az-address" rows="2" placeholder="Street, city, state, ZIP"></textarea>
+              </label>
+              <label class="field">Signature (optional extra lines)
+                <textarea id="az-signature" rows="2" placeholder="Independent DataEarners partner"></textarea>
+              </label>
+            </div>
+            <p class="az-hint" id="az-settings-note"></p>
+            <button type="button" class="iv-btn-ghost" id="az-debug-complete" hidden>Mark this state complete (test)</button>
+          </details>
+          <div class="az-stats" id="az-stats"></div>
+          <div class="az-complete" id="az-complete" hidden></div>
+          <div class="az-batch-bar" id="az-batch-bar">
+            <label class="field">Daily batch size
+              <select id="az-batch-size">
+                <option value="10">10</option>
+                <option value="20">20</option>
+              </select>
+            </label>
+            <button type="button" class="iv-btn" id="az-build">Build today’s batch</button>
+          </div>
+          <div id="az-batch" class="az-batch"></div>
+          <details class="az-card" id="az-alt-wrap">
+            <summary id="az-alt-summary">Contact via their site (no email)</summary>
+            <p class="az-hint">These businesses are in the list but have no email in the extract. There is no email draft. If you reach out through their website or phone, one at a time, you can log that here.</p>
+            <div id="az-alt"></div>
+          </details>
+          <details class="az-card" id="az-log-wrap">
+            <summary id="az-log-summary">Outreach log</summary>
+            <div class="az-log-actions">
+              <button type="button" class="iv-btn-ghost" id="az-export-json">Export JSON</button>
+              <button type="button" class="iv-btn-ghost" id="az-export-csv">Export CSV</button>
+              <label class="iv-btn-ghost az-import-label">Import file
+                <input type="file" id="az-import" accept=".json,.csv,text/csv,application/json" hidden>
+              </label>
+            </div>
+            <div id="az-log"></div>
+          </details>
+        </div>
+      </section>
       <p class="attrib" id="attrib"></p>
     </aside>
   </div>
@@ -146,6 +207,7 @@
 
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="leads.js"></script>
-  <script src="app.js?v=card1"></script>
+  <script src="app.js?v=outreach1"></script>
+  <script src="outreach.js?v=outreach1"></script>
 </body>
 </html>

@@ -348,6 +348,7 @@
     document.body.classList.remove("sheet-open");
     document.documentElement.dataset.listOpen = "";
     if (selectedLead) selectLead(null, false);
+    if (window.AzOutreach && window.AzOutreach.close) window.AzOutreach.close();
   }
 
   function leaderKey(l) {
@@ -910,34 +911,39 @@
       .polygonsData(regions)
       .polygonGeoJsonGeometry((d) => d.geometry)
       .polygonCapColor((d) => {
+        const outreachDone = window.AzOutreach && window.AzOutreach.isRegionComplete && window.AzOutreach.isRegionComplete(d.properties.id);
         if (heatmapOn) {
           const t = heatT(d.properties.id);
-          if (t == null) return "rgba(148, 158, 172, 0.16)";
+          if (t == null) return outreachDone ? "rgba(246, 194, 107, 0.22)" : "rgba(148, 158, 172, 0.16)";
           if (selectedRegion && d.properties.id === selectedRegion.properties.id) return heatRgba(t, 0.92);
           if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return heatRgba(Math.min(1, t + 0.08), 0.86);
-          return heatRgba(t, 0.72);
+          return heatRgba(t, outreachDone ? 0.82 : 0.72);
         }
         if (selectedRegion && d.properties.id === selectedRegion.properties.id) return "rgba(8, 190, 200, 0.42)";
         if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return "rgba(8, 190, 200, 0.28)";
+        if (outreachDone) return "rgba(246, 194, 107, 0.28)";
         return "rgba(8, 116, 201, 0.10)";
       })
       .polygonSideColor(() => (heatmapOn ? "rgba(20, 24, 48, 0.35)" : "rgba(8, 116, 201, 0.12)"))
       .polygonStrokeColor((d) => {
         if (selectedRegion && d.properties.id === selectedRegion.properties.id) return "#08BEC8";
         if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return "#6ff3f0";
+        if (window.AzOutreach && window.AzOutreach.isRegionComplete && window.AzOutreach.isRegionComplete(d.properties.id)) return "#f6c26b";
         if (heatmapOn) return heatRaw(d.properties.id) == null ? "rgba(160, 170, 185, 0.28)" : "rgba(8, 12, 28, 0.35)";
         return "rgba(120, 170, 255, 0.28)";
       })
       .polygonAltitude((d) => {
+        const outreachDone = window.AzOutreach && window.AzOutreach.isRegionComplete && window.AzOutreach.isRegionComplete(d.properties.id);
         if (heatmapOn) {
           const t = heatT(d.properties.id);
           const base = t == null ? 0.003 : 0.003 + t * 0.016;
           if (selectedRegion && d.properties.id === selectedRegion.properties.id) return base + 0.008;
           if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return base + 0.005;
-          return base;
+          return base + (outreachDone ? 0.002 : 0);
         }
         if (selectedRegion && d.properties.id === selectedRegion.properties.id) return 0.012;
         if (hoveredRegion && d.properties.id === hoveredRegion.properties.id) return 0.009;
+        if (outreachDone) return 0.006;
         return 0.003;
       })
       .polygonLabel((d) => regionLabel(d));
@@ -976,6 +982,9 @@
     }
     paintPolygons();
     renderList();
+    if (window.AzOutreach && window.AzOutreach.syncRegion) {
+      window.AzOutreach.syncRegion(r ? r.properties.id : "");
+    }
     return r;
   }
 
@@ -1813,6 +1822,12 @@ out center tags ${cap};`;
       heatmapOn: () => heatmapOn,
       heatValue: (id) => heatRaw(id),
       selectRegion: (id, opts) => selectRegion(id, opts),
+      refreshPolygons: () => paintPolygons(),
+      closeLeadModal: () => selectLead(null, false),
+      getRegionName: (id) => {
+        const r = regions.find((x) => x.properties.id === id);
+        return r && r.properties.name ? r.properties.name : id;
+      },
       closePanel: () => closeListPanel(),
       panelOpen: () => !!(els.panel && els.panel.classList.contains("is-open")),
       pointOfView: () => (globe && globe.pointOfView ? globe.pointOfView() : null),
