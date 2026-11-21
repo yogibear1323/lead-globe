@@ -353,19 +353,8 @@
     return lines.join("\n");
   }
 
-  function optoutUrl(lead) {
-    const base = new URL("optout.html", window.location.href).href.split("?")[0];
-    const params = new URLSearchParams();
-    params.set("b", lead.key || "");
-    if (store.profile.email) params.set("to", store.profile.email.trim());
-    return base + "?" + params.toString();
-  }
-
   function optoutBlock(lead) {
-    return (
-      'If this is not for you, reply "unsubscribe" and I will not email you again. You can also use this opt-out page:\n' +
-      optoutUrl(lead)
-    );
+    return 'If this is not for you, reply "unsubscribe" and I will not email you again.';
   }
 
   function categoryPhrase(cat) {
@@ -581,7 +570,7 @@
   }
 
   function isStaleDraftText(text) {
-    return /At a glance|Mode's ads|\bMode says\b|\$100K|\$5M|walkthrough call|You've been invited\. This is about/i.test(
+    return /At a glance|Mode's ads|\bMode says\b|\$100K|\$5M|walkthrough call|You've been invited\. This is about|optout\.html|github\.io|yogibear1323|You can also use this opt-out page/i.test(
       String(text || "")
     );
   }
