@@ -106,6 +106,10 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
+  function cleanReason(s) {
+    return String(s || "").replace(/Not a Mode or DataEarners decision\.?/g, "Not a DataEarners or licensing-company decision.");
+  }
+
   function dash(s) {
     return s ? escapeHtml(s) : "—";
   }
@@ -389,8 +393,11 @@
       );
     }
     if (email) {
+      const mail = outreachRegionKind() === "us"
+        ? `<a href="mailto:${escapeHtml(email)}" data-contact="1">${escapeHtml(email)}</a>`
+        : escapeHtml(email);
       rows.push(
-        `<div class="card-row"><span class="lbl">Email</span><a href="mailto:${escapeHtml(email)}" data-contact="1">${escapeHtml(email)}</a></div>`
+        `<div class="card-row"><span class="lbl">Email</span>${mail}</div>`
       );
     } else if (hiddenEu) {
       rows.push(`<div class="card-row"><span class="lbl">Email</span><span>Hidden (GDPR)</span></div>`);
@@ -438,7 +445,8 @@
     root.dataset.seedPins = String(rows.filter((r) => r.source === "seed").length);
     root.dataset.osmPins = String(rows.filter((r) => r.source === "OSM").length);
     root.dataset.selectedLead = selectedLead ? selectedLead.name || selectedLead.key : "";
-    root.dataset.outreach = selectedLead ? "ready" : "hidden";
+    root.dataset.outreach = selectedLead ? (outreachRegionKind() === "us" ? "ready" : "blocked") : "hidden";
+    root.dataset.outreachRegion = selectedLead ? outreachRegionKind() : "";
     root.dataset.listOpen = selectedRegion ? "region" : "seed";
     window.LeadGlobe = window.LeadGlobe || {};
     window.LeadGlobe.ready = true;
@@ -710,7 +718,55 @@
     );
   }
 
-  function scriptItems(pack) {
+  function generatedScriptItems(lead) {
+    const az = window.AzOutreach;
+    if (!lead || !az || typeof az.buildDraft !== "function") return [];
+    if (outreachRegionKind() !== "us") return [];
+    const items = [];
+    const def = az.buildDraft(lead);
+    items.push({
+      id: "email-default",
+      kind: "email",
+      label: "Email: outreach draft",
+      subject: def.subject,
+      body: def.body,
+    });
+    const labels = ["Email: variation 1", "Email: variation 2", "Email: variation 3"];
+    for (let i = 0; i < 3; i++) {
+      if (i === def.openingVar && i === def.subjectVar) continue;
+      const d = az.buildDraft(lead, { openingVar: i, subjectVar: i });
+      items.push({
+        id: "email-var-" + i,
+        kind: "email",
+        label: labels[i],
+        subject: d.subject,
+        body: d.body,
+      });
+    }
+    if (typeof az.buildCallScript === "function") {
+      const c = az.buildCallScript(lead);
+      items.push({ id: "call-live", kind: "call", label: "Call: live conversation", subject: "", body: c.body });
+    }
+    if (typeof az.buildVoicemail === "function") {
+      const v = az.buildVoicemail(lead);
+      items.push({ id: "call-voicemail", kind: "call", label: "Call: voicemail", subject: "", body: v.body });
+    }
+    if (az.canFollowUp && az.canFollowUp(lead) && typeof az.buildFollowUp === "function") {
+      const f = az.buildFollowUp(lead);
+      items.push({
+        id: "email-followup",
+        kind: "email",
+        label: "Email: follow-up",
+        subject: f.subject,
+        body: f.body,
+        followUp: true,
+      });
+    }
+    return items;
+  }
+
+  function scriptItems(pack, lead) {
+    if (lead) return generatedScriptItems(lead);
     const emails = (pack.emails || []).map((s, i) => ({
       ...s,
       kind: "email",
@@ -748,6 +804,41 @@
 
   function regionIdOf() {
     return selectedRegion && selectedRegion.properties ? selectedRegion.properties.id : "";
+  }
+
+
+  const TERRITORIES = { "US-PR": 1, "US-VI": 1, "US-GU": 1, "US-AS": 1, "US-MP": 1 };
+  const DRAFT_TEMPLATE_VERSION = "v3";
+  const DRAFT_VER_KEY = "leadglobe:draft-template-version";
+
+  function isUsRegionId(id) {
+    if (window.AzOutreach && typeof AzOutreach.isUsState === "function") return AzOutreach.isUsState(id);
+    if (!id || !/^US-[A-Z]{2}$/.test(id)) return false;
+    return !TERRITORIES[id];
+  }
+
+  function outreachRegionKind() {
+    const id = regionIdOf();
+    if (!id) return "";
+    if (isUsRegionId(id)) return "us";
+    const privacy = selectedRegion && selectedRegion.properties && selectedRegion.properties.privacy;
+    if (id.indexOf("CA-") === 0 || privacy === "ca") return "ca";
+    if (privacy === "eu" || hideEmail()) return "eu";
+    return "other";
+  }
+
+  function usOnlyNote() {
+    const kind = outreachRegionKind();
+    if (kind === "ca") {
+      return "Outreach drafts are US-only. This region is in Canada, so this tool does not prepare an email or call script (CASL). Honor local rules if you later reach out yourself, one at a time.";
+    }
+    if (kind === "eu") {
+      return "Outreach drafts are US-only. This region is in Europe, so this tool does not prepare an email or call script (GDPR). Published emails from OpenStreetMap stay hidden.";
+    }
+    if (kind && kind !== "us") {
+      return "Outreach drafts are US-only. This tool does not prepare an email or call script for this region.";
+    }
+    return "";
   }
 
   function usesOutreachDraft(lead) {
@@ -789,10 +880,27 @@
     const a = document.getElementById("outreach-mailto");
     const note = document.getElementById("outreach-mail-note");
     const fields = currentOutreachFields();
-    const item = scriptItems(scriptPackFor(lead)).find((s) => s.id === fields.scriptId);
+    const item = scriptItems(scriptPackFor(lead), lead).find((s) => s.id === fields.scriptId);
     const isCall = !!(item && item.kind === "call");
     if (!a) return;
-    if (isCall && !usesOutreachDraft(lead)) {
+    if (outreachRegionKind() !== "us") {
+      a.removeAttribute("href");
+      a.setAttribute("aria-disabled", "true");
+      a.setAttribute("disabled", "disabled");
+      a.classList.add("is-disabled");
+      var changeBtnR = document.getElementById("outreach-mail-change");
+      if (changeBtnR) { changeBtnR.hidden = true; changeBtnR.disabled = true; }
+      if (note) {
+        note.hidden = true;
+        note.textContent = "";
+      }
+      document.documentElement.dataset.outreachMailto = "blocked";
+      document.documentElement.dataset.outreachDraft = "blocked";
+      document.documentElement.dataset.outreachStatus = "";
+      document.documentElement.dataset.outreachRegion = outreachRegionKind();
+      return;
+    }
+    if (isCall) {
       a.removeAttribute("href");
       a.setAttribute("aria-disabled", "true");
       a.setAttribute("disabled", "disabled");
@@ -802,11 +910,10 @@
       if (note) {
         note.hidden = false;
         note.textContent =
-          "This is a call script. Copy it, or switch to an email variation to open a single-recipient draft in your own mail client.";
+          "This is a call or voicemail script. Copy it, or switch to an email draft to open a prefilled message in your own mail client.";
       }
       document.documentElement.dataset.outreachMailto = "no";
-      document.documentElement.dataset.outreachDraft = "no";
-      document.documentElement.dataset.outreachStatus = "";
+      document.documentElement.dataset.outreachDraft = usesOutreachDraft(lead) ? "yes" : "no";
       return;
     }
     if (!email) {
@@ -906,27 +1013,46 @@
 
   function applyScriptChoice(lead, scriptId, keepEdits) {
     const pack = scriptPackFor(lead);
-    const items = scriptItems(pack);
+    const items = scriptItems(pack, lead);
     const item = items.find((s) => s.id === scriptId) || items[0];
     const subjectEl = document.getElementById("outreach-subject");
     const bodyEl = document.getElementById("outreach-body");
     const subjectWrap = document.getElementById("outreach-subject-field");
-    if (!item || !bodyEl) return;
+    const regen = document.getElementById("outreach-regenerate");
+    if (!bodyEl) {
+      syncMailtoLink(lead);
+      return;
+    }
+    if (!item) {
+      if (subjectEl) subjectEl.value = "";
+      bodyEl.value = "";
+      syncMailtoLink(lead);
+      return;
+    }
     const sel = document.getElementById("outreach-script");
     if (sel) sel.value = item.id;
-    if (!keepEdits) {
-      if (subjectEl) subjectEl.value = fillTemplate(item.subject || "", lead);
-      bodyEl.value = fillTemplate(item.body || "", lead);
+    const stale =
+      window.AzOutreach && AzOutreach.isStaleDraftText &&
+      (AzOutreach.isStaleDraftText(bodyEl.value) || AzOutreach.isStaleDraftText((subjectEl && subjectEl.value) || ""));
+    if (!keepEdits || stale) {
+      if (subjectEl) subjectEl.value = item.subject || "";
+      bodyEl.value = item.body || "";
     }
     if (subjectWrap) subjectWrap.hidden = item.kind === "call";
     if (subjectEl) subjectEl.disabled = item.kind === "call";
+    if (regen) {
+      regen.hidden = !stale;
+      regen.dataset.scriptId = item.id;
+    }
+    document.documentElement.dataset.outreachScript = item.id;
+    document.documentElement.dataset.outreachScriptKind = item.kind || "";
     syncMailtoLink(lead);
   }
 
   function copyOutreach() {
     const fields = currentOutreachFields();
     const packItem = selectedLead
-      ? scriptItems(scriptPackFor(selectedLead)).find((s) => s.id === fields.scriptId)
+      ? scriptItems(scriptPackFor(selectedLead), selectedLead).find((s) => s.id === fields.scriptId)
       : null;
     const text =
       packItem && packItem.kind === "email" && fields.subject
@@ -1029,12 +1155,12 @@
       : "—";
     const emailShown = hideEmail() && l.source === "OSM"
       ? "Hidden (GDPR)"
-      : (publishedEmail(l)
+      : (publishedEmail(l) && outreachRegionKind() === "us"
           ? `<a href="mailto:${escapeHtml(publishedEmail(l))}" data-contact="1">${escapeHtml(publishedEmail(l))}</a>`
-          : dash(l.email));
+          : (publishedEmail(l) ? escapeHtml(publishedEmail(l)) : dash(l.email)));
     const fitLine = l.fitKind === "heuristic" ? `heuristic ${l.fit}` : String(l.fit);
     const pack = scriptPackFor(l);
-    const items = scriptItems(pack);
+    const items = scriptItems(pack, l);
     const prev = els.detail.dataset.leadKey === l.key ? currentOutreachFields().scriptId : "";
     const chosen = items.some((s) => s.id === prev) ? prev : (items[0] && items[0].id) || "";
     const review = escapeHtml(
@@ -1058,13 +1184,15 @@
         <dl>
           <dt>Address</dt><dd>${dash(l.address)}</dd>
           <dt>Website</dt><dd>${site}</dd>
-          <dt>Why</dt><dd>${escapeHtml(l.reason || "")}</dd>
+          <dt>Why</dt><dd>${escapeHtml(cleanReason(l.reason))}</dd>
           <dt>OSM</dt><dd>${osm}</dd>
         </dl>
       </details>
-      <section class="outreach" id="outreach" data-category="${escapeHtml(pack.id || "generic")}">
+      <section class="outreach" id="outreach" data-category="${escapeHtml(pack.id || "generic")}" data-region-kind="${escapeHtml(outreachRegionKind())}">
         <div class="kicker">Outreach</div>
         <p class="outreach-log-status" id="outreach-log-status" hidden></p>
+        <p class="outreach-us-only" id="outreach-us-only" ${outreachRegionKind() === "us" ? "hidden" : ""}>${escapeHtml(usOnlyNote())}</p>
+        <div id="outreach-script-wrap" ${outreachRegionKind() === "us" ? "" : "hidden"}>
         <p class="outreach-note">${review}</p>
         <label class="field">Script
           <select id="outreach-script">${options}</select>
@@ -1077,16 +1205,19 @@
         </label>
         <div class="outreach-actions">
           <button type="button" class="iv-btn-ghost" id="outreach-copy">Copy</button>
+          <button type="button" class="iv-btn-ghost" id="outreach-regenerate" hidden>Use latest template</button>
           <div class="mail-open-wrap">
             <button type="button" class="iv-btn" id="outreach-mailto">Open in email</button>
             <button type="button" class="iv-btn-ghost" id="outreach-mail-change">Change</button>
           </div>
         </div>
         <p class="outreach-mail-note" id="outreach-mail-note"></p>
+        </div>
       </section>
     `;
     els.detail.dataset.leadKey = l.key;
-    document.documentElement.dataset.outreach = "ready";
+    document.documentElement.dataset.outreach = outreachRegionKind() === "us" ? "ready" : "blocked";
+    document.documentElement.dataset.outreachRegion = outreachRegionKind();
     document.documentElement.dataset.outreachCategory = pack.id || "generic";
     document.documentElement.dataset.selectedLead = l.name || l.key;
     applyScriptChoice(l, chosen, false);
@@ -1511,7 +1642,7 @@ out center tags ${cap};`;
         address: formatAddress(tags),
         fit,
         fitKind: "heuristic",
-        reason: `Heuristic fit ${fit} based on OSM tags for ${cat.label.toLowerCase()}. Not a Mode or DataEarners decision.`,
+        reason: `Heuristic fit ${fit} based on OSM tags for ${cat.label.toLowerCase()}. Not a DataEarners or licensing-company decision.`,
         source: "OSM",
         osmUrl: "https://www.openstreetmap.org/" + id,
         osmId: id,
@@ -1925,6 +2056,11 @@ out center tags ${cap};`;
       copyOutreach();
       return;
     }
+    if (e.target && e.target.id === "outreach-regenerate") {
+      e.preventDefault();
+      if (selectedLead) applyScriptChoice(selectedLead, currentOutreachFields().scriptId, false);
+      return;
+    }
     const mail = e.target.closest && e.target.closest("#outreach-mailto, #outreach-mail-change");
     if (mail) {
       e.preventDefault();
@@ -1932,15 +2068,22 @@ out center tags ${cap};`;
       if (!selectedLead || !window.MailChooser) return;
       const email = publishedEmail(selectedLead);
       const isChange = mail.id === "outreach-mail-change";
+      if (outreachRegionKind() !== "us") return;
       if (usesOutreachDraft(selectedLead) && window.AzOutreach && AzOutreach.openLeadMail) {
+        const fields = currentOutreachFields();
+        const item = scriptItems(scriptPackFor(selectedLead), selectedLead).find((s) => s.id === fields.scriptId);
+        if (item && item.kind === "call") return;
         AzOutreach.openLeadMail(selectedLead, {
           source: "card",
           mode: isChange ? "change" : "use",
+          kind: item && item.followUp ? "follow-up" : "initial",
+          logStatus: item && item.followUp ? "follow-up" : "contacted",
+          payload: { subject: fields.subject, body: fields.body },
         });
         return;
       }
       const fields = currentOutreachFields();
-      const pack = scriptItems(scriptPackFor(selectedLead)).find((s) => s.id === fields.scriptId);
+      const pack = scriptItems(scriptPackFor(selectedLead), selectedLead).find((s) => s.id === fields.scriptId);
       if (pack && pack.kind === "call") return;
       const payload = { to: email, subject: fields.subject, body: fields.body };
       const opts = { onCopy: () => copyOutreach() };
@@ -1986,11 +2129,12 @@ out center tags ${cap};`;
 
   async function init() {
     ensureKeys(seedLeads);
+    try { localStorage.setItem(DRAFT_VER_KEY, DRAFT_TEMPLATE_VERSION); } catch (e) {}
     try {
       const [catCfg, regionCfg, scriptCfg, leadersDoc, manifestDoc, payoutCfg] = await Promise.all([
         loadJson("config/categories.json"),
         loadJson("config/regions.json"),
-        loadJson("config/scripts.json").catch(() => ({ categories: {}, inviteUrl: INVITE })),
+        loadJson("config/scripts.json?v=mail4").catch(() => ({ categories: {}, inviteUrl: INVITE })),
         loadJson("data/leaders.json").catch(() => ({ leaders: {} })),
         loadJson("data/regions/manifest.json").catch(() => ({})),
         loadJson("config/payout-tiers.json?v=payout1").catch(() => null),

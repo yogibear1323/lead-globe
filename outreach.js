@@ -2,6 +2,8 @@
 (function () {
   const INVITE = "https://robertwalker.dataearns.com/invite";
   const STORE_KEY = "leadglobe:az-outreach:v1";
+  const DRAFT_TEMPLATE_VERSION = "v3";
+  const DRAFT_VER_KEY = "leadglobe:draft-template-version";
   const TZ = "America/Phoenix";
   const FIRST_REGION = "US-AZ";
   const TERRITORIES = { "US-PR": 1, "US-VI": 1, "US-GU": 1, "US-AS": 1, "US-MP": 1 };
@@ -443,14 +445,15 @@
     return "Start your free profile here:\n" + INVITE + "\n\nQuestions? Just reply.";
   }
 
-  function buildDraft(lead) {
+  function buildDraft(lead, opts) {
     const name = lead.name || "your company";
     const city = lead.city || regionName(viewRegion) || "your city";
     const sender = (store.profile.name || "Robert Walker").trim();
     const info = categoryInfo(lead.category);
     const key = lead.key || lead.email || name;
-    const subjectVar = hashVar(key, 3);
-    const openingVar = hashVar(key + ":open", 3);
+    const o = opts || {};
+    const subjectVar = o.subjectVar != null ? Number(o.subjectVar) % 3 : hashVar(key, 3);
+    const openingVar = o.openingVar != null ? Number(o.openingVar) % 3 : hashVar(key + ":open", 3);
     const subjects = subjectLines(name, city);
     const openings = openingVariants(lead, sender);
     const opening = openings[openingVar];
@@ -531,6 +534,58 @@
       kind: "follow-up",
     };
   }
+
+  function buildCallScript(lead) {
+    const name = lead.name || "your company";
+    const city = lead.city || regionName(viewRegion) || "your city";
+    const sender = (store.profile.name || "Robert Walker").trim();
+    const asset = typeLine(lead.category);
+    const body =
+      "Hi, this is " +
+      sender +
+      ", an independent DataEarners partner. I'm calling about " +
+      name +
+      " in " +
+      city +
+      ". Do you have a minute?\n\nFor years, " +
+      name +
+      " has been quietly building a data asset — " +
+      asset +
+      " — and it never had a name.\n\nThere's a short page that shows how a written offer is reached for a company like yours. The first step is a free Company Data Asset Profile: a written description of the systems you run, how much they hold, and how far back they go. It contains no data, no files and no passwords, and there's no commitment unless you later choose to sign. Only the data licensing company makes an offer.\n\nI can email you the link, or you can open it now:\n" +
+      INVITE +
+      "\n\nStart your free profile there when you have a few minutes. Questions? I'm happy to stay on the line, or you can reply by email.\n\nIf this is not for you, just say so and I will not contact you again.\n\n" +
+      DISCLAIMER;
+    return { subject: "", body: body, kind: "call", category: categoryKind(lead.category) };
+  }
+
+  function buildVoicemail(lead) {
+    const name = lead.name || "your company";
+    const city = lead.city || regionName(viewRegion) || "your city";
+    const sender = (store.profile.name || "Robert Walker").trim();
+    const asset = typeLine(lead.category);
+    const body =
+      "Hi, this is " +
+      sender +
+      ", an independent DataEarners partner, calling about " +
+      name +
+      " in " +
+      city +
+      ".\n\nI'm reaching out about a data asset " +
+      name +
+      " may already have in day-to-day systems — " +
+      asset +
+      ". There's a short page that shows how a written offer is reached for a company like yours, starting with a free Company Data Asset Profile. No data, files or passwords. Only the data licensing company makes an offer.\n\nThe page is " +
+      INVITE +
+      " — start your free profile there when you have a few minutes, or email me back with questions.\n\nIf you'd rather I not contact you again, just let me know.";
+    return { subject: "", body: body, kind: "voicemail", category: categoryKind(lead.category) };
+  }
+
+  function isStaleDraftText(text) {
+    return /At a glance|Mode's ads|\bMode says\b|\$100K|\$5M|walkthrough call|You've been invited\. This is about/i.test(
+      String(text || "")
+    );
+  }
+
 
   function mailPayload(id) {
     const lead = leadByKey(id);
@@ -1611,9 +1666,7 @@
   function usesOutreachDraft(lead, regionId) {
     if (!lead || !String(lead.email || "").trim()) return false;
     const region = regionId || lead.regionId || selectedId || "";
-    const active = store.activeRegion || FIRST_REGION;
-    if (!region || region !== active) return false;
-    return outreachAllowed(active);
+    return isUsState(region);
   }
 
   function statusDate(lead, status) {
@@ -1846,10 +1899,33 @@
 
   function openLeadMail(lead, opts) {
     const o = opts || {};
-    const pack = draftForLead(lead);
+    let pack = null;
+    if (o.payload && (o.payload.subject != null || o.payload.body != null)) {
+      pack = {
+        lead: lead,
+        to: lead.email || "",
+        subject: o.payload.subject || "",
+        body: o.payload.body || "",
+      };
+    } else if (o.kind === "follow-up") {
+      const built = buildFollowUp(lead);
+      const f = lead && lead.key ? followUpFields(lead.key) : { subject: "", body: "" };
+      pack = {
+        lead: lead,
+        to: lead.email || "",
+        subject: f.subject || built.subject,
+        body: f.body || built.body,
+      };
+    } else {
+      pack = draftForLead(lead);
+    }
     if (!pack) return false;
+    const logStatus = o.logStatus || (o.kind === "follow-up" ? "follow-up" : "contacted");
+    if (logStatus === "follow-up" && hasFollowUp(lead)) return false;
     gateForLead(lead, o, function () {
-      launchDraft(pack, o.mode || "use", o.onCopy ? { onCopy: o.onCopy } : {});
+      const extra = { logStatus: logStatus };
+      if (o.onCopy) extra.onCopy = o.onCopy;
+      launchDraft(pack, o.mode || "use", extra);
     });
     return true;
   }
@@ -1919,6 +1995,10 @@
     subjectLines: subjectLines,
     buildDraft: buildDraft,
     buildFollowUp: buildFollowUp,
+    buildCallScript: buildCallScript,
+    buildVoicemail: buildVoicemail,
+    isStaleDraftText: isStaleDraftText,
+    DRAFT_TEMPLATE_VERSION: DRAFT_TEMPLATE_VERSION,
     markSent: (id) => handleAction("sent", id),
     markOptedOut: (id) => handleAction("optout", id),
     skip: (id) => handleAction("skip", id),
@@ -1958,6 +2038,9 @@
 
   function boot() {
     store = loadStore();
+    try {
+      localStorage.setItem(DRAFT_VER_KEY, DRAFT_TEMPLATE_VERSION);
+    } catch (e) {}
     bind();
     attachLeadGlobe();
     notifyGlobe();

@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "comment": "Shared payout-estimate table for the Lead Globe research card. There are no public per-business market rates. The only public figure is the data licensing company's advertised range for company data, $100K–$5M, which also appears on Robert's invite page and in the short 'At a glance' block in config/scripts.json. Those scripts must keep citing that advertised envelope — not these per-category sub-ranges. Per-category estimates are for the in-app card (and an optional list chip) only. Never copy them into outreach email drafts, the landing page, or the opt-out page. They are not offers; only the data licensing company makes an offer.",
+  "comment": "Shared payout-estimate table for the Lead Globe research card. There are no public per-business market rates. The only public figure is the data licensing company's advertised range for company data, $100K–$5M, which also appears on Robert's invite page. Per-category estimates are for the in-app research card (and an optional list chip) only, not for email or call scripts. Never copy them into outreach email drafts, the landing page, or the opt-out page. They are not offers; only the data licensing company makes an offer.",
   "methodology": "Each category is placed in a wide sub-range inside the advertised $100K–$5M envelope, based on how data-rich that kind of business typically is: (1) how many core systems it tends to run (CRM, accounting, field service / operations, email and related tools), (2) how many years of records those systems often hold, and (3) typical record volume (jobs, invoices, tickets, transactions). This tool does not know a given company's actual systems, years, or volume, so the bands stay wide on purpose and are labeled as rough estimates by business type. No public per-business comps exist; the advertised range is the only published dollar figure used. Lower bands are for types that usually have fewer operational systems or thinner history (for example small single-location retail). Higher bands are for types that typically run several connected systems with years of operational records (multi-system trades and field service, dealerships, healthcare). Unknown types use the full advertised envelope as the default, rather than inventing a tighter range.",
   "advertised": {
     "min": 100000,
     "max": 5000000,
     "label": "$100K–$5M",
-    "source": "The data licensing company's advertised range for company data, also shown on https://robertwalker.dataearns.com/invite and in the 'At a glance' block in config/scripts.json."
+    "source": "The data licensing company's advertised range for company data, also shown on https://robertwalker.dataearns.com/invite. It is not copied into email or call scripts."
   },
   "defaultTier": "generic",
   "caveat": "Your estimate by business type, within the licensing company's advertised $100K–$5M range. Not an offer; only the data licensing company makes an offer.",
