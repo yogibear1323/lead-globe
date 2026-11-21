@@ -11,14 +11,14 @@
   const DISCLAIMER_CONFIRMED = true;
 
   const PROCESS =
-    "Here's the whole process, start to finish:\n" +
+    "Here's the process, start to finish:\n" +
     "1. Build your profile: describe your systems with us beside you. No data, files or logins.\n" +
-    "2. Request your offer when you're ready. Asking commits you to nothing.\n" +
-    "3. Receive a fixed offer in writing, showing the systems and dates it covers.\n" +
-    "4. Sign the agreement, only if you choose to. This is the only point you're committed, and we recommend your attorney reviews it.\n" +
-    "5. Your team exports copies. Your systems keep running and no passwords are shared.\n" +
+    "2. Request an offer when you're ready. Asking commits you to nothing.\n" +
+    "3. Receive a fixed offer in writing, covering the systems and dates.\n" +
+    "4. Sign only if you choose to. This is the first point you're committed; have your attorney review it.\n" +
+    "5. Your team exports copies. Your systems keep running. No passwords are shared.\n" +
     "6. The data licensing company removes sensitive material and de-identifies personal details.\n" +
-    "7. You get paid directly under the agreement. You never pay DataEarners anything.";
+    "7. You're paid directly under the agreement. You never pay DataEarners anything.";
 
   const COMPLIANCE =
     "One-to-one outreach only — review and send each email yourself, one business at a time. This tool never sends mail. Honor opt-outs the same day; anyone marked contacted or opted out is kept out of future batches, in every state. CAN-SPAM requires a valid physical mailing address in commercial email; add yours below so it appears in the signature. No dollar claims or promised offers. Outreach stays off for Canadian provinces (CASL) and European countries (GDPR).";
@@ -231,12 +231,109 @@
     return id || "";
   }
 
-  function hashVar(key) {
+  function hashNum(key) {
     let h = 0;
     String(key || "").split("").forEach((ch) => {
       h = (h * 33 + ch.charCodeAt(0)) >>> 0;
     });
-    return h % 4;
+    return h;
+  }
+
+  function hashVar(key, n) {
+    return hashNum(key) % (n || 3);
+  }
+
+  function wordCount(text) {
+    return String(text || "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+  }
+
+  function stampFromIso(iso) {
+    if (!iso) return "";
+    try {
+      return new Date(iso).toLocaleDateString("en-CA", { timeZone: TZ });
+    } catch (e) {
+      return "";
+    }
+  }
+
+  const CATEGORY_LINES = {
+    home: {
+      id: "home",
+      label: "trades / home services",
+      noun: "home-services company",
+      asset: "every quote, job and invoice in systems like QuickBooks or ServiceTitan",
+    },
+    auto: {
+      id: "auto",
+      label: "auto",
+      noun: "auto business",
+      asset: "every lead, service job and invoice in the systems a dealership already runs",
+    },
+    contractors: {
+      id: "contractors",
+      label: "contractors",
+      noun: "contractor",
+      asset: "every bid, job, change order and invoice in the systems you already use",
+    },
+    property: {
+      id: "property",
+      label: "property management",
+      noun: "property-management company",
+      asset: "every work order, lease file and invoice in the systems you already run",
+    },
+    logistics: {
+      id: "logistics",
+      label: "logistics",
+      noun: "logistics or fleet business",
+      asset: "every dispatch, route, job and invoice in the systems you already run",
+    },
+    retail: {
+      id: "retail",
+      label: "retail",
+      noun: "retail business",
+      asset: "every order, inventory movement and customer record in the systems you already use",
+    },
+    professional: {
+      id: "professional",
+      label: "professional services",
+      noun: "professional-services firm",
+      asset: "every engagement, client file and invoice in the systems you already use",
+    },
+    default: {
+      id: "default",
+      label: "default",
+      noun: "local business",
+      asset: "every request, quote, job and invoice, and the emails in between, in the systems you already use",
+    },
+  };
+
+  function categoryKind(cat) {
+    const c = String(cat || "").toLowerCase();
+    if (c.indexOf("home service") !== -1 || c.indexOf("hvac") !== -1 || c.indexOf("plumb") !== -1) return "home";
+    if (c.indexOf("auto") !== -1 || c.indexOf("dealer") !== -1 || c.indexOf("tyre") !== -1 || c.indexOf("tire") !== -1) return "auto";
+    if (c.indexOf("contractor") !== -1 || c.indexOf("construction") !== -1) return "contractors";
+    if (c.indexOf("property") !== -1) return "property";
+    if (c.indexOf("logistics") !== -1 || c.indexOf("fleet") !== -1 || c.indexOf("trucking") !== -1 || c.indexOf("freight") !== -1) return "logistics";
+    if (c.indexOf("retail") !== -1 || c.indexOf("e-commerce") !== -1 || c.indexOf("ecommerce") !== -1) return "retail";
+    if (
+      c.indexOf("professional") !== -1 ||
+      c.indexOf("account") !== -1 ||
+      c.indexOf("law") !== -1 ||
+      c.indexOf("legal") !== -1 ||
+      c.indexOf("insur") !== -1 ||
+      c.indexOf("agenc") !== -1 ||
+      c.indexOf("consult") !== -1
+    ) {
+      return "professional";
+    }
+    return "default";
+  }
+
+  function categoryInfo(cat) {
+    return CATEGORY_LINES[categoryKind(cat)] || CATEGORY_LINES.default;
   }
 
   function profileSignature() {
@@ -262,125 +359,178 @@
     return base + "?" + params.toString();
   }
 
+  function optoutBlock(lead) {
+    return (
+      'If this is not for you, reply "unsubscribe" and I will not email you again. You can also use this opt-out page:\n' +
+      optoutUrl(lead)
+    );
+  }
+
   function categoryPhrase(cat) {
     const c = String(cat || "local business").trim();
     return c.charAt(0).toLowerCase() + c.slice(1);
   }
 
   function typeLine(cat) {
-    const c = String(cat || "").toLowerCase();
-    if (c.indexOf("home service") !== -1 || c.indexOf("contractor") !== -1) {
-      return "every quote, job and invoice in systems like QuickBooks or ServiceTitan";
-    }
-    if (c.indexOf("auto") !== -1 || c.indexOf("dealer") !== -1) {
-      return "every lead, service job and invoice in the systems a dealership already runs";
-    }
-    if (c.indexOf("property") !== -1) {
-      return "every work order, lease file and invoice in the systems you already use";
-    }
-    if (c.indexOf("logistics") !== -1 || c.indexOf("fleet") !== -1) {
-      return "every dispatch, job and invoice in the systems you already run";
-    }
-    return "every request, quote, job and invoice, and all the emails in between, in the systems you already use";
+    return categoryInfo(cat).asset;
+  }
+
+  function subjectLines(name, city) {
+    return [
+      name + " in " + city + ": a data asset with no name on it",
+      "A question about the records " + name + " already has",
+      name + ": start a free profile of the systems you already run",
+    ];
+  }
+
+  function openingVariants(lead, sender) {
+    const name = lead.name || "your company";
+    const city = lead.city || regionName(viewRegion) || "your city";
+    const info = categoryInfo(lead.category);
+    const asset = info.asset;
+    const noun = info.noun;
+    const article = /^[aeiou]/i.test(noun) ? "An " : "A ";
+    return [
+      "Hi,\n\nI'm " +
+        sender +
+        ", an independent DataEarners partner, writing only to " +
+        name +
+        " in " +
+        city +
+        ".\n\nFor years, " +
+        name +
+        " has been quietly building a data asset — " +
+        asset +
+        " — and it never had a name.",
+      "Hi,\n\nThis is " +
+        sender +
+        ". I work independently with DataEarners and I'm reaching out one-to-one to " +
+        name +
+        " in " +
+        city +
+        ".\n\n" +
+        name +
+        " already has a data asset sitting in day-to-day systems — " +
+        asset +
+        " — most companies just never look at it that way.",
+      "Hi,\n\nI'm " +
+        sender +
+        ", writing personally to " +
+        name +
+        " in " +
+        city +
+        ", not a list.\n\n" +
+        article +
+        noun +
+        " in " +
+        city +
+        " builds a record over years — " +
+        asset +
+        " — and that record can be described without sharing the data itself.",
+    ];
+  }
+
+  function corePitch() {
+    return (
+      "AI developers need real examples of how businesses like yours actually operate. The data licensing company licenses those examples under a written agreement, and only that company makes an offer.\n\n" +
+      "The first step is a free Company Data Asset Profile: a written description of the systems you run, how much they hold, and how far back they go. It contains no data, no files and no passwords. There's no commitment unless you later choose to sign.\n\n" +
+      "The page takes a few minutes and shows exactly how a written offer is reached for a company like yours:\n" +
+      INVITE
+    );
+  }
+
+  function closingCta() {
+    return "Start your free profile here:\n" + INVITE + "\n\nQuestions? Just reply.";
   }
 
   function buildDraft(lead) {
     const name = lead.name || "your company";
     const city = lead.city || regionName(viewRegion) || "your city";
-    const cat = categoryPhrase(lead.category);
-    const type = typeLine(lead.category);
     const sender = (store.profile.name || "Robert Walker").trim();
-    const invite = INVITE;
-    const opt = optoutUrl(lead);
-    const sign = profileSignature();
-    const v = hashVar(lead.key || lead.email);
-    const optBlock =
-      'If this is not for you, reply "unsubscribe" and I will not email you again. You can also use this opt-out page:\n' +
-      opt;
-    const hook =
-      name +
-      " has been building a data asset for years — " +
-      type +
-      " — and it never had a name.";
-    const why =
-      "AI developers need real examples of how real businesses work, and the data licensing company licenses them under a written agreement.";
-    const offer =
-      "The next step is a free Company Data Asset Profile: a written description of the systems you run, how much they hold, and how far back they go. It contains no data, no files and no passwords, and takes a few hours of your team's time, with a voice guide.";
-    const cta =
-      "Take a few minutes to see what it could mean for your company:\n" +
-      invite +
-      "\n\nIf it would help, I would also welcome a short walkthrough call.";
-    let subject, opening;
-    if (v === 0) {
-      subject = "You've been invited, " + name + ". This is about your company.";
-      opening =
-        "You've been invited. This is about your company.\n\nHi,\n\nI'm " +
-        sender +
-        ", writing to you personally about " +
-        name +
-        " in " +
-        city +
-        ".\n\n" +
-        hook +
-        " " +
-        why;
-    } else if (v === 1) {
-      subject = name + " has been building a data asset for years";
-      opening =
-        "Hi,\n\nI'm " +
-        sender +
-        ", reaching out one-to-one to " +
-        name +
-        " in " +
-        city +
-        ".\n\n" +
-        hook +
-        " " +
-        why;
-    } else if (v === 2) {
-      subject = "A free Company Data Asset Profile for " + name;
-      opening =
-        "Hi,\n\nThis is " +
-        sender +
-        ". I'm writing only to " +
-        name +
-        " in " +
-        city +
-        ", not a mass mailing.\n\n" +
-        hook +
-        " " +
-        why;
-    } else {
-      subject = "Take a few minutes, " + name + ": what your records could mean";
-      opening =
-        "Hi,\n\nI'm " +
-        sender +
-        ". This note is about " +
-        name +
-        " in " +
-        city +
-        ".\n\nYou've been invited. This is about your company. " +
-        hook +
-        " " +
-        why;
-    }
+    const info = categoryInfo(lead.category);
+    const key = lead.key || lead.email || name;
+    const subjectVar = hashVar(key, 3);
+    const openingVar = hashVar(key + ":open", 3);
+    const subjects = subjectLines(name, city);
+    const openings = openingVariants(lead, sender);
+    const opening = openings[openingVar];
+    const mainBody = opening + "\n\n" + corePitch();
     const body =
-      opening +
-      "\n\n" +
-      offer +
+      mainBody +
       "\n\n" +
       PROCESS +
       "\n\n" +
-      cta +
+      closingCta() +
       "\n\n" +
       DISCLAIMER +
       "\n\n" +
-      optBlock +
+      optoutBlock(lead) +
       "\n\n" +
-      sign;
-    return { subject: subject, body: body, variation: v };
+      profileSignature();
+    return {
+      subject: subjects[subjectVar],
+      body: body,
+      mainBody: mainBody,
+      wordCount: wordCount(mainBody),
+      variation: openingVar,
+      subjectVar: subjectVar,
+      openingVar: openingVar,
+      category: info.id,
+      kind: "initial",
+    };
   }
 
+  function buildFollowUp(lead) {
+    const name = lead.name || "your company";
+    const city = lead.city || regionName(viewRegion) || "your city";
+    const sender = (store.profile.name || "Robert Walker").trim();
+    const asset = typeLine(lead.category);
+    const fv = hashVar((lead.key || lead.email || name) + ":fu", 2);
+    const subjects = [
+      "Following up: " + name + "'s Company Data Asset Profile",
+      "Still here if useful, " + name,
+    ];
+    const openings = [
+      "Hi,\n\nI wrote last week about a data asset " +
+        name +
+        " in " +
+        city +
+        " may already have — " +
+        asset +
+        " — and a free Company Data Asset Profile that describes it, with no data, files or passwords attached.",
+      "Hi,\n\nJust a short follow-up for " +
+        name +
+        " in " +
+        city +
+        ". I had asked whether the records you already run — " +
+        asset +
+        " — would be worth describing in a free Company Data Asset Profile. No data, files or passwords are involved.",
+    ];
+    const mid =
+      "If this didn't land at the right time, the page is still here. It takes a few minutes and shows exactly how a written offer is reached for a company like yours. Only the data licensing company makes an offer.\n\n" +
+      INVITE;
+    const end = "Start your free profile here when you're ready:\n" + INVITE + "\n\nQuestions? Just reply.";
+    const mainBody = openings[fv] + "\n\n" + mid;
+    const body =
+      mainBody +
+      "\n\n" +
+      end +
+      "\n\n" +
+      DISCLAIMER +
+      "\n\n" +
+      optoutBlock(lead) +
+      "\n\n" +
+      profileSignature();
+    return {
+      subject: subjects[fv],
+      body: body,
+      mainBody: mainBody,
+      wordCount: wordCount(mainBody),
+      variation: fv,
+      category: categoryKind(lead.category),
+      kind: "follow-up",
+    };
+  }
 
   function mailPayload(id) {
     const lead = leadByKey(id);
@@ -421,16 +571,18 @@
 
   function launchDraft(pack, mode, extraOpts) {
     if (!pack || !window.MailChooser) return;
+    const extra = extraOpts || {};
+    const logStatus = extra.logStatus || "contacted";
     const opts = Object.assign({
       onOpened: (info) => {
-        logEntry(pack.lead, "contacted", (info && info.id) || "mail");
+        logEntry(pack.lead, logStatus, (info && info.id) || "mail");
         refreshAfterLog();
       },
       onCopy: () => {
-        logEntry(pack.lead, "contacted", "copy");
+        logEntry(pack.lead, logStatus, "copy");
         refreshAfterLog();
       },
-    }, extraOpts || {});
+    }, extra);
     const pref = MailChooser.getPreferred && MailChooser.getPreferred();
     if (mode === "use" && pref) {
       return MailChooser.launch(pref, pack, opts);
@@ -443,6 +595,32 @@
     if (!pack) return;
     gateForLead(pack.lead, { fromDesk: true }, function () {
       launchDraft(pack, mode, { onCopy: () => handleAction("copy", id) });
+    });
+  }
+
+  function followUpPayload(id) {
+    const lead = leadByKey(id);
+    if (!lead) return null;
+    const built = buildFollowUp(lead);
+    const f = followUpFields(id);
+    return {
+      lead: lead,
+      to: lead.email || "",
+      subject: f.subject || built.subject,
+      body: f.body || built.body,
+    };
+  }
+
+  function openFollowUpChooser(id, mode) {
+    const lead = leadByKey(id);
+    if (!lead || !canFollowUp(lead)) return;
+    const pack = followUpPayload(id);
+    if (!pack) return;
+    gateForLead(lead, { fromDesk: true }, function () {
+      launchDraft(pack, mode, {
+        logStatus: "follow-up",
+        onCopy: () => handleAction("fu-copy", id),
+      });
     });
   }
 
@@ -581,14 +759,59 @@
     return currentLeads().find((l) => l.key === id) || currentAlt().find((l) => l.key === id) || null;
   }
 
-  function draftFields(id) {
-    const sub = document.getElementById("az-sub-" + cssId(id));
-    const body = document.getElementById("az-body-" + cssId(id));
+  function draftFields(id, prefix) {
+    const pfx = prefix || "az";
+    const sub = document.getElementById(pfx + "-sub-" + cssId(id));
+    const body = document.getElementById(pfx + "-body-" + cssId(id));
     return {
       subject: sub ? sub.value : "",
       body: body ? body.value : "",
     };
   }
+
+  function followUpFields(id) {
+    return draftFields(id, "az-fu");
+  }
+
+  function leadMatchesEntry(lead, e) {
+    const email = String((lead && lead.email) || "").toLowerCase().trim();
+    const name = normName(lead && lead.name);
+    const key = (lead && lead.key) || "";
+    if (key && e.id && e.id === key) return true;
+    if (email && e.email && String(e.email).toLowerCase().trim() === email) return true;
+    if (name && e.name && normName(e.name) === name) return true;
+    return false;
+  }
+
+  function hasFollowUp(lead) {
+    return store.entries.some((e) => e.status === "follow-up" && leadMatchesEntry(lead, e));
+  }
+
+  function firstContactedDate(lead) {
+    const hits = store.entries.filter((e) => e.status === "contacted" && leadMatchesEntry(lead, e));
+    if (!hits.length) return "";
+    hits.sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")));
+    return hits[0].date || "";
+  }
+
+  function daysSinceContact(lead) {
+    const day = stampFromIso(firstContactedDate(lead));
+    if (!day) return -1;
+    const today = todayStamp();
+    return Math.round((Date.parse(today + "T00:00:00") - Date.parse(day + "T00:00:00")) / 86400000);
+  }
+
+  function canFollowUp(lead) {
+    if (!lead || !String(lead.email || "").trim()) return false;
+    if (statusOf(lead) !== "contacted") return false;
+    if (hasFollowUp(lead)) return false;
+    return daysSinceContact(lead) >= 4;
+  }
+
+  function followUpCandidates() {
+    return currentLeads().filter(canFollowUp);
+  }
+
 
   function cssId(id) {
     return String(id || "").replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -605,6 +828,7 @@
     els.complete = document.getElementById("az-complete");
     els.batchBar = document.getElementById("az-batch-bar");
     els.batch = document.getElementById("az-batch");
+    els.followups = document.getElementById("az-followups");
     els.build = document.getElementById("az-build");
     els.size = document.getElementById("az-batch-size");
     els.compliance = document.getElementById("az-compliance");
@@ -948,6 +1172,75 @@
       "</tbody></table>";
   }
 
+  function renderFollowups() {
+    if (!els.followups) return;
+    const rows = followUpCandidates();
+    document.documentElement.dataset.azFollowups = String(rows.length);
+    if (!rows.length) {
+      const contacted = currentLeads().filter((l) => statusOf(l) === "contacted" && !hasFollowUp(l)).length;
+      els.followups.innerHTML =
+        "<h3 class=\"az-batch-title\">Follow-ups</h3>" +
+        "<p class=\"az-hint\">A short bump is available 4 days after first contact, once per business, and only if they have not opted out. " +
+        (contacted
+          ? contacted + " contacted " + (contacted === 1 ? "business is" : "businesses are") + " waiting for the 4-day mark."
+          : "None are waiting right now.") +
+        " This is a manual step; nothing is sent automatically.</p>";
+      return;
+    }
+    const cards = rows.map((lead, idx) => {
+      const draft = buildFollowUp(lead);
+      const id = lead.key;
+      const cid = cssId(id);
+      const days = daysSinceContact(lead);
+      return (
+        "<article class=\"az-draft az-followup\" data-az-id=\"" +
+        escapeHtml(id) +
+        "\" data-kind=\"follow-up\">" +
+        "<div class=\"az-draft-top\"><h3>" +
+        (idx + 1) +
+        ". " +
+        escapeHtml(lead.name || "Business") +
+        "</h3>" +
+        "<span class=\"badge ready\">Follow-up · day " +
+        days +
+        "</span></div>" +
+        "<p class=\"meta\">" +
+        escapeHtml(lead.category || "") +
+        (lead.city ? " · " + escapeHtml(lead.city) : "") +
+        " · " +
+        escapeHtml(lead.email) +
+        "</p>" +
+        "<label class=\"field\">Subject" +
+        "<input id=\"az-fu-sub-" +
+        cid +
+        "\" type=\"text\" value=\"" +
+        escapeHtml(draft.subject) +
+        "\"></label>" +
+        "<label class=\"field\">Draft" +
+        "<textarea id=\"az-fu-body-" +
+        cid +
+        "\">" +
+        escapeHtml(draft.body) +
+        "</textarea></label>" +
+        "<div class=\"az-actions\">" +
+        mailActionButtons(id, false).replace(/az-mail-use/g, "az-mail-use az-fu-use").replace(/az-mail-change/g, "az-mail-change az-fu-change") +
+        "<button type=\"button\" class=\"iv-btn-ghost\" data-act=\"fu-copy\" data-id=\"" +
+        escapeHtml(id) +
+        "\">Copy</button>" +
+        "<button type=\"button\" class=\"iv-btn-ghost\" data-act=\"optout\" data-id=\"" +
+        escapeHtml(id) +
+        "\">Mark opted out</button>" +
+        "</div></article>"
+      );
+    });
+    els.followups.innerHTML =
+      "<h3 class=\"az-batch-title\">Follow-ups (" +
+      rows.length +
+      ")</h3>" +
+      "<p class=\"az-hint\">Best 4–7 days after first contact. One follow-up per business. Review and send it yourself.</p>" +
+      cards.join("");
+  }
+
   function renderAll() {
     if (els.compliance) els.compliance.textContent = COMPLIANCE;
     maybeComplete(viewRegion);
@@ -955,6 +1248,7 @@
     renderComplete();
     renderStats();
     renderBatch();
+    renderFollowups();
     renderAlt();
     renderLog();
   }
@@ -968,6 +1262,22 @@
   function handleAction(act, id, ev) {
     const lead = leadByKey(id);
     if (!lead) return;
+    if (act === "fu-copy") {
+      if (!canFollowUp(lead)) return;
+      const f = followUpFields(id);
+      const built = buildFollowUp(lead);
+      const text = (f.subject || built.subject) + "\n\n" + (f.body || built.body);
+      const done = () => {
+        logEntry(lead, "follow-up", "copy");
+        refreshAfterLog();
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(done);
+      } else {
+        done();
+      }
+      return;
+    }
     if (act === "copy") {
       const f = draftFields(id);
       const text = (f.subject || "") + "\n\n" + (f.body || "");
@@ -1223,6 +1533,20 @@
           const f = draftFields(id);
           a.href = mailtoHref(lead.email, f.subject, f.body);
         }
+      });
+    }
+    if (els.followups) {
+      els.followups.addEventListener("click", (e) => {
+        const use = e.target.closest && e.target.closest(".az-mail-use, .az-mail-change");
+        if (use) {
+          e.preventDefault();
+          if (use.disabled) return;
+          const id = use.getAttribute("data-id");
+          openFollowUpChooser(id, use.classList.contains("az-mail-change") ? "change" : "use");
+          return;
+        }
+        const btn = e.target.closest && e.target.closest("[data-act]");
+        if (btn) handleAction(btn.getAttribute("data-act"), btn.getAttribute("data-id"), e);
       });
     }
     if (els.alt) {
@@ -1561,8 +1885,40 @@
         mailto: mailtoHref(lead.email, subject, body),
         compose: window.MailChooser ? MailChooser.buildAll({ to: lead.email, subject: subject, body: body }) : null,
         variation: built.variation,
+        subjectVar: built.subjectVar,
+        openingVar: built.openingVar,
+        category: built.category,
+        kind: built.kind,
+        mainBody: built.mainBody,
+        wordCount: built.wordCount,
       };
     },
+    getFollowUp: (id) => {
+      const lead = typeof id === "object" && id ? id : leadByKey(id);
+      if (!lead) return null;
+      const built = buildFollowUp(lead);
+      const f = lead.key ? followUpFields(lead.key) : { subject: "", body: "" };
+      const subject = f.subject || built.subject;
+      const body = f.body || built.body;
+      return Object.assign({}, built, {
+        id: lead.key,
+        name: lead.name,
+        email: lead.email,
+        subject: subject,
+        body: body,
+        mailto: mailtoHref(lead.email, subject, body),
+        compose: window.MailChooser ? MailChooser.buildAll({ to: lead.email, subject: subject, body: body }) : null,
+      });
+    },
+    canFollowUp: canFollowUp,
+    hasFollowUp: hasFollowUp,
+    daysSinceContact: daysSinceContact,
+    followUpCandidates: () => followUpCandidates().map((l) => l.key),
+    categoryKind: categoryKind,
+    categoryInfo: categoryInfo,
+    subjectLines: subjectLines,
+    buildDraft: buildDraft,
+    buildFollowUp: buildFollowUp,
     markSent: (id) => handleAction("sent", id),
     markOptedOut: (id) => handleAction("optout", id),
     skip: (id) => handleAction("skip", id),

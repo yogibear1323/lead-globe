@@ -1437,3 +1437,9 @@ body.mail-chooser-open { overflow: hidden; }
     min-height: 44px;
   }
 }
+
+.az-followups { margin-top: 1rem; }
+.az-followups .az-draft .field textarea[id^="az-fu-body-"] { min-height: 10rem; font-size: .82rem; line-height: 1.45; }
+@media (max-width: 768px) {
+  .az-followups .az-draft .field textarea[id^="az-fu-body-"] { min-height: 9rem; }
+}
