@@ -756,7 +756,10 @@
     if (isCall) {
       a.removeAttribute("href");
       a.setAttribute("aria-disabled", "true");
+      a.setAttribute("disabled", "disabled");
       a.classList.add("is-disabled");
+      var changeBtn = document.getElementById("outreach-mail-change");
+      if (changeBtn) { changeBtn.hidden = true; changeBtn.disabled = true; }
       if (note) {
         note.hidden = false;
         note.textContent =
@@ -768,7 +771,10 @@
     if (!email) {
       a.removeAttribute("href");
       a.setAttribute("aria-disabled", "true");
+      a.setAttribute("disabled", "disabled");
       a.classList.add("is-disabled");
+      var changeBtn2 = document.getElementById("outreach-mail-change");
+      if (changeBtn2) { changeBtn2.hidden = true; changeBtn2.disabled = true; }
       if (note) {
         note.hidden = false;
         const phone = lead && lead.phone ? " Published phone: " + lead.phone + "." : "";
@@ -779,15 +785,27 @@
       document.documentElement.dataset.outreachMailto = "no";
       return;
     }
-    a.href = buildMailto(email, fields.subject, fields.body);
+    a.removeAttribute("href");
     a.removeAttribute("aria-disabled");
+    a.removeAttribute("disabled");
     a.classList.remove("is-disabled");
+    const useLabel =
+      window.MailChooser && MailChooser.getPreferred && MailChooser.getPreferred() && MailChooser.useButtonLabel
+        ? MailChooser.useButtonLabel()
+        : "Open in email";
+    a.textContent = useLabel;
+    const change = document.getElementById("outreach-mail-change");
+    const hasPref = !!(window.MailChooser && MailChooser.getPreferred && MailChooser.getPreferred());
+    if (change) {
+      change.hidden = !hasPref;
+      change.disabled = !hasPref;
+    }
     if (note) {
       note.hidden = false;
       note.textContent =
-        "Open in email creates a single-recipient draft to " +
+        "Opens a single-recipient draft to " +
         email +
-        " in your own mail client. Review it and press Send yourself. This tool never sends mail, and it will not BCC or message more than one address.";
+        " in Gmail, Outlook, Yahoo, or your default email app. Review it and press Send yourself. This tool never sends mail, and it will not BCC or message more than one address.";
     }
     document.documentElement.dataset.outreachMailto = "yes";
   }
@@ -915,7 +933,11 @@
     const osm = l.osmUrl
       ? `<a href="${escapeHtml(l.osmUrl)}" target="_blank" rel="noopener">OpenStreetMap source</a>`
       : "—";
-    const emailShown = hideEmail() && l.source === "OSM" ? "Hidden (GDPR)" : dash(l.email);
+    const emailShown = hideEmail() && l.source === "OSM"
+      ? "Hidden (GDPR)"
+      : (publishedEmail(l)
+          ? `<a href="mailto:${escapeHtml(publishedEmail(l))}" data-contact="1">${escapeHtml(publishedEmail(l))}</a>`
+          : dash(l.email));
     const fitLine = l.fitKind === "heuristic" ? `heuristic ${l.fit}` : String(l.fit);
     const pack = scriptPackFor(l);
     const items = scriptItems(pack);
@@ -960,7 +982,10 @@
         </label>
         <div class="outreach-actions">
           <button type="button" class="iv-btn-ghost" id="outreach-copy">Copy</button>
-          <a class="iv-btn" id="outreach-mailto">Open in email</a>
+          <div class="mail-open-wrap">
+            <button type="button" class="iv-btn" id="outreach-mailto">Open in email</button>
+            <button type="button" class="iv-btn-ghost" id="outreach-mail-change">Change</button>
+          </div>
         </div>
         <p class="outreach-mail-note" id="outreach-mail-note"></p>
       </section>
@@ -1805,10 +1830,25 @@ out center tags ${cap};`;
       copyOutreach();
       return;
     }
-    const mail = e.target.closest && e.target.closest("#outreach-mailto");
-    if (mail && mail.getAttribute("aria-disabled") === "true") {
+    const mail = e.target.closest && e.target.closest("#outreach-mailto, #outreach-mail-change");
+    if (mail) {
       e.preventDefault();
+      if (mail.getAttribute("aria-disabled") === "true" || mail.disabled) return;
+      if (!selectedLead || !window.MailChooser) return;
+      const email = publishedEmail(selectedLead);
+      const fields = currentOutreachFields();
+      const pack = scriptItems(scriptPackFor(selectedLead)).find((s) => s.id === fields.scriptId);
+      if (pack && pack.kind === "call") return;
+      const payload = { to: email, subject: fields.subject, body: fields.body };
+      const opts = { onCopy: () => copyOutreach() };
+      const pref = MailChooser.getPreferred && MailChooser.getPreferred();
+      const isChange = mail.id === "outreach-mail-change";
+      if (!isChange && pref) MailChooser.launch(pref, payload, opts);
+      else MailChooser.open(payload, opts);
     }
+  });
+  document.addEventListener("leadglobe:mail-provider", () => {
+    if (selectedLead) syncMailtoLink(selectedLead);
   });
   els.q.addEventListener("input", renderList);
   els.cat.addEventListener("change", renderList);

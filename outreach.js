@@ -381,6 +381,61 @@
     return { subject: subject, body: body, variation: v };
   }
 
+
+  function mailPayload(id) {
+    const lead = leadByKey(id);
+    if (!lead) return null;
+    const f = draftFields(id);
+    return {
+      lead: lead,
+      to: lead.email || "",
+      subject: f.subject || "",
+      body: f.body || "",
+    };
+  }
+
+  function mailActionButtons(id, disabled) {
+    const pref = window.MailChooser && MailChooser.getPreferred && MailChooser.getPreferred();
+    const useLabel =
+      pref && MailChooser.useButtonLabel ? MailChooser.useButtonLabel() : "Open in email";
+    const change = pref
+      ? '<button type="button" class="iv-btn-ghost az-mail-change" data-id="' +
+        escapeHtml(id) +
+        '"' +
+        (disabled ? " disabled" : "") +
+        ">Change</button>"
+      : "";
+    return (
+      '<div class="mail-open-wrap">' +
+      '<button type="button" class="iv-btn az-mail-use" data-id="' +
+      escapeHtml(id) +
+      '"' +
+      (disabled ? " disabled" : "") +
+      ">" +
+      escapeHtml(useLabel) +
+      "</button>" +
+      change +
+      "</div>"
+    );
+  }
+
+  function openDraftChooser(id, mode) {
+    const pack = mailPayload(id);
+    if (!pack || !window.MailChooser) return;
+    const opts = {
+      onOpened: (info) => {
+        logEntry(pack.lead, "contacted", (info && info.id) || "mail");
+        refreshAfterLog();
+      },
+      onCopy: () => handleAction("copy", id),
+    };
+    const pref = MailChooser.getPreferred && MailChooser.getPreferred();
+    if (mode === "use" && pref) {
+      return MailChooser.launch(pref, pack, opts);
+    }
+    MailChooser.open(pack, opts);
+  }
+
   function mailtoHref(email, subject, body) {
     return (
       "mailto:" +
@@ -779,11 +834,7 @@
           escapeHtml(draft.body) +
           "</textarea></label>" +
           "<div class=\"az-actions\">" +
-          "<a class=\"iv-btn az-mailto\" data-id=\"" +
-          escapeHtml(id) +
-          "\" href=\"" +
-          escapeHtml(href) +
-          "\">Open in my email app</a>" +
+          mailActionButtons(id, disabled) +
           "<button type=\"button\" class=\"iv-btn-ghost\" data-act=\"copy\" data-id=\"" +
           escapeHtml(id) +
           "\">Copy</button>" +
@@ -1136,16 +1187,12 @@
     });
     if (els.batch) {
       els.batch.addEventListener("click", (e) => {
-        const mail = e.target.closest && e.target.closest("a.az-mailto");
-        if (mail) {
-          const id = mail.getAttribute("data-id");
-          const lead = leadByKey(id);
-          if (lead) {
-            const f = draftFields(id);
-            mail.href = mailtoHref(lead.email, f.subject, f.body);
-            logEntry(lead, "contacted", "mailto");
-            setTimeout(refreshAfterLog, 0);
-          }
+        const use = e.target.closest && e.target.closest(".az-mail-use, .az-mail-change");
+        if (use) {
+          e.preventDefault();
+          if (use.disabled) return;
+          const id = use.getAttribute("data-id");
+          openDraftChooser(id, use.classList.contains("az-mail-change") ? "change" : "use");
           return;
         }
         const btn = e.target.closest && e.target.closest("[data-act]");
@@ -1183,7 +1230,12 @@
     updateFlags();
   }
 
+  document.addEventListener("leadglobe:mail-provider", () => {
+    if (els.batch && els.desk && !els.desk.hidden) renderAll();
+  });
+
   function debugMarkRegionComplete(id) {
+
     const rid = id || viewRegion || FIRST_REGION;
     markComplete(rid, "debug");
     renderAll();
@@ -1242,6 +1294,7 @@
         subject: subject,
         body: body,
         mailto: mailtoHref(lead.email, subject, body),
+        compose: window.MailChooser ? MailChooser.buildAll({ to: lead.email, subject: subject, body: body }) : null,
         variation: built.variation,
       };
     },
