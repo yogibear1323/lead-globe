@@ -419,21 +419,31 @@
     );
   }
 
-  function openDraftChooser(id, mode) {
-    const pack = mailPayload(id);
+  function launchDraft(pack, mode, extraOpts) {
     if (!pack || !window.MailChooser) return;
-    const opts = {
+    const opts = Object.assign({
       onOpened: (info) => {
         logEntry(pack.lead, "contacted", (info && info.id) || "mail");
         refreshAfterLog();
       },
-      onCopy: () => handleAction("copy", id),
-    };
+      onCopy: () => {
+        logEntry(pack.lead, "contacted", "copy");
+        refreshAfterLog();
+      },
+    }, extraOpts || {});
     const pref = MailChooser.getPreferred && MailChooser.getPreferred();
     if (mode === "use" && pref) {
       return MailChooser.launch(pref, pack, opts);
     }
     MailChooser.open(pack, opts);
+  }
+
+  function openDraftChooser(id, mode) {
+    const pack = mailPayload(id);
+    if (!pack) return;
+    gateForLead(pack.lead, { fromDesk: true }, function () {
+      launchDraft(pack, mode, { onCopy: () => handleAction("copy", id) });
+    });
   }
 
   function mailtoHref(email, subject, body) {
@@ -452,13 +462,16 @@
       id: lead.key || "",
       name: lead.name || "",
       email: lead.email || "",
-      region: viewRegion || lead.regionId || "",
+      region: store.activeRegion || viewRegion || lead.regionId || "",
       status: status,
       date: nowIso(),
       via: via || "",
     });
     saveStore();
-    maybeComplete(viewRegion);
+    maybeComplete(store.activeRegion || viewRegion);
+    try {
+      document.dispatchEvent(new CustomEvent("leadglobe:outreach-log", { detail: { id: lead && lead.key, status: status, via: via || "" } }));
+    } catch (e) {}
   }
 
   function parseLeads(doc) {
@@ -1265,6 +1278,258 @@
     return true;
   }
 
+
+  function profileReady() {
+    const p = store.profile || {};
+    return !!(p.name || "").trim() && !!(p.address || "").trim();
+  }
+
+  function usesOutreachDraft(lead, regionId) {
+    if (!lead || !String(lead.email || "").trim()) return false;
+    const region = regionId || lead.regionId || selectedId || "";
+    const active = store.activeRegion || FIRST_REGION;
+    if (!region || region !== active) return false;
+    return outreachAllowed(active);
+  }
+
+  function statusDate(lead, status) {
+    const email = String((lead && lead.email) || "").toLowerCase().trim();
+    const name = normName(lead && lead.name);
+    const key = (lead && lead.key) || "";
+    const hits = store.entries.filter((e) => {
+      if (e.status !== status) return false;
+      if (key && e.id && e.id === key) return true;
+      if (email && e.email && String(e.email).toLowerCase().trim() === email) return true;
+      if (name && e.name && normName(e.name) === name) return true;
+      return false;
+    });
+    const last = hits[hits.length - 1];
+    return last ? last.date : "";
+  }
+
+  function formatStamp(iso) {
+    if (!iso) return "";
+    try {
+      return new Date(iso).toLocaleString("en-US", {
+        timeZone: TZ,
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+    } catch (e) {
+      return String(iso);
+    }
+  }
+
+  function draftForLead(lead) {
+    if (!lead || !String(lead.email || "").trim()) return null;
+    const built = buildDraft(lead);
+    const f = lead.key ? draftFields(lead.key) : { subject: "", body: "" };
+    const subject = f.subject || built.subject;
+    const body = f.body || built.body;
+    return {
+      lead: lead,
+      to: lead.email,
+      subject: subject,
+      body: body,
+      variation: built.variation,
+    };
+  }
+
+  let gateRoot = null;
+  let gateOnConfirm = null;
+  let gateOnCancel = null;
+
+  function ensureGate() {
+    if (gateRoot && document.body.contains(gateRoot)) return gateRoot;
+    gateRoot = document.createElement("div");
+    gateRoot.id = "az-gate";
+    gateRoot.className = "mail-chooser az-gate";
+    gateRoot.hidden = true;
+    gateRoot.innerHTML =
+      '<div class="mail-chooser-backdrop" data-act="cancel"></div>' +
+      '<div class="mail-chooser-panel" id="az-gate-panel" role="dialog" aria-modal="true" aria-labelledby="az-gate-title" tabindex="-1">' +
+      '<div class="mail-chooser-head"><p class="kicker" id="az-gate-title"></p>' +
+      '<button type="button" class="mail-chooser-x" data-act="cancel" aria-label="Close">×</button></div>' +
+      '<p class="az-gate-body" id="az-gate-body"></p>' +
+      '<div class="az-gate-fields" id="az-gate-fields" hidden>' +
+      '<label class="field">Your name<input id="az-gate-name" type="text" autocomplete="name"></label>' +
+      '<label class="field">Physical mailing address (required for CAN-SPAM)' +
+      '<textarea id="az-gate-address" rows="2" placeholder="Street, city, state, ZIP"></textarea></label>' +
+      '<label class="field">Your email (optional)<input id="az-gate-email" type="email" autocomplete="email"></label>' +
+      '</div>' +
+      '<p class="az-gate-error" id="az-gate-error" hidden></p>' +
+      '<div class="mail-chooser-foot">' +
+      '<button type="button" class="iv-btn" id="az-gate-confirm" data-act="confirm">Continue</button>' +
+      '<button type="button" class="iv-btn-ghost" id="az-gate-cancel" data-act="cancel">Cancel</button>' +
+      "</div></div>";
+    document.body.appendChild(gateRoot);
+    gateRoot.addEventListener("click", (e) => {
+      const act = e.target && e.target.closest && e.target.closest("[data-act]");
+      if (!act || !gateRoot.contains(act)) return;
+      const kind = act.getAttribute("data-act");
+      if (kind === "confirm") confirmGate();
+      else if (kind === "cancel") closeGate(true);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && gateRoot && !gateRoot.hidden) {
+        e.preventDefault();
+        closeGate(true);
+      }
+    });
+    return gateRoot;
+  }
+
+  function setGateOpen(on, kind) {
+    ensureGate();
+    gateRoot.hidden = !on;
+    document.body.classList.toggle("az-gate-open", !!on);
+    document.documentElement.dataset.azGate = on ? (kind || "open") : "closed";
+  }
+
+  function closeGate(runCancel) {
+    const cancel = gateOnCancel;
+    gateOnConfirm = null;
+    gateOnCancel = null;
+    setGateOpen(false, "closed");
+    if (runCancel && typeof cancel === "function") cancel();
+  }
+
+  function confirmGate() {
+    const kind = document.documentElement.dataset.azGate;
+    if (kind === "profile") {
+      const nameEl = document.getElementById("az-gate-name");
+      const addrEl = document.getElementById("az-gate-address");
+      const emailEl = document.getElementById("az-gate-email");
+      const err = document.getElementById("az-gate-error");
+      const name = nameEl ? nameEl.value.trim() : "";
+      const address = addrEl ? addrEl.value.trim() : "";
+      const email = emailEl ? emailEl.value.trim() : "";
+      if (!name || !address) {
+        if (err) {
+          err.hidden = false;
+          err.textContent = "Add your name and a physical mailing address before opening a draft. CAN-SPAM requires a valid address in commercial email.";
+        }
+        return;
+      }
+      store.profile.name = name;
+      store.profile.address = address;
+      if (emailEl) store.profile.email = email;
+      saveStore();
+      fillProfileForm();
+    }
+    const fn = gateOnConfirm;
+    gateOnConfirm = null;
+    gateOnCancel = null;
+    setGateOpen(false, "closed");
+    if (typeof fn === "function") fn();
+  }
+
+  function showGate(opts) {
+    ensureGate();
+    const o = opts || {};
+    const title = document.getElementById("az-gate-title");
+    const body = document.getElementById("az-gate-body");
+    const fields = document.getElementById("az-gate-fields");
+    const err = document.getElementById("az-gate-error");
+    const confirmBtn = document.getElementById("az-gate-confirm");
+    const cancelBtn = document.getElementById("az-gate-cancel");
+    if (title) title.textContent = o.title || "";
+    if (body) body.textContent = o.body || "";
+    if (err) {
+      err.hidden = true;
+      err.textContent = "";
+    }
+    if (fields) fields.hidden = o.kind !== "profile";
+    if (o.kind === "profile") {
+      const nameEl = document.getElementById("az-gate-name");
+      const addrEl = document.getElementById("az-gate-address");
+      const emailEl = document.getElementById("az-gate-email");
+      if (nameEl) nameEl.value = (store.profile.name || "").trim();
+      if (addrEl) addrEl.value = (store.profile.address || "").trim();
+      if (emailEl) emailEl.value = (store.profile.email || "").trim();
+    }
+    if (confirmBtn) {
+      confirmBtn.textContent = o.confirmLabel || "Continue";
+      confirmBtn.hidden = !!o.hideConfirm;
+    }
+    if (cancelBtn) {
+      cancelBtn.textContent = o.cancelLabel || "Cancel";
+      cancelBtn.hidden = !!o.hideCancel;
+    }
+    gateOnConfirm = o.onConfirm || null;
+    gateOnCancel = o.onCancel || null;
+    setGateOpen(true, o.kind || "open");
+    const panel = document.getElementById("az-gate-panel");
+    if (panel && panel.focus) panel.focus();
+    if (o.kind === "profile") {
+      const first = document.getElementById((store.profile.name || "").trim() ? "az-gate-address" : "az-gate-name");
+      if (first && first.focus) first.focus();
+    }
+  }
+
+  function gateForLead(lead, opts, proceed) {
+    if (!lead || typeof proceed !== "function") return;
+    const fromDesk = !!(opts && opts.fromDesk);
+    const st = statusOf(lead);
+    if (st === "opted-out") {
+      const when = formatStamp(statusDate(lead, "opted-out"));
+      showGate({
+        kind: "opted-out",
+        title: "This business opted out",
+        body:
+          (lead.name || "This business") +
+          " opted out" +
+          (when ? " on " + when : "") +
+          ". Lead Globe will not open a draft. Honor the opt-out and do not email them.",
+        confirmLabel: "OK",
+        hideCancel: true,
+      });
+      return;
+    }
+    const afterProfile = function () {
+      if (st === "contacted" && !fromDesk) {
+        const when = formatStamp(statusDate(lead, "contacted"));
+        showGate({
+          kind: "contacted",
+          title: "Already contacted",
+          body:
+            "You already marked " +
+            (lead.name || "this business") +
+            " as contacted" +
+            (when ? " on " + when : "") +
+            ". Open another prefilled draft anyway? This will log another contacted entry if you open it.",
+          confirmLabel: "Open anyway",
+          cancelLabel: "Cancel",
+          onConfirm: proceed,
+        });
+        return;
+      }
+      proceed();
+    };
+    if (!profileReady()) {
+      showGate({
+        kind: "profile",
+        title: "Your sending details",
+        body: "Add your name and a physical mailing address before opening a draft. They appear in the signature. CAN-SPAM requires a valid address in commercial email. Nothing is sent automatically.",
+        confirmLabel: "Save and continue",
+        cancelLabel: "Cancel",
+        onConfirm: afterProfile,
+      });
+      return;
+    }
+    afterProfile();
+  }
+
+  function openLeadMail(lead, opts) {
+    const o = opts || {};
+    const pack = draftForLead(lead);
+    if (!pack) return false;
+    gateForLead(lead, o, function () {
+      launchDraft(pack, o.mode || "use", o.onCopy ? { onCopy: o.onCopy } : {});
+    });
+    return true;
+  }
+
   const api = {
     DISCLAIMER: DISCLAIMER,
     DISCLAIMER_CONFIRMED: DISCLAIMER_CONFIRMED,
@@ -1315,6 +1580,13 @@
     getActiveRegion: () => store.activeRegion,
     getCompletedRegions: () => (store.completedRegions || []).slice(),
     getViewRegion: () => viewRegion,
+    usesOutreachDraft: usesOutreachDraft,
+    profileReady: profileReady,
+    statusOf: statusOf,
+    statusDate: statusDate,
+    draftForLead: draftForLead,
+    openLeadMail: openLeadMail,
+    formatStamp: formatStamp,
     debugMarkRegionComplete: debugMarkRegionComplete,
     debugClearComplete: debugClearComplete,
     debugUpsertLog: debugUpsertLog,

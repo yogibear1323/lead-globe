@@ -745,6 +745,45 @@
     );
   }
 
+
+  function regionIdOf() {
+    return selectedRegion && selectedRegion.properties ? selectedRegion.properties.id : "";
+  }
+
+  function usesOutreachDraft(lead) {
+    return !!(window.AzOutreach && AzOutreach.usesOutreachDraft && AzOutreach.usesOutreachDraft(lead, regionIdOf()));
+  }
+
+  function leadFromMailtoAnchor(anchor, payload) {
+    const card = anchor && anchor.closest && anchor.closest("[data-key]");
+    if (card) {
+      const key = card.getAttribute("data-key");
+      const fromList = allLeads().find((l) => l.key === key);
+      if (fromList) return fromList;
+      if (selectedLead && selectedLead.key === key) return selectedLead;
+    }
+    const to = payload && payload.to ? String(payload.to).toLowerCase().trim() : "";
+    if (selectedLead && publishedEmail(selectedLead) && publishedEmail(selectedLead).toLowerCase() === to) {
+      return selectedLead;
+    }
+    if (to) {
+      const hit = allLeads().find((l) => publishedEmail(l) && publishedEmail(l).toLowerCase() === to);
+      if (hit) return hit;
+    }
+    return null;
+  }
+
+  function installMailtoHook() {
+    if (!window.MailChooser) return;
+    MailChooser.beforeMailto = function (payload, anchor) {
+      if (!window.AzOutreach || !AzOutreach.openLeadMail) return false;
+      const lead = leadFromMailtoAnchor(anchor, payload);
+      if (!lead || !usesOutreachDraft(lead)) return false;
+      AzOutreach.openLeadMail(lead, { source: "list", mode: "use" });
+      return true;
+    };
+  }
+
   function syncMailtoLink(lead) {
     const email = publishedEmail(lead);
     const a = document.getElementById("outreach-mailto");
@@ -753,7 +792,7 @@
     const item = scriptItems(scriptPackFor(lead)).find((s) => s.id === fields.scriptId);
     const isCall = !!(item && item.kind === "call");
     if (!a) return;
-    if (isCall) {
+    if (isCall && !usesOutreachDraft(lead)) {
       a.removeAttribute("href");
       a.setAttribute("aria-disabled", "true");
       a.setAttribute("disabled", "disabled");
@@ -766,6 +805,8 @@
           "This is a call script. Copy it, or switch to an email variation to open a single-recipient draft in your own mail client.";
       }
       document.documentElement.dataset.outreachMailto = "no";
+      document.documentElement.dataset.outreachDraft = "no";
+      document.documentElement.dataset.outreachStatus = "";
       return;
     }
     if (!email) {
@@ -785,6 +826,51 @@
       document.documentElement.dataset.outreachMailto = "no";
       return;
     }
+    const statusEl = document.getElementById("outreach-log-status");
+    const az = window.AzOutreach;
+    const inOutreach = usesOutreachDraft(lead);
+    const st = inOutreach && az && az.statusOf ? az.statusOf(lead) : "";
+    if (statusEl) {
+      if (st === "opted-out") {
+        const when = az.formatStamp && az.statusDate ? az.formatStamp(az.statusDate(lead, "opted-out")) : "";
+        statusEl.hidden = false;
+        statusEl.className = "outreach-log-status is-opted";
+        statusEl.textContent =
+          (lead.name || "This business") +
+          " opted out" +
+          (when ? " on " + when : "") +
+          ". Lead Globe will not open a draft.";
+      } else if (st === "contacted") {
+        const when = az.formatStamp && az.statusDate ? az.formatStamp(az.statusDate(lead, "contacted")) : "";
+        statusEl.hidden = false;
+        statusEl.className = "outreach-log-status is-contacted";
+        statusEl.textContent =
+          "Already contacted" +
+          (when ? " on " + when : "") +
+          ". Opening again will ask you to confirm.";
+      } else {
+        statusEl.hidden = true;
+        statusEl.textContent = "";
+        statusEl.className = "outreach-log-status";
+      }
+    }
+    document.documentElement.dataset.outreachStatus = st || "";
+    document.documentElement.dataset.outreachDraft = inOutreach ? "yes" : "no";
+    if (inOutreach && st === "opted-out") {
+      a.removeAttribute("href");
+      a.setAttribute("aria-disabled", "true");
+      a.setAttribute("disabled", "disabled");
+      a.classList.add("is-disabled");
+      a.textContent = "Opted out";
+      const changeBtn3 = document.getElementById("outreach-mail-change");
+      if (changeBtn3) { changeBtn3.hidden = true; changeBtn3.disabled = true; }
+      if (note) {
+        note.hidden = false;
+        note.textContent = "This business opted out. Honor the opt-out and do not email them.";
+      }
+      document.documentElement.dataset.outreachMailto = "blocked";
+      return;
+    }
     a.removeAttribute("href");
     a.removeAttribute("aria-disabled");
     a.removeAttribute("disabled");
@@ -802,10 +888,18 @@
     }
     if (note) {
       note.hidden = false;
-      note.textContent =
-        "Opens a single-recipient draft to " +
-        email +
-        " in Gmail, Outlook, Yahoo, or your default email app. Review it and press Send yourself. This tool never sends mail, and it will not BCC or message more than one address.";
+      if (inOutreach) {
+        const place = az && az.getActiveRegion ? az.getActiveRegion() : "this state";
+        note.textContent =
+          "Opens the same personalized outreach draft as the outreach desk, prefilled to " +
+          email +
+          " (subject, the seven-step process, disclaimer, opt-out link, and your signature). Review it and press Send yourself. This tool never sends mail, and it will not BCC or message more than one address.";
+      } else {
+        note.textContent =
+          "Opens a single-recipient draft to " +
+          email +
+          " in Gmail, Outlook, Yahoo, or your default email app. Review it and press Send yourself. This tool never sends mail, and it will not BCC or message more than one address.";
+      }
     }
     document.documentElement.dataset.outreachMailto = "yes";
   }
@@ -970,6 +1064,7 @@
       </details>
       <section class="outreach" id="outreach" data-category="${escapeHtml(pack.id || "generic")}">
         <div class="kicker">Outreach</div>
+        <p class="outreach-log-status" id="outreach-log-status" hidden></p>
         <p class="outreach-note">${review}</p>
         <label class="field">Script
           <select id="outreach-script">${options}</select>
@@ -1836,13 +1931,20 @@ out center tags ${cap};`;
       if (mail.getAttribute("aria-disabled") === "true" || mail.disabled) return;
       if (!selectedLead || !window.MailChooser) return;
       const email = publishedEmail(selectedLead);
+      const isChange = mail.id === "outreach-mail-change";
+      if (usesOutreachDraft(selectedLead) && window.AzOutreach && AzOutreach.openLeadMail) {
+        AzOutreach.openLeadMail(selectedLead, {
+          source: "card",
+          mode: isChange ? "change" : "use",
+        });
+        return;
+      }
       const fields = currentOutreachFields();
       const pack = scriptItems(scriptPackFor(selectedLead)).find((s) => s.id === fields.scriptId);
       if (pack && pack.kind === "call") return;
       const payload = { to: email, subject: fields.subject, body: fields.body };
       const opts = { onCopy: () => copyOutreach() };
       const pref = MailChooser.getPreferred && MailChooser.getPreferred();
-      const isChange = mail.id === "outreach-mail-change";
       if (!isChange && pref) MailChooser.launch(pref, payload, opts);
       else MailChooser.open(payload, opts);
     }
@@ -1850,6 +1952,10 @@ out center tags ${cap};`;
   document.addEventListener("leadglobe:mail-provider", () => {
     if (selectedLead) syncMailtoLink(selectedLead);
   });
+  document.addEventListener("leadglobe:outreach-log", () => {
+    if (selectedLead) syncMailtoLink(selectedLead);
+  });
+  installMailtoHook();
   els.q.addEventListener("input", renderList);
   els.cat.addEventListener("change", renderList);
   els.sort.addEventListener("change", renderList);

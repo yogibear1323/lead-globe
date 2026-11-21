@@ -390,6 +390,7 @@
     choose: choose,
     launch: launch,
     openUrl: null,
+    beforeMailto: null,
   };
 
   function syncSelect() {
@@ -439,6 +440,15 @@
     if (!a || (root && root.contains(a))) return;
     const payload = parseMailto(a.getAttribute("href"));
     if (!payload || !payload.to) return;
+    if (typeof api.beforeMailto === "function") {
+      try {
+        if (api.beforeMailto(payload, a, e) === true) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      } catch (err) {}
+    }
     e.preventDefault();
     e.stopPropagation();
     const pref = getPreferred();

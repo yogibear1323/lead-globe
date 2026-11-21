@@ -1263,6 +1263,11 @@ body.lead-modal-open .globe-hint { visibility: hidden; pointer-events: none; }
 .outreach-actions #outreach-mail-change {
   width: auto;
 }
+.mail-open-wrap [hidden],
+.az-mail-change[hidden],
+#outreach-mail-change[hidden] {
+  display: none !important;
+}
 .mail-chooser[hidden] { display: none !important; }
 .mail-chooser {
   position: fixed;
@@ -1379,6 +1384,56 @@ body.mail-chooser-open { overflow: hidden; }
   .mail-open-wrap .iv-btn-ghost,
   .az-mail-change,
   #outreach-mail-change {
+    min-height: 44px;
+  }
+}
+
+
+/* Outreach draft status on the business card, and the sending-details / confirm gate */
+.outreach-log-status {
+  margin: 0 0 .65rem;
+  padding: .55rem .7rem;
+  border-radius: 12px;
+  border: 1px solid rgba(246, 194, 107, .45);
+  background: rgba(246, 194, 107, .12);
+  color: #f6c26b;
+  font-size: .8rem;
+  line-height: 1.4;
+}
+.outreach-log-status.is-opted {
+  border-color: rgba(232, 116, 116, .5);
+  background: rgba(232, 116, 116, .12);
+  color: #f0b0b0;
+}
+.az-gate { z-index: 95; }
+.az-gate-body {
+  margin: 0 0 .75rem;
+  font-size: .88rem;
+  line-height: 1.45;
+  color: var(--iv-ink);
+}
+.az-gate-fields { display: grid; gap: .55rem; margin: 0 0 .7rem; }
+.az-gate [hidden],
+.az-gate-fields[hidden],
+.az-gate-error[hidden] {
+  display: none !important;
+}
+.az-gate-error {
+  margin: 0 0 .7rem;
+  padding: .5rem .65rem;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 116, 116, .5);
+  background: rgba(232, 116, 116, .12);
+  color: #f0b0b0;
+  font-size: .8rem;
+  line-height: 1.4;
+}
+@media (max-width: 768px) {
+  .outreach-log-status { font-size: .86rem; }
+  .az-gate-fields input,
+  .az-gate-fields textarea,
+  #az-gate-confirm,
+  #az-gate-cancel {
     min-height: 44px;
   }
 }
