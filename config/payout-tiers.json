@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "comment": "Shared payout-estimate table for the Lead Globe research card. There are no public per-business market rates. The only public figure is the data licensing company's advertised range for company data, $100K–$5M, which also appears on Robert's invite page and in the short 'At a glance' block in config/scripts.json. Those scripts must keep citing that advertised envelope — not these per-category sub-ranges. Per-category estimates are for the in-app card (and an optional list chip) only. Never copy them into outreach email drafts, the landing page, or the opt-out page. They are not offers; only the data licensing company makes an offer.",
+  "methodology": "Each category is placed in a wide sub-range inside the advertised $100K–$5M envelope, based on how data-rich that kind of business typically is: (1) how many core systems it tends to run (CRM, accounting, field service / operations, email and related tools), (2) how many years of records those systems often hold, and (3) typical record volume (jobs, invoices, tickets, transactions). This tool does not know a given company's actual systems, years, or volume, so the bands stay wide on purpose and are labeled as rough estimates by business type. No public per-business comps exist; the advertised range is the only published dollar figure used. Lower bands are for types that usually have fewer operational systems or thinner history (for example small single-location retail). Higher bands are for types that typically run several connected systems with years of operational records (multi-system trades and field service, dealerships, healthcare). Unknown types use the full advertised envelope as the default, rather than inventing a tighter range.",
+  "advertised": {
+    "min": 100000,
+    "max": 5000000,
+    "label": "$100K–$5M",
+    "source": "The data licensing company's advertised range for company data, also shown on https://robertwalker.dataearns.com/invite and in the 'At a glance' block in config/scripts.json."
+  },
+  "defaultTier": "generic",
+  "caveat": "Your estimate by business type, within the licensing company's advertised $100K–$5M range. Not an offer; only the data licensing company makes an offer.",
+  "labelPrefix": "Rough payout estimate",
+  "tiers": [
+    {
+      "id": "photo",
+      "label": "Photo / video studio",
+      "min": 100000,
+      "max": 400000,
+      "rationale": "Studios typically keep project files, images or video, and email, but fewer long-running operational systems (no field-service or ERP stack at scale) and lower record volume than trades, fleets, or clinical practices."
+    },
+    {
+      "id": "agencies",
+      "label": "Agencies",
+      "min": 100000,
+      "max": 500000,
+      "rationale": "Usually project files, briefs, creative, and client email rather than years of request-to-invoice operational systems. System count and volume are typically lighter than field service or dealership stacks."
+    },
+    {
+      "id": "retail",
+      "label": "Retail / e-commerce",
+      "min": 100000,
+      "max": 600000,
+      "rationale": "Small single-location retail sits at the low end of the advertised envelope. Transaction, catalog, and ticket volume can be higher for larger or e-commerce operators, but this tool cannot see store count or years, so the band stays toward the lower advertised range."
+    },
+    {
+      "id": "insurance",
+      "label": "Insurance",
+      "min": 250000,
+      "max": 1000000,
+      "rationale": "Policy, CRM, and claims files can be structured and long-lived, but book size is unknown here. Mid-low to mid band inside the advertised range. (Outreach to this category remains deferred; the estimate is for the research card only.)"
+    },
+    {
+      "id": "accounting",
+      "label": "Accounting firm",
+      "min": 250000,
+      "max": 1250000,
+      "rationale": "Document-heavy, with multi-year client files and collaboration tools. The licensing company's accounting ads mention firms with 10+ employees. Volume varies widely with firm size, so the band is mid-wide."
+    },
+    {
+      "id": "saas",
+      "label": "App / SaaS",
+      "min": 400000,
+      "max": 1500000,
+      "rationale": "Support tickets, product documentation, and operations logs can span several systems, but years and volume vary a lot by product, so this sits in a mid band."
+    },
+    {
+      "id": "call-center",
+      "label": "Call center / BPO",
+      "min": 400000,
+      "max": 1500000,
+      "rationale": "Established centers can hold high ticket, chat, and call volume. They often have fewer job-to-invoice operational systems than trades, so the band is mid rather than at the top of the advertised range."
+    },
+    {
+      "id": "property",
+      "label": "Property management",
+      "min": 500000,
+      "max": 1500000,
+      "rationale": "Typically several connected systems (property, work-order, accounting, and email) and years of maintenance and resident-service records. Mid band; portfolio size is unknown."
+    },
+    {
+      "id": "logistics",
+      "label": "Logistics / fleet",
+      "min": 500000,
+      "max": 2000000,
+      "rationale": "Dispatch, shipment, fleet maintenance, and operations systems usually run together and accumulate ongoing volume. Years and fleet size are unknown, so the band is mid to mid-high."
+    },
+    {
+      "id": "contractors",
+      "label": "Contractors",
+      "min": 500000,
+      "max": 2000000,
+      "rationale": "Bids, change orders, job logs, project documents, and accounting — often multi-system when the firm is established. Not always as field-service-system-heavy as dedicated home-services trades, so the band starts slightly lower than that tier."
+    },
+    {
+      "id": "home-services",
+      "label": "Home services",
+      "min": 750000,
+      "max": 2500000,
+      "rationale": "Multi-system trades and field service typically run CRM or field-service software plus accounting and email, with years of request, quote, job, and invoice records. That pattern is data-richer than single-location retail, so this tier sits higher in the advertised envelope."
+    },
+    {
+      "id": "auto",
+      "label": "Auto dealer / auto group",
+      "min": 750000,
+      "max": 3000000,
+      "rationale": "Dealerships typically run a DMS or CRM, sales, and service-order systems with high customer and repair volume, so they sit in the upper half of the advertised range. This extract label can also include auto-repair and tyre shops, which may be thinner than a full dealer group; the band is wide for that reason."
+    },
+    {
+      "id": "manufacturing",
+      "label": "Manufacturer",
+      "min": 750000,
+      "max": 3000000,
+      "rationale": "Work orders, ERP records, and quality logs usually mean several operational systems and years of production history. The licensing company's manufacturer ads do not state a company size, so the band stays wide in the upper half."
+    },
+    {
+      "id": "medical",
+      "label": "Medical / dental",
+      "min": 1000000,
+      "max": 5000000,
+      "rationale": "Clinical, scheduling, billing, and communications systems typically hold long histories and high record volume, so healthcare sits toward the top of the advertised envelope. (Outreach to this category remains deferred; the estimate is for the research card only.)"
+    },
+    {
+      "id": "oil-gas",
+      "label": "Oil & gas",
+      "min": 1000000,
+      "max": 5000000,
+      "rationale": "Well logs, field reports, and maintenance records are specialized, often long-lived operational data. Ads for this type do not state a company size. Upper bound is the advertised cap."
+    },
+    {
+      "id": "generic",
+      "label": "General / unknown type",
+      "min": 100000,
+      "max": 5000000,
+      "rationale": "Fallback when the business type is unknown or unmapped. With no category signal, the estimate is the full advertised $100K–$5M envelope rather than a tighter invented band."
+    }
+  ]
+}

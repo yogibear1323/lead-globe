@@ -71,6 +71,7 @@
 
   let categoryConfig = { categories: [], resultCap: RESULT_CAP, overpassTimeoutSec: 25 };
   let scriptConfig = { categories: {}, inviteUrl: INVITE, reviewNote: "" };
+  let payoutConfig = null;
   let regionSets = [];
   let regions = []; // feature-like {properties, geometry}
   let osmByRegion = {}; // regionId -> leads[]
@@ -533,7 +534,7 @@
               <h2>${escapeHtml(l.name)}</h2>
               <span class="fit f${Math.min(5, Math.max(1, l.fit))}">FIT ${l.fit}${heuristic}</span>
             </div>
-            <div class="meta">${escapeHtml(l.category)} · ${escapeHtml(l.city || "")} · <span class="badge ${l.source === "seed" ? "seed" : "osm"}">${escapeHtml(l.source)}</span></div>
+            <div class="meta">${escapeHtml(l.category)} · ${escapeHtml(l.city || "")} · ${payoutEstimateHtml(l, "chip")} · <span class="badge ${l.source === "seed" ? "seed" : "osm"}">${escapeHtml(l.source)}</span></div>
             ${contactRows(l)}
             ${leadersBlock(l)}
           </article>`;
@@ -602,6 +603,111 @@
       if (re.test(lower) && packs[id]) return packs[id];
     }
     return packs.generic || { id: "generic", label: "General", emails: [], calls: [] };
+  }
+
+
+  function payoutConfigReady() {
+    return payoutConfig && Array.isArray(payoutConfig.tiers) && payoutConfig.tiers.length;
+  }
+
+  function formatPayout(n) {
+    const v = Number(n);
+    if (!isFinite(v)) return "";
+    if (v >= 1000000) {
+      const m = v / 1000000;
+      const txt = m % 1 === 0 ? String(m) : String(Math.round(m * 10) / 10);
+      return "$" + txt + "M";
+    }
+    if (v >= 1000) {
+      const k = v / 1000;
+      const txt = k % 1 === 0 ? String(k) : String(Math.round(k * 10) / 10);
+      return "$" + txt + "K";
+    }
+    return "$" + v.toLocaleString("en-US");
+  }
+
+  function payoutRangeLabel(tier) {
+    if (!tier) return "";
+    return formatPayout(tier.min) + "–" + formatPayout(tier.max);
+  }
+
+  function payoutTierById(id) {
+    if (!payoutConfigReady() || !id) return null;
+    return payoutConfig.tiers.find((t) => t.id === id) || null;
+  }
+
+  function payoutTierFor(lead) {
+    if (!payoutConfigReady()) return null;
+    const advertised = payoutConfig.advertised || { min: 100000, max: 5000000 };
+    const fallbackId = payoutConfig.defaultTier || "generic";
+    const raw = String((lead && lead.category) || "").trim();
+    const lower = raw.toLowerCase();
+    let found = null;
+    if (raw) {
+      found = payoutConfig.tiers.find((t) => t.id === lower || (t.label && t.label.toLowerCase() === lower));
+    }
+    if (!found) {
+      const pack = scriptPackFor(lead);
+      if (pack && pack.id) found = payoutTierById(pack.id);
+    }
+    if (!found) {
+      const extra = [
+        [/medical|\bdental\b|\bclinic\b|\bhospital\b|\bdoctor/, "medical"],
+        [/\binsurance\b/, "insurance"],
+      ];
+      for (const [re, id] of extra) {
+        if (re.test(lower)) {
+          found = payoutTierById(id);
+          if (found) break;
+        }
+      }
+    }
+    if (!found) found = payoutTierById(fallbackId);
+    if (!found) {
+      found = {
+        id: fallbackId,
+        label: "General / unknown type",
+        min: advertised.min,
+        max: advertised.max,
+      };
+    }
+    return found;
+  }
+
+  function payoutEstimateHtml(lead, kind) {
+    const tier = payoutTierFor(lead);
+    if (!tier) return "";
+    const range = payoutRangeLabel(tier);
+    const caveat =
+      (payoutConfig && payoutConfig.caveat) ||
+      "Your estimate by business type, within the licensing company's advertised $100K–$5M range. Not an offer; only the data licensing company makes an offer.";
+    if (kind === "chip") {
+      return (
+        '<span class="payout-chip" title="' +
+        escapeHtml(caveat) +
+        '" data-tier="' +
+        escapeHtml(tier.id) +
+        '">' +
+        escapeHtml(range) +
+        "</span>"
+      );
+    }
+    const prefix = (payoutConfig && payoutConfig.labelPrefix) || "Rough payout estimate";
+    return (
+      '<div class="payout-estimate" id="payout-estimate" data-tier="' +
+      escapeHtml(tier.id) +
+      '" data-min="' +
+      String(tier.min) +
+      '" data-max="' +
+      String(tier.max) +
+      '"><div class="payout-label">' +
+      escapeHtml(prefix) +
+      ": " +
+      escapeHtml(range) +
+      '</div><p class="payout-caveat">' +
+      escapeHtml(caveat) +
+      "</p></div>"
+    );
   }
 
   function scriptItems(pack) {
@@ -828,6 +934,7 @@
       </div>
       <h3 id="lead-modal-title">${escapeHtml(l.name)}</h3>
       <div class="meta">${escapeHtml(l.category)} · ${escapeHtml(l.city || "")} · fit ${escapeHtml(fitLine)} · <span class="badge ${l.source === "seed" ? "seed" : "osm"}">${escapeHtml(l.source)}</span></div>
+      ${payoutEstimateHtml(l, "card")}
       <p class="contact-line">${dash(l.phone)} · ${emailShown}</p>
       ${leadersBlock(l)}
       <details class="more" open>
@@ -1734,18 +1841,21 @@ out center tags ${cap};`;
   async function init() {
     ensureKeys(seedLeads);
     try {
-      const [catCfg, regionCfg, scriptCfg, leadersDoc, manifestDoc] = await Promise.all([
+      const [catCfg, regionCfg, scriptCfg, leadersDoc, manifestDoc, payoutCfg] = await Promise.all([
         loadJson("config/categories.json"),
         loadJson("config/regions.json"),
         loadJson("config/scripts.json").catch(() => ({ categories: {}, inviteUrl: INVITE })),
         loadJson("data/leaders.json").catch(() => ({ leaders: {} })),
         loadJson("data/regions/manifest.json").catch(() => ({})),
+        loadJson("config/payout-tiers.json?v=payout1").catch(() => null),
       ]);
       applyHeatManifest(manifestDoc);
       leadersById = (leadersDoc && leadersDoc.leaders) || {};
       document.documentElement.dataset.leadersLoaded = String(Object.keys(leadersById).length);
       categoryConfig = catCfg;
       scriptConfig = scriptCfg || scriptConfig;
+      payoutConfig = payoutCfg || payoutConfig;
+      document.documentElement.dataset.payoutTiers = payoutConfigReady() ? "ready" : "missing";
       if (scriptConfig.inviteUrl) {
         // Keep the in-app CTA aligned with the scripts file.
       }
@@ -1836,6 +1946,8 @@ out center tags ${cap};`;
       getVisible: () => filtered(),
       getRegions: () => regions.map((r) => r.properties),
       getSelected: () => selectedLead,
+      payoutTierFor: (lead) => payoutTierFor(lead),
+      formatPayout: (n) => formatPayout(n),
       requestOsm: (id, force) => {
         const r = regions.find((x) => x.properties.id === id) || selectedRegion;
         if (r) return requestOsm(r, { force: !!force });
